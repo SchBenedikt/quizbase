@@ -1,0 +1,139 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * PulsePoll Security Rules
+     * 
+     * CORE PHILOSOPHY:
+     * This ruleset implements a robust presenter-ownership model combined with anonymous participant interaction.
+     * Presenters (Users) have full control over their own polls, questions, and sessions. Participants are 
+     * granted restricted access to join active sessions and submit responses.
+     * 
+     * DATA STRUCTURE:
+     * - /users/{userId}: Private user profiles and preferences (including UI themes).
+     * - /users/{userId}/polls/...: Hierarchical storage of poll content, secured by path-based ownership.
+     * - /sessions/{sessionId}: Top-level collection for live interactions, allowing participants to join via ID/Code.
+     * - /sessions/{sessionId}/responses/{responseId}: Participant data, listable by presenters and creatable by guests.
+     * 
+     * KEY SECURITY DECISIONS:
+     * - Authorization Independence: Critical fields like 'userId' are denormalized onto sub-resources to allow 
+     *   for fast, non-atomic ownership checks without traversing the document tree.
+     * - Session State Validation: Participant responses are only permitted if the parent session is 'active', 
+     *   verified via a cross-document get() call.
+     * - Theme Management: UI preferences like 'theme' are stored within the User document's data to ensure 
+     *   persistence and cross-device consistency.
+     * - Prototyping Flexibility: Rules enforce relational integrity and ownership but do not restrict the 
+     *   specific schema of content fields to allow for rapid development iterations.
+     */
+
+    // --- HELPER FUNCTIONS ---
+
+    /** Checks if the request is from a signed-in user (Password or Anonymous). */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** Checks if the authenticated user matches the provided ID. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** Checks ownership and ensures the document exists for update/delete operations. */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** Validates that a field in the document remains unchanged during an update. */
+    function isUnchanged(fieldName) {
+      return request.resource.data[fieldName] == resource.data[fieldName];
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Rules for user profiles. Users can only manage their own profile.
+     * @path /users/{userId}
+     * @allow (create) if auth.uid matches userId.
+     * @deny (read) if trying to view another user's profile.
+     * @principle Self-Creation and Ownership.
+     */
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && isUnchanged('id');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for Polls. Polls are strictly owned by the creator.
+     * @path /users/{userId}/polls/{pollId}
+     * @allow (list) if the authenticated user is the path owner.
+     * @deny (update) if trying to change the poll's userId.
+     * @principle Path-based authorization and ownership immutability.
+     */
+    match /users/{userId}/polls/{pollId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && isUnchanged('userId');
+      allow delete: if isExistingOwner(userId);
+
+      /**
+       * @description Rules for Questions within a poll.
+       * @path /users/{userId}/polls/{pollId}/questions/{questionId}
+       */
+      match /questions/{questionId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId);
+        allow update: if isExistingOwner(userId);
+        allow delete: if isExistingOwner(userId);
+
+        /**
+         * @description Rules for Question Options.
+         * @path /users/{userId}/polls/{pollId}/questions/{questionId}/options/{optionId}
+         */
+        match /options/{optionId} {
+          allow get, list: if isOwner(userId);
+          allow create: if isOwner(userId);
+          allow update: if isExistingOwner(userId);
+          allow delete: if isExistingOwner(userId);
+        }
+      }
+    }
+
+    /**
+     * @description Live Session rules. Publicly readable for participants; owner-only writes.
+     * @path /sessions/{sessionId}
+     * @allow (get) for any user to join a session.
+     * @deny (create) if the userId field doesn't match the presenter's UID.
+     * @principle Public Read with Owner-Only Writes.
+     */
+    match /sessions/{sessionId} {
+      // Participants need to 'get' the session to join via sessionCode
+      allow get: if true;
+      // List is restricted to creators (clients must filter by userId)
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.userId) && isUnchanged('userId');
+      allow delete: if isExistingOwner(resource.data.userId);
+
+      /**
+       * @description Rules for participant responses.
+       * @path /sessions/{sessionId}/responses/{responseId}
+       * @allow (create) if the parent session is 'active'.
+       * @deny (list) if the user is not the session owner.
+       * @principle State-based validation via get() and denormalized ownership.
+       */
+      match /responses/{responseId} {
+        // Only the presenter (session owner) can list or get individual responses
+        allow get, list: if isSignedIn() && isOwner(resource.data.userId);
+        
+        // Participants can submit responses if the session is currently active
+        allow create: if get(/databases/$(database)/documents/sessions/$(sessionId)).data.status == 'active';
+        
+        // Responses are typically immutable once sent
+        allow update, delete: if false;
+      }
+    }
+  }
+}

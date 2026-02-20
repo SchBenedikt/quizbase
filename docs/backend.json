@@ -1,0 +1,406 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user (presenter/creator) of the PulsePoll application who creates and manages polls and sessions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the user, used for identification. Not for authentication.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Poll": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Poll",
+      "type": "object",
+      "description": "Represents a collection of interactive questions, serving as a survey or quiz created by a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Poll entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who created this poll. (Relationship: User 1:N Poll)"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title or name of the poll."
+        },
+        "description": {
+          "type": "string",
+          "description": "An optional detailed description of the poll."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the poll was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the poll was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Question": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Question",
+      "type": "object",
+      "description": "Represents a single interactive question within a poll, with a specific type and associated options if applicable.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Question entity."
+        },
+        "pollId": {
+          "type": "string",
+          "description": "Reference to the Poll this question belongs to. (Relationship: Poll 1:N Question)"
+        },
+        "text": {
+          "type": "string",
+          "description": "The actual text of the question."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of the question (e.g., 'multiple_choice', 'open_text', 'rating', 'word_cloud')."
+        },
+        "order": {
+          "type": "number",
+          "description": "The display order of the question within its poll."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the question was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the question was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "pollId",
+        "text",
+        "type",
+        "order",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "QuestionOption": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "QuestionOption",
+      "type": "object",
+      "description": "Represents a specific choice or option for a multiple-choice question within a poll.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the QuestionOption entity."
+        },
+        "questionId": {
+          "type": "string",
+          "description": "Reference to the Question this option belongs to. (Relationship: Question 1:N QuestionOption)"
+        },
+        "text": {
+          "type": "string",
+          "description": "The text displayed for this option."
+        },
+        "isCorrect": {
+          "type": "boolean",
+          "description": "Indicates if this option is the correct answer for quiz questions. Defaults to false if not a quiz."
+        },
+        "order": {
+          "type": "number",
+          "description": "The display order of the option within its question."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the option was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the option was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "questionId",
+        "text",
+        "isCorrect",
+        "order",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Session": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Session",
+      "type": "object",
+      "description": "Represents a live, interactive instance of a poll, allowing participants to join and respond in real-time.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Session entity."
+        },
+        "pollId": {
+          "type": "string",
+          "description": "Reference to the Poll that this session is based on. (Relationship: Poll 1:N Session)"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who is conducting this session. (Relationship: User 1:N Session)"
+        },
+        "sessionCode": {
+          "type": "string",
+          "description": "A unique, short code (e.g., 6 alphanumeric characters) for participants to join the session."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the session (e.g., 'created', 'active', 'paused', 'finished')."
+        },
+        "currentQuestionId": {
+          "type": "string",
+          "description": "Reference to the Question currently being displayed or responded to in the session. Null if no question is active. (Relationship: Question 1:N Session)"
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "Timestamp when the session officially started.",
+          "format": "date-time"
+        },
+        "endedAt": {
+          "type": "string",
+          "description": "Timestamp when the session officially ended.",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the session was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the session was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "pollId",
+        "userId",
+        "sessionCode",
+        "status",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ParticipantResponse": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ParticipantResponse",
+      "type": "object",
+      "description": "Represents an anonymous participant's response to a specific question within a live session. At least one of 'selectedOptionIds', 'openTextAnswer', or 'ratingValue' should be provided based on the question type.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ParticipantResponse entity."
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Reference to the Session where this response was submitted. (Relationship: Session 1:N ParticipantResponse)"
+        },
+        "questionId": {
+          "type": "string",
+          "description": "Reference to the Question to which this response applies. (Relationship: Question 1:N ParticipantResponse)"
+        },
+        "selectedOptionIds": {
+          "type": "array",
+          "description": "An array of selected option IDs for 'multiple_choice' questions. Empty or null if not applicable or no option selected.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "openTextAnswer": {
+          "type": "string",
+          "description": "The text submitted by the participant for 'open_text' or 'word_cloud' questions."
+        },
+        "ratingValue": {
+          "type": "number",
+          "description": "The numeric rating value submitted by the participant for 'rating' questions."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the response was submitted.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "questionId",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. The '{userId}' wildcard MUST match the authenticated user's UID (request.auth.uid) and the 'id' field within the document. This collection is private to the owning user."
+        }
+      },
+      {
+        "path": "/users/{userId}/polls/{pollId}",
+        "definition": {
+          "entityName": "Poll",
+          "schema": {
+            "$ref": "#/backend/entities/Poll"
+          },
+          "description": "Stores individual polls created by a user. The '{userId}' wildcard MUST match the authenticated user's UID and the 'userId' field within the document, ensuring direct ownership. This enables simple, secure listing of a user's own polls. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns this poll."
+            },
+            {
+              "name": "pollId",
+              "description": "The unique identifier for the poll."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/polls/{pollId}/questions/{questionId}",
+        "definition": {
+          "entityName": "Question",
+          "schema": {
+            "$ref": "#/backend/entities/Question"
+          },
+          "description": "Stores questions belonging to a specific poll. Includes denormalized 'userId' (owner of the parent poll) for authorization independence, allowing direct ownership checks without a 'get()' call. The '{userId}' wildcard MUST match the authenticated user's UID and the denormalized 'userId' field.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns the parent poll."
+            },
+            {
+              "name": "pollId",
+              "description": "The unique identifier for the parent poll."
+            },
+            {
+              "name": "questionId",
+              "description": "The unique identifier for the question."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/polls/{pollId}/questions/{questionId}/options/{optionId}",
+        "definition": {
+          "entityName": "QuestionOption",
+          "schema": {
+            "$ref": "#/backend/entities/QuestionOption"
+          },
+          "description": "Stores options for a specific question within a poll. Includes denormalized 'userId' (owner of the grandparent poll) for authorization independence, allowing direct ownership checks without a 'get()' call. The '{userId}' wildcard MUST match the authenticated user's UID and the denormalized 'userId' field.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user who owns the grandparent poll."
+            },
+            {
+              "name": "pollId",
+              "description": "The unique identifier for the parent poll."
+            },
+            {
+              "name": "questionId",
+              "description": "The unique identifier for the parent question."
+            },
+            {
+              "name": "optionId",
+              "description": "The unique identifier for the question option."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sessions/{sessionId}",
+        "definition": {
+          "entityName": "Session",
+          "schema": {
+            "$ref": "#/backend/entities/Session"
+          },
+          "description": "Stores details for live interactive sessions. Includes 'userId' for presenter ownership and 'sessionCode' for participant access. Presenters can list their sessions via query on 'userId'. Participants can 'get' an 'active' session by 'sessionCode'."
+        }
+      },
+      {
+        "path": "/sessions/{sessionId}/responses/{responseId}",
+        "definition": {
+          "entityName": "ParticipantResponse",
+          "schema": {
+            "$ref": "#/backend/entities/ParticipantResponse"
+          },
+          "description": "Stores anonymous responses submitted by participants to a session's question. Includes denormalized 'userId' (owner of the parent session) for presenter authorization independence to list/read responses. Anonymous 'create' operations for responses will require a 'get()' to the parent session to validate its 'status' and 'currentQuestionId' for state validation.",
+          "params": [
+            {
+              "name": "sessionId",
+              "description": "The unique identifier for the parent session."
+            },
+            {
+              "name": "responseId",
+              "description": "The unique identifier for the participant response."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for PulsePoll is designed with a strong emphasis on Authorization Independence, utilizing denormalization to ensure robust, scalable, and debuggable security rules. All documents critical for authorization (Poll, Question, QuestionOption, Session, ParticipantResponse) will include a denormalized 'userId' field, which refers to the ID of the user who owns the top-level entity (Poll or Session). This allows security rules to check ownership using `request.auth.uid == resource.data.userId` without performing expensive and non-atomic `get()` operations on parent documents, thereby supporting atomic writes and simplifying rule logic.\n\nUser-owned content (Polls, Questions, QuestionOptions) follows a clear hierarchical path structure: `/users/{userId}/polls/{pollId}/questions/{questionId}/options/{optionId}`. This naturally segregates each user's data and enables straightforward ownership checks via the path and denormalized `userId` field. This structure also inherently supports Query-as-a-Proxy (QAP) for listing a user's own polls, questions, and options, as `list` operations can be securely scoped to `request.auth.uid` matching the `{userId}` wildcard in the path.\n\nSessions, which are central to real-time interaction, are placed in a top-level collection `/sessions/{sessionId}`. This choice facilitates participant access via a unique `sessionCode` without requiring the participant to know the owner's `userId`. For presenters, this structure still supports QAPs, allowing them to `list` their own sessions using a query like `db.collection('sessions').where('userId', '==', request.auth.uid)`, as the `Session` document includes the owner's `userId`. Participants can `get` a session by its `sessionId` (or `sessionCode`) if the session's `status` is 'active', with security rules validating against the `sessionCode` field in the document.\n\nParticipant responses are stored as a subcollection under a specific session: `/sessions/{sessionId}/responses/{responseId}`. To ensure presenters can securely `list` their session's responses without `get()` calls, each `ParticipantResponse` document will include the denormalized `userId` of the session owner. For anonymous participant `create` operations, security rules will necessarily involve a `get()` call to the parent `Session` document to validate the session's current state (e.g., `status` and `currentQuestionId`). This is a controlled exception, used for *validation of state* rather than *authorization of ownership*, which is crucial for real-time interactive systems and is generally accepted where strict authorization independence for writes is not feasible without significant overhead or alternative services (like Cloud Functions).\n\nFinally, user preferences like the `theme` (e.g., `&theme=blue`) would be stored within the `/users/{userId}` document, as part of a `preferences` map, making them easily accessible and manageable by the authenticated user."
+  }
+}
