@@ -1,8 +1,13 @@
+
 "use client";
 
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useUser, useAuth } from "@/firebase";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { LogOut, User as UserIcon } from "lucide-react";
 
 interface HeaderProps {
   className?: string;
@@ -10,6 +15,15 @@ interface HeaderProps {
 }
 
 export function Header({ className, variant = 'brand' }: HeaderProps) {
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    router.push("/");
+  };
+
   return (
     <header className={cn(
       "fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300",
@@ -30,12 +44,27 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
           <Link href="#impact" className="hover:opacity-50 transition-opacity">Impact</Link>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs hover:bg-primary hover:text-background transition-colors">
-            <Link href="/join">Join</Link>
-          </Button>
-          <Button asChild className="rounded-full px-8 font-black uppercase text-xs bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all">
-            <Link href="/presenter">Dashboard</Link>
-          </Button>
+          {!user ? (
+            <>
+              <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs hover:bg-primary hover:text-background transition-colors">
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild className="rounded-full px-8 font-black uppercase text-xs bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all">
+                <Link href="/login?signup=true">Sign Up</Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs">
+                <Link href="/presenter" className="flex items-center gap-2">
+                  <UserIcon className="h-4 w-4" /> {user.displayName || "Me"}
+                </Link>
+              </Button>
+              <Button onClick={handleSignOut} className="rounded-full px-8 font-black uppercase text-xs bg-foreground text-background border-4 border-foreground hover:bg-transparent hover:text-foreground transition-all">
+                <LogOut className="h-4 w-4 mr-2" /> Out
+              </Button>
+            </>
+          )}
         </div>
       </nav>
     </header>
