@@ -1,4 +1,5 @@
 export type PollType = 'multiple-choice' | 'open-text' | 'rating' | 'slider' | 'word-cloud';
+export type AppTheme = 'orange' | 'green' | 'red' | 'blue';
 
 export interface PollQuestion {
   id: string;
@@ -16,6 +17,7 @@ export interface PollSession {
   questions: PollQuestion[];
   currentQuestionIndex: number;
   status: 'draft' | 'active' | 'paused' | 'ended';
+  theme: AppTheme;
   createdAt: number;
 }
 

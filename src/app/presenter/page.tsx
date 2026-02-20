@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PollCreator } from "@/components/poll/PollCreator";
-import { PollQuestion, PollSession } from "@/app/types/poll";
+import { PollQuestion, AppTheme } from "@/app/types/poll";
 import { Zap, ArrowLeft, Sparkles, Plus } from "lucide-react";
 
 export default function PresenterPage() {
@@ -15,7 +15,7 @@ export default function PresenterPage() {
   const [sessionTitle, setSessionTitle] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleStartSession = async (questions: PollQuestion[]) => {
+  const handleStartSession = async (questions: PollQuestion[], theme: AppTheme) => {
     if (!sessionTitle) {
       alert("Please enter a session title");
       return;
@@ -25,32 +25,28 @@ export default function PresenterPage() {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     const sessionId = Math.random().toString(36).substring(2, 12);
 
-    router.push(`/presenter/${sessionId}?code=${code}&title=${encodeURIComponent(sessionTitle)}`);
+    router.push(`/presenter/${sessionId}?code=${code}&title=${encodeURIComponent(sessionTitle)}&theme=${theme}`);
     setLoading(false);
   };
 
   if (isCreating) {
     return (
-      <div className="min-h-screen bg-background p-6 text-primary">
-        <div className="max-w-5xl mx-auto space-y-16 py-12">
-          <div className="flex items-center gap-8">
-            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-20 w-20 border-4 border-primary shadow-none">
-              <ArrowLeft className="h-10 w-10" />
+      <div className="min-h-screen bg-[#f3f3f1] p-6 text-foreground presenter-ui">
+        <div className="max-w-4xl mx-auto space-y-12 py-10">
+          <div className="flex items-center gap-6">
+            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-16 w-16 border-4 border-foreground">
+              <ArrowLeft className="h-8 w-8" />
             </Button>
-            <div className="bg-primary/10 p-6 rounded-[2.5rem] border-4 border-primary/20">
-              <Sparkles className="text-primary h-10 w-10" />
-            </div>
-            <h1 className="text-7xl font-black font-headline uppercase tracking-tighter">NEW PULSE.</h1>
+            <h1 className="text-5xl font-black uppercase tracking-tighter">NEW SESSION</h1>
           </div>
           
-          <div className="space-y-6">
-            <label htmlFor="title" className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">SESSION IDENTITY</label>
+          <div className="space-y-4">
+            <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4">TITLE</label>
             <Input 
-              id="title"
               value={sessionTitle} 
-              onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="E.G. GLOBAL KEYNOTE 2025"
-              className="text-5xl font-black h-32 border-8 border-primary bg-white/10 rounded-[3.5rem] px-12 focus-visible:ring-0 uppercase placeholder:opacity-10 shadow-none leading-none"
+              onChange={(e) => setSessionTitle(e.target.value.toUpperCase())}
+              placeholder="E.G. Q4 STRATEGY SYNC"
+              className="text-4xl font-black h-24 border-8 border-foreground bg-white rounded-[2rem] px-10 focus-visible:ring-0 uppercase placeholder:opacity-10"
             />
           </div>
 
@@ -61,30 +57,30 @@ export default function PresenterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center text-primary">
-      <div className="max-w-lg w-full text-center space-y-16">
-        <div className="bg-primary w-32 h-32 rounded-[4rem] flex items-center justify-center mx-auto border-4 border-primary animate-float">
-          <Zap className="text-background h-16 w-16" />
+    <div className="min-h-screen bg-[#f3f3f1] p-6 flex flex-col items-center justify-center text-foreground presenter-ui">
+      <div className="max-w-md w-full text-center space-y-12">
+        <div className="bg-foreground w-24 h-24 rounded-[2.5rem] flex items-center justify-center mx-auto animate-float">
+          <Zap className="text-white h-12 w-12" />
         </div>
-        <div className="space-y-6">
-          <h1 className="text-8xl font-black font-headline uppercase tracking-tighter leading-none">POP <br /> PULSE.</h1>
-          <p className="text-2xl font-bold opacity-70 uppercase tracking-[0.3em]">Command The Vibe.</p>
+        <div className="space-y-4">
+          <h1 className="text-7xl font-black uppercase tracking-tighter leading-none">POPPULSE*</h1>
+          <p className="text-xl font-black opacity-40 uppercase tracking-[0.3em]">Command The Vibe.</p>
         </div>
 
-        <Card className="border-8 border-primary rounded-[5rem] overflow-hidden bg-white/10 shadow-none">
-          <CardHeader className="bg-primary/10 pb-16 pt-16 border-b-8 border-primary">
-            <CardTitle className="text-5xl font-black uppercase tracking-tighter">READY?</CardTitle>
-            <CardDescription className="text-primary font-bold uppercase text-xs tracking-[0.4em] mt-4 opacity-50">Zero lag. Maximum impact.</CardDescription>
+        <Card className="border-8 border-foreground rounded-[4rem] overflow-hidden bg-white">
+          <CardHeader className="bg-foreground/5 pb-10 pt-10 border-b-8 border-foreground">
+            <CardTitle className="text-4xl font-black uppercase tracking-tighter">READY?</CardTitle>
+            <CardDescription className="text-foreground font-bold uppercase text-[10px] tracking-[0.4em] mt-2 opacity-50">Zero lag. Max engagement.</CardDescription>
           </CardHeader>
-          <CardContent className="p-12 space-y-6">
+          <CardContent className="p-10 space-y-4">
             <Button 
-              className="w-full h-28 text-3xl font-black rounded-[3rem] bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tighter shadow-none" 
+              className="w-full h-24 text-2xl font-black rounded-[2rem] bg-foreground text-white hover:opacity-90 transition-all uppercase tracking-tighter" 
               onClick={() => setIsCreating(true)}
             >
-              <Plus className="mr-4 h-10 w-10" /> CREATE PULSE
+              <Plus className="mr-3 h-8 w-8" /> CREATE PULSE
             </Button>
-            <Button variant="outline" className="w-full h-24 text-xl font-black rounded-[2.5rem] border-4 border-primary/20 text-primary hover:bg-primary hover:text-background uppercase tracking-[0.3em] transition-all shadow-none">
-              VIEW HISTORY
+            <Button variant="outline" className="w-full h-20 text-sm font-black rounded-[1.5rem] border-4 border-foreground/10 text-foreground hover:bg-foreground hover:text-white uppercase tracking-[0.3em] transition-all">
+              SESSION HISTORY
             </Button>
           </CardContent>
         </Card>
