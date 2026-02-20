@@ -46,7 +46,7 @@ export default function Home() {
             </p>
             
             <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-6 pt-6">
-              <div className="flex-grow bg-white/10 rounded-[2.5rem] px-10 py-4 flex items-center border-4 border-primary">
+              <div className="flex-grow bg-white/10 rounded-[2.5rem] px-10 py-4 flex items-center border-4 border-primary transition-all hover:bg-white/20">
                 <span className="font-black opacity-30 mr-2 text-xl">CODE:</span>
                 <Input 
                   value={joinCode}
@@ -56,24 +56,24 @@ export default function Home() {
                   className="border-none bg-transparent focus-visible:ring-0 text-2xl font-black p-0 placeholder:opacity-10 uppercase h-auto text-primary shadow-none"
                 />
               </div>
-              <Button type="submit" disabled={joinCode.length < 6} size="lg" className="h-24 px-12 rounded-[2.5rem] text-2xl font-black bg-primary text-background group border-4 border-primary hover:bg-transparent hover:text-primary transition-all">
+              <Button type="submit" disabled={joinCode.length < 6} size="lg" className="h-24 px-12 rounded-[2.5rem] text-2xl font-black bg-primary text-background group border-4 border-primary hover:bg-transparent hover:text-primary transition-all active:scale-95">
                 JOIN PULSE <ArrowRight className="ml-3 h-10 w-10 group-hover:translate-x-2 transition-transform" />
               </Button>
             </form>
           </div>
 
-          <div className="relative">
-            <div className="relative rounded-[5rem] overflow-hidden border-8 border-primary transform lg:rotate-3 transition-transform hover:rotate-0 duration-700">
+          <div className="relative group">
+            <div className="relative rounded-[5rem] overflow-hidden border-8 border-primary transform lg:rotate-3 transition-transform group-hover:rotate-0 duration-700">
               <Image 
                 src={heroImage?.imageUrl || "https://picsum.photos/seed/poppulse1/800/1000"} 
                 alt="PopPulse Interaction"
                 width={800}
                 height={1000}
-                className="object-cover aspect-[4/5] contrast-125"
+                className="object-cover aspect-[4/5] contrast-125 transition-all group-hover:scale-110 duration-700"
                 data-ai-hint="audience cheering"
               />
               <div className="absolute inset-0 bg-primary/10 mix-blend-multiply" />
-              <div className="absolute bottom-12 right-12 bg-background border-4 border-primary p-8 rounded-[3rem]">
+              <div className="absolute bottom-12 right-12 bg-background border-4 border-primary p-8 rounded-[3rem] animate-bounce">
                 <Zap className="h-12 w-12 fill-primary" />
               </div>
             </div>
@@ -96,7 +96,7 @@ export default function Home() {
                 { icon: ListChecks, title: "Live Polls", desc: "Make decisions in a split second." },
                 { icon: SlidersHorizontal, title: "Sliders", desc: "Measure the energy and scale of your room." }
               ].map((tool, i) => (
-                <div key={i} className="bg-background p-12 rounded-[4rem] border-4 border-background space-y-6">
+                <div key={i} className="bg-background p-12 rounded-[4rem] border-4 border-background space-y-6 transition-all hover:-translate-y-4 hover:rotate-1">
                   <tool.icon className="h-16 w-16 text-primary" />
                   <h3 className="text-4xl font-black uppercase tracking-tighter">{tool.title}</h3>
                   <p className="text-xl font-bold opacity-70 leading-tight uppercase">{tool.desc}</p>
@@ -109,14 +109,14 @@ export default function Home() {
         {/* How It Works */}
         <section id="how-it-works" className="py-40 px-6 bg-background">
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <div className="space-y-12 order-2 lg:order-1">
-               <div className="relative rounded-[5rem] overflow-hidden border-8 border-primary -rotate-3 transition-transform hover:rotate-0 duration-700">
+            <div className="space-y-12 order-2 lg:order-1 group">
+               <div className="relative rounded-[5rem] overflow-hidden border-8 border-primary -rotate-3 transition-transform group-hover:rotate-0 duration-700">
                 <Image 
                   src={featureImage?.imageUrl || "https://picsum.photos/seed/poppulse2/800/1000"} 
                   alt="Process"
                   width={800}
                   height={1000}
-                  className="object-cover aspect-[4/5] contrast-125"
+                  className="object-cover aspect-[4/5] contrast-125 transition-all group-hover:scale-105 duration-700"
                   data-ai-hint="data visualization"
                 />
               </div>
@@ -132,9 +132,9 @@ export default function Home() {
                   { step: "02", title: "SHARE", desc: "Broadcast your code. No apps, no signups for participants." },
                   { step: "03", title: "EVOLVE", desc: "Watch the energy take shape as results stream in live." }
                 ].map((s, i) => (
-                  <div key={i} className="flex gap-8 group">
-                    <span className="text-5xl font-black opacity-20 group-hover:opacity-100 transition-opacity">{s.step}</span>
-                    <div className="space-y-2">
+                  <div key={i} className="flex gap-8 group cursor-default">
+                    <span className="text-5xl font-black opacity-20 group-hover:opacity-100 group-hover:text-primary transition-all duration-300">{s.step}</span>
+                    <div className="space-y-2 transition-transform group-hover:translate-x-4 duration-300">
                       <h4 className="text-3xl font-black uppercase tracking-tighter">{s.title}</h4>
                       <p className="text-lg font-bold opacity-60 uppercase">{s.desc}</p>
                     </div>
@@ -158,7 +158,7 @@ export default function Home() {
                   { icon: MessageSquare, label: "Feedback", value: "PURE" },
                   { icon: Sparkles, label: "Experience", value: "BEYOND" }
                 ].map((item, i) => (
-                  <div key={i} className="bg-white/10 p-10 rounded-[3rem] border-4 border-background/20 flex flex-col items-center gap-4 text-background">
+                  <div key={i} className="bg-white/10 p-10 rounded-[3rem] border-4 border-background/20 flex flex-col items-center gap-4 text-background transition-all hover:bg-white/20 hover:scale-105 duration-300">
                     <item.icon className="h-10 w-10" />
                     <span className="text-4xl font-black tracking-tighter">{item.value}</span>
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">{item.label}</span>

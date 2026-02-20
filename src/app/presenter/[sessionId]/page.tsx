@@ -51,67 +51,67 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const q = MOCK_QUESTIONS[currentIdx];
 
   return (
-    <div className={cn("no-scroll flex flex-col font-body", `theme-${theme}`)}>
-      {/* Header - Fixed Height */}
-      <header className="h-[12vh] min-h-[100px] px-12 flex items-center justify-between bg-white border-b-8 border-foreground z-10">
-        <div className="flex items-center gap-6">
-          <div className="bg-foreground p-3 rounded-[1.5rem]">
-            <Zap className="text-background h-6 w-6" />
+    <div className={cn("no-scroll h-screen w-screen overflow-hidden flex flex-col font-body", `theme-${theme}`)}>
+      {/* Header - Strictly No Scroll Layout */}
+      <header className="h-[15vh] px-12 flex items-center justify-between bg-white border-b-8 border-foreground shrink-0 z-10">
+        <div className="flex items-center gap-6 overflow-hidden">
+          <div className="bg-foreground p-4 rounded-[1.5rem] shrink-0">
+            <Zap className="text-background h-8 w-8" />
           </div>
-          <h1 className="text-3xl font-black uppercase tracking-tighter truncate max-w-md">{title}</h1>
+          <h1 className="text-4xl font-black uppercase tracking-tighter truncate max-w-xl">{title}</h1>
         </div>
         
-        <div className="flex items-center gap-8">
-          <div className="text-center bg-foreground text-background px-10 py-3 rounded-[2rem]">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">PopPulse.me</p>
-            <p className="text-4xl font-black tracking-tighter leading-none mt-1">{code}</p>
+        <div className="flex items-center gap-10">
+          <div className="text-center bg-foreground text-background px-12 py-4 rounded-[2.5rem]">
+            <p className="text-[12px] font-black uppercase tracking-[0.6em] opacity-60 leading-none">JOIN CODE</p>
+            <p className="text-6xl font-black tracking-tighter leading-none mt-2">{code}</p>
           </div>
-          <div className="flex items-center gap-4 bg-foreground/5 px-6 py-3 rounded-[2rem] border-4 border-foreground">
-            <Users className="h-6 w-6" />
-            <span className="text-2xl font-black leading-none">{participantCount}</span>
+          <div className="flex items-center gap-4 bg-foreground/5 px-8 py-4 rounded-[2.5rem] border-4 border-foreground">
+            <Users className="h-8 w-8" />
+            <span className="text-4xl font-black leading-none">{participantCount}</span>
           </div>
         </div>
       </header>
 
-      {/* Main Content - Flex-1 and Overflow-Hidden to ensure no scrolling */}
-      <main className="flex-1 flex flex-col items-center justify-center p-8 bg-background overflow-hidden relative">
-        <div className="w-full max-w-6xl flex flex-col h-full justify-center space-y-6">
-          <div className="space-y-4 text-center">
-             <div className="inline-block px-6 py-1.5 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-[0.5em]">
+      {/* Main Content - No Scroll flex-grow */}
+      <main className="flex-1 min-h-0 p-12 bg-background flex flex-col items-center justify-center overflow-hidden">
+        <div className="w-full max-w-7xl h-full flex flex-col gap-8">
+          <div className="space-y-4 text-center shrink-0">
+             <div className="inline-block px-8 py-2 bg-foreground text-background rounded-full text-sm font-black uppercase tracking-[0.6em]">
                STAGE {currentIdx + 1} / {MOCK_QUESTIONS.length}
              </div>
-             <h2 className="text-6xl md:text-8xl font-black leading-[0.8] uppercase tracking-tighter">
+             <h2 className="text-7xl md:text-9xl font-black leading-[0.8] uppercase tracking-tighter text-foreground">
                {q.question}
              </h2>
           </div>
 
-          <div className="flex-1 min-h-0 flex items-center justify-center">
-            <Card className="w-full border-8 border-foreground rounded-[4rem] bg-white/50 backdrop-blur-sm p-12 h-full flex items-center justify-center">
+          <div className="flex-1 min-h-0 w-full">
+            <Card className="h-full border-8 border-foreground rounded-[5rem] bg-white/50 backdrop-blur-sm p-12 flex items-center justify-center overflow-hidden">
                <ResultChart question={q} results={results} />
             </Card>
           </div>
         </div>
       </main>
 
-      {/* Footer Controls - Fixed Height */}
-      <footer className="h-[10vh] min-h-[80px] flex items-center justify-center gap-6 bg-white border-t-8 border-foreground">
+      {/* Footer Controls - Strictly No Scroll */}
+      <footer className="h-[12vh] flex items-center justify-center gap-8 bg-white border-t-8 border-foreground shrink-0">
         <Button 
           variant="outline" 
           size="icon" 
           onClick={() => { setCurrentIdx(Math.max(0, currentIdx - 1)); setResults({}); }}
           disabled={currentIdx === 0}
-          className="h-16 w-16 rounded-full border-4 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all"
+          className="h-20 w-20 rounded-full border-4 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all"
         >
-          <ChevronLeft className="h-8 w-8" />
+          <ChevronLeft className="h-10 w-10" />
         </Button>
         
-        <div className="bg-foreground text-background px-12 py-3 rounded-[3rem] flex items-center gap-8 border-4 border-foreground">
-           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1.5rem] font-black uppercase tracking-widest text-xs px-6 py-3 h-auto">
-             <LayoutGrid className="h-5 w-5 mr-3" /> GRID
+        <div className="bg-foreground text-background px-16 py-4 rounded-[4rem] flex items-center gap-12 border-4 border-foreground">
+           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1.5rem] font-black uppercase tracking-widest text-sm px-8 py-4 h-auto">
+             <LayoutGrid className="h-6 w-6 mr-4" /> GRID
            </Button>
-           <div className="w-1 h-8 bg-background/20 rounded-full" />
-           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1.5rem] font-black uppercase tracking-widest text-xs px-6 py-3 h-auto">
-             <Timer className="h-5 w-5 mr-3" /> LOCK
+           <div className="w-1.5 h-10 bg-background/20 rounded-full" />
+           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1.5rem] font-black uppercase tracking-widest text-sm px-8 py-4 h-auto">
+             <Timer className="h-6 w-6 mr-4" /> LOCK
            </Button>
         </div>
 
@@ -120,9 +120,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           size="icon" 
           onClick={() => { setCurrentIdx(Math.min(MOCK_QUESTIONS.length - 1, currentIdx + 1)); setResults({}); }}
           disabled={currentIdx === MOCK_QUESTIONS.length - 1}
-          className="h-16 w-16 rounded-full border-4 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all"
+          className="h-20 w-20 rounded-full border-4 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all"
         >
-          <ChevronRight className="h-8 w-8" />
+          <ChevronRight className="h-10 w-10" />
         </Button>
       </footer>
     </div>
