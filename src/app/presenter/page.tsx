@@ -95,23 +95,23 @@ export default function PresenterPage() {
 
   if (isCreating) {
     return (
-      <div className="min-h-screen bg-[#f3f3f1] presenter-ui">
+      <div className="min-h-screen bg-[#f3f3f1] presenter-ui font-body">
         <Header variant="minimal" />
         <div className="max-w-4xl mx-auto px-6 space-y-12 py-10 pb-40">
-          <div className="flex items-center gap-6 mt-20">
-            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-16 w-16 border-4 border-foreground">
+          <div className="flex items-center gap-6 mt-32">
+            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-16 w-16 border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all">
               <ArrowLeft className="h-8 w-8" />
             </Button>
-            <h1 className="text-6xl font-black uppercase tracking-tighter">NEW PULSE</h1>
+            <h1 className="text-7xl font-black uppercase tracking-tighter text-primary">NEW PULSE</h1>
           </div>
           
           <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4">SESSION TITLE</label>
+            <label className="text-[12px] font-black uppercase tracking-[0.5em] opacity-40 ml-4 text-primary">SESSION IDENTITY</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value.toUpperCase())}
-              placeholder="E.G. Q4 STRATEGY SYNC"
-              className="text-4xl font-black h-24 border-8 border-foreground bg-white rounded-[2rem] px-10 focus-visible:ring-0 uppercase placeholder:opacity-10"
+              placeholder="E.G. PRODUCT VISION 2025"
+              className="text-4xl font-black h-24 border-8 border-primary bg-white rounded-[2rem] px-10 focus-visible:ring-0 uppercase placeholder:opacity-10 text-primary"
             />
           </div>
 
@@ -122,40 +122,40 @@ export default function PresenterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f3f1] presenter-ui flex flex-col">
+    <div className="min-h-screen bg-[#f3f3f1] presenter-ui flex flex-col font-body">
       <Header variant="minimal" />
       
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 grid lg:grid-cols-12 gap-12 mt-20">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 grid lg:grid-cols-12 gap-12 mt-32">
         <div className="lg:col-span-8 space-y-12">
           <div className="space-y-4">
-            <h1 className="text-8xl font-black uppercase tracking-tighter leading-none">COMMAND<br />CENTER.</h1>
-            <p className="text-2xl font-black opacity-40 uppercase tracking-[0.3em]">Ready to lead, {user.displayName || 'Presenter'}.</p>
+            <h1 className="text-9xl font-black uppercase tracking-tighter leading-none text-primary">CONTROL<br />UNIT.</h1>
+            <p className="text-2xl font-black opacity-40 uppercase tracking-[0.3em] text-primary">Welcome back, {user.displayName || 'Presenter'}.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-10">
              <Card 
-               className="border-8 border-foreground rounded-[4rem] bg-primary group hover:bg-foreground transition-all cursor-pointer overflow-hidden active:scale-95"
+               className="border-8 border-primary rounded-[4rem] bg-primary group hover:bg-primary-foreground transition-all cursor-pointer overflow-hidden active:scale-95"
                onClick={() => setIsCreating(true)}
              >
                 <CardContent className="p-12 space-y-8 flex flex-col h-full">
-                  <div className="bg-background w-24 h-24 rounded-[2.5rem] flex items-center justify-center">
+                  <div className="bg-background w-24 h-24 rounded-[2.5rem] flex items-center justify-center border-4 border-primary">
                     <Plus className="h-12 w-12 text-primary" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-5xl font-black text-background uppercase tracking-tighter">NEW PULSE</h3>
-                    <p className="text-background/60 font-black text-xs uppercase tracking-[0.3em]">Ignite interaction now</p>
+                    <h3 className="text-5xl font-black text-background group-hover:text-primary uppercase tracking-tighter">NEW PULSE</h3>
+                    <p className="text-background/60 group-hover:text-primary/60 font-black text-xs uppercase tracking-[0.3em]">START INTERACTION</p>
                   </div>
                 </CardContent>
              </Card>
 
-             <Card className="border-8 border-foreground rounded-[4rem] bg-white hover:bg-muted/10 transition-all cursor-pointer overflow-hidden active:scale-95">
+             <Card className="border-8 border-primary rounded-[4rem] bg-white hover:bg-primary/5 transition-all cursor-pointer overflow-hidden active:scale-95">
                 <CardContent className="p-12 space-y-8 flex flex-col h-full">
-                  <div className="bg-foreground w-24 h-24 rounded-[2.5rem] flex items-center justify-center">
-                    <History className="h-12 w-12 text-white" />
+                  <div className="bg-primary w-24 h-24 rounded-[2.5rem] flex items-center justify-center border-4 border-primary">
+                    <History className="h-12 w-12 text-background" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-5xl font-black text-foreground uppercase tracking-tighter">HISTORY</h3>
-                    <p className="text-foreground/40 font-black text-xs uppercase tracking-[0.3em]">Access previous pulses ({polls?.length || 0})</p>
+                    <h3 className="text-5xl font-black text-primary uppercase tracking-tighter">VAULT</h3>
+                    <p className="text-primary/40 font-black text-xs uppercase tracking-[0.3em]">{polls?.length || 0} PREVIOUS PULSES</p>
                   </div>
                 </CardContent>
              </Card>
@@ -163,29 +163,29 @@ export default function PresenterPage() {
         </div>
 
         <aside className="lg:col-span-4">
-          <Card className="border-8 border-foreground rounded-[4rem] bg-white h-fit sticky top-32">
+          <Card className="border-8 border-primary rounded-[4rem] bg-white h-fit sticky top-32">
              <CardContent className="p-12 space-y-12">
-                <h4 className="text-4xl font-black uppercase tracking-tighter border-b-8 border-foreground pb-6">STATISTICS</h4>
-                <div className="space-y-10">
+                <h4 className="text-4xl font-black uppercase tracking-tighter border-b-8 border-primary pb-6 text-primary">VITAL SIGNS</h4>
+                <div className="space-y-12">
                   {[
-                    { label: "Total Sessions", val: polls?.length || "0", icon: Activity },
-                    { label: "Total Captures", val: "1.4K", icon: TrendingUp },
-                    { label: "Global Users", val: "12K+", icon: Users }
+                    { label: "Active Sessions", val: polls?.length || "0", icon: Activity },
+                    { label: "Total Insights", val: "1.4K", icon: TrendingUp },
+                    { label: "Global Reach", val: "12K+", icon: Users }
                   ].map((stat, i) => (
-                    <div key={i} className="flex justify-between items-center group">
-                      <div className="flex items-center gap-6">
-                        <div className="p-4 bg-foreground/5 rounded-[1.5rem] group-hover:bg-primary group-hover:text-background transition-all">
-                          <stat.icon className="h-8 w-8" />
+                    <div key={i} className="flex flex-col gap-2 group">
+                      <div className="flex items-center gap-6 mb-2">
+                        <div className="p-5 bg-primary/5 rounded-[1.5rem] group-hover:bg-primary group-hover:text-background transition-all border-4 border-primary/10">
+                          <stat.icon className="h-10 w-10 text-primary group-hover:text-background" />
                         </div>
-                        <span className="text-sm font-black uppercase tracking-[0.2em] opacity-40">{stat.label}</span>
+                        <span className="text-[12px] font-black uppercase tracking-[0.3em] opacity-40 text-primary">{stat.label}</span>
                       </div>
-                      <span className="text-5xl font-black tracking-tighter">{stat.val}</span>
+                      <span className="text-7xl font-black tracking-tighter text-primary">{stat.val}</span>
                     </div>
                   ))}
                 </div>
-                <div className="bg-primary/10 p-10 rounded-[3rem] border-4 border-primary/20 transition-all hover:bg-primary/20">
-                   <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40 mb-4">Pro Insight</p>
-                   <p className="text-2xl font-black uppercase leading-tight tracking-tight">Active visuals increase engagement by 40%.</p>
+                <div className="bg-primary p-10 rounded-[3rem] border-4 border-primary transition-all">
+                   <p className="text-xs font-black uppercase tracking-[0.4em] text-background opacity-60 mb-4">SYSTEM FEEDBACK</p>
+                   <p className="text-2xl font-black uppercase leading-tight tracking-tight text-background">Dynamic visualizations are currently peaking.</p>
                 </div>
              </CardContent>
           </Card>
