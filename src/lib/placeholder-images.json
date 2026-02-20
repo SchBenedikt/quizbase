@@ -1,3 +1,16 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-poll",
+      "description": "People interacting with a digital poll on their smartphones during a presentation",
+      "imageUrl": "https://images.unsplash.com/photo-1677506048377-1099738d294d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwcmVzZW50YXRpb24lMjBpbnRlcmFjdGl2ZXxlbnwwfHx8fDE3NzE2MDAwNzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "presentation interactive"
+    },
+    {
+      "id": "feature-live",
+      "description": "Dynamic bar charts showing live polling results in a vibrant purple office setting",
+      "imageUrl": "https://images.unsplash.com/photo-1728995025396-b5141e209455?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkYXRhJTIwdmlzdWFsaXphdGlvbnxlbnwwfHx8fDE3NzE1NDgzNDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "data visualization"
+    }
+  ]
 }
