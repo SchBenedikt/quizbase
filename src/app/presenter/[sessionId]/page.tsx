@@ -23,7 +23,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const [results, setResults] = useState<Record<string, number>>({});
   
   const title = searchParams.get('title') || "New Presentation";
-  const code = searchParams.get('code') || "PULSE1";
+  const code = searchParams.get('code') || "POP123";
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,49 +49,49 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   return (
     <div className="min-h-screen bg-background flex flex-col font-body text-primary">
       {/* Header */}
-      <header className="px-12 py-6 flex items-center justify-between bg-white/10 border-b-4 border-primary">
-        <div className="flex items-center gap-6">
-          <div className="bg-primary p-3 rounded-2xl border-4 border-primary">
-            <Zap className="text-background h-6 w-6" />
+      <header className="px-12 py-8 flex items-center justify-between bg-white/10 border-b-8 border-primary">
+        <div className="flex items-center gap-8">
+          <div className="bg-primary p-4 rounded-[2rem] border-4 border-primary">
+            <Zap className="text-background h-8 w-8" />
           </div>
-          <h1 className="text-3xl font-black uppercase tracking-tighter truncate max-w-md">{title}</h1>
+          <h1 className="text-5xl font-black uppercase tracking-tighter truncate max-w-xl">{title}</h1>
         </div>
         
-        <div className="flex items-center gap-8">
-          <div className="text-center bg-primary text-background px-8 py-3 rounded-[2rem] border-4 border-primary">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Join at PulsePoll.com</p>
-            <p className="text-4xl font-black tracking-tighter">{code}</p>
+        <div className="flex items-center gap-10">
+          <div className="text-center bg-primary text-background px-12 py-4 rounded-[3rem] border-4 border-primary">
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">Join at PopPulse.me</p>
+            <p className="text-5xl font-black tracking-tighter leading-none mt-1">{code}</p>
           </div>
-          <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-full border-4 border-primary">
-            <Users className="h-6 w-6" />
-            <span className="text-2xl font-black">{participantCount}</span>
+          <div className="flex items-center gap-4 bg-white/10 px-8 py-4 rounded-[2.5rem] border-4 border-primary">
+            <Users className="h-8 w-8" />
+            <span className="text-4xl font-black leading-none">{participantCount}</span>
           </div>
-          <Button variant="ghost" size="icon" className="rounded-full h-14 w-14 border-4 border-primary hover:bg-primary hover:text-background transition-all">
-            <Share2 className="h-6 w-6" />
+          <Button variant="ghost" size="icon" className="rounded-full h-20 w-20 border-4 border-primary hover:bg-primary hover:text-background transition-all shadow-none">
+            <Share2 className="h-8 w-8" />
           </Button>
         </div>
       </header>
 
       {/* Main Display Area */}
-      <main className="flex-grow flex items-center justify-center p-16">
-        <div className="w-full max-w-6xl space-y-16 animate-in slide-in-from-bottom-8 duration-700">
-          <div className="space-y-6 text-center">
-             <div className="inline-block px-6 py-1 bg-primary text-background rounded-full text-sm font-black uppercase tracking-[0.4em]">
-               Q {currentIdx + 1} / {MOCK_QUESTIONS.length}
+      <main className="flex-grow flex items-center justify-center p-20">
+        <div className="w-full max-w-7xl space-y-20 animate-in slide-in-from-bottom-12 duration-700">
+          <div className="space-y-8 text-center">
+             <div className="inline-block px-8 py-2 bg-primary text-background rounded-full text-sm font-black uppercase tracking-[0.5em]">
+               STAGE {currentIdx + 1} / {MOCK_QUESTIONS.length}
              </div>
-             <h2 className="text-7xl md:text-9xl font-black leading-[0.8] uppercase tracking-tighter">
+             <h2 className="text-8xl md:text-[11rem] font-black leading-[0.75] uppercase tracking-tighter">
                {q.question}
              </h2>
           </div>
 
           <div className="relative">
-            <Card className="border-8 border-primary rounded-[5rem] bg-white/20 p-20 overflow-hidden">
+            <Card className="border-[12px] border-primary rounded-[6rem] bg-white/10 p-24 overflow-hidden shadow-none">
                <ResultChart question={q} results={results} />
                
                {q.type === 'open-text' && (
-                 <div className="grid grid-cols-2 gap-6 mt-12">
-                   {["BOLD IDEA!", "REALLY IMPACTFUL", "LETS DO IT", "EXCITING TIMES"].map((text, i) => (
-                     <div key={i} className="bg-primary text-background p-8 rounded-[3rem] text-2xl font-black uppercase tracking-tighter border-4 border-primary animate-in zoom-in duration-500">
+                 <div className="grid grid-cols-2 gap-8 mt-16">
+                   {["PUSH BOUNDARIES", "FAST TRACK", "SYSTEM SYNERGY", "BOLD MOVES"].map((text, i) => (
+                     <div key={i} className="bg-primary text-background p-10 rounded-[4rem] text-3xl font-black uppercase tracking-tighter border-4 border-primary animate-in zoom-in duration-500">
                         {text}
                      </div>
                    ))}
@@ -103,24 +103,24 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       </main>
 
       {/* Control Bar */}
-      <footer className="p-12 flex items-center justify-center gap-6">
+      <footer className="p-16 flex items-center justify-center gap-8">
         <Button 
           variant="outline" 
           size="icon" 
           onClick={() => { setCurrentIdx(Math.max(0, currentIdx - 1)); setResults({}); }}
           disabled={currentIdx === 0}
-          className="h-20 w-20 rounded-full border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all"
+          className="h-24 w-24 rounded-full border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all shadow-none"
         >
-          <ChevronLeft className="h-10 w-10" />
+          <ChevronLeft className="h-12 w-12" />
         </Button>
         
-        <div className="bg-primary text-background px-12 py-4 rounded-[3rem] flex items-center gap-8 border-4 border-primary">
-           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-2xl font-black uppercase tracking-widest">
-             <LayoutGrid className="h-6 w-6 mr-3" /> GRID
+        <div className="bg-primary text-background px-16 py-6 rounded-[4rem] flex items-center gap-12 border-4 border-primary">
+           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[2rem] font-black uppercase tracking-widest text-lg px-8 py-10 h-auto">
+             <LayoutGrid className="h-8 w-8 mr-4" /> GRID VIEW
            </Button>
-           <div className="w-1 h-8 bg-background/20 rounded-full" />
-           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-2xl font-black uppercase tracking-widest">
-             <Timer className="h-6 w-6 mr-3" /> TIME
+           <div className="w-1.5 h-12 bg-background/20 rounded-full" />
+           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[2rem] font-black uppercase tracking-widest text-lg px-8 py-10 h-auto">
+             <Timer className="h-8 w-8 mr-4" /> LOCK PULSE
            </Button>
         </div>
 
@@ -129,9 +129,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           size="icon" 
           onClick={() => { setCurrentIdx(Math.min(MOCK_QUESTIONS.length - 1, currentIdx + 1)); setResults({}); }}
           disabled={currentIdx === MOCK_QUESTIONS.length - 1}
-          className="h-20 w-20 rounded-full border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all"
+          className="h-24 w-24 rounded-full border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all shadow-none"
         >
-          <ChevronRight className="h-10 w-10" />
+          <ChevronRight className="h-12 w-12" />
         </Button>
       </footer>
     </div>

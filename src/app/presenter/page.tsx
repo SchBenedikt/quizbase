@@ -32,25 +32,25 @@ export default function PresenterPage() {
   if (isCreating) {
     return (
       <div className="min-h-screen bg-background p-6 text-primary">
-        <div className="max-w-4xl mx-auto space-y-12">
-          <div className="flex items-center gap-6">
-            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-16 w-16 border-4 border-primary">
-              <ArrowLeft className="h-8 w-8" />
+        <div className="max-w-5xl mx-auto space-y-16 py-12">
+          <div className="flex items-center gap-8">
+            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-20 w-20 border-4 border-primary shadow-none">
+              <ArrowLeft className="h-10 w-10" />
             </Button>
-            <div className="bg-primary/10 p-4 rounded-[2rem] border-4 border-primary/20">
-              <Sparkles className="text-primary h-8 w-8" />
+            <div className="bg-primary/10 p-6 rounded-[2.5rem] border-4 border-primary/20">
+              <Sparkles className="text-primary h-10 w-10" />
             </div>
-            <h1 className="text-5xl font-black font-headline uppercase tracking-tighter">New Pulse</h1>
+            <h1 className="text-7xl font-black font-headline uppercase tracking-tighter">NEW PULSE.</h1>
           </div>
           
-          <div className="space-y-4">
-            <label htmlFor="title" className="text-sm font-black uppercase tracking-[0.3em] opacity-40">Session Name</label>
+          <div className="space-y-6">
+            <label htmlFor="title" className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">SESSION IDENTITY</label>
             <Input 
               id="title"
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="e.g. STRATEGY 2025"
-              className="text-4xl font-black h-24 border-4 border-primary bg-white/10 rounded-[2.5rem] px-8 focus-visible:ring-0 uppercase placeholder:opacity-10"
+              placeholder="E.G. GLOBAL KEYNOTE 2025"
+              className="text-5xl font-black h-32 border-8 border-primary bg-white/10 rounded-[3.5rem] px-12 focus-visible:ring-0 uppercase placeholder:opacity-10 shadow-none leading-none"
             />
           </div>
 
@@ -62,29 +62,29 @@ export default function PresenterPage() {
 
   return (
     <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center text-primary">
-      <div className="max-w-md w-full text-center space-y-12">
-        <div className="bg-primary w-24 h-24 rounded-[3rem] flex items-center justify-center mx-auto border-4 border-primary animate-float">
-          <Zap className="text-background h-12 w-12" />
+      <div className="max-w-lg w-full text-center space-y-16">
+        <div className="bg-primary w-32 h-32 rounded-[4rem] flex items-center justify-center mx-auto border-4 border-primary animate-float">
+          <Zap className="text-background h-16 w-16" />
         </div>
-        <div className="space-y-4">
-          <h1 className="text-6xl font-black font-headline uppercase tracking-tighter">Presenter.</h1>
-          <p className="text-xl font-bold opacity-70 uppercase tracking-widest">Command the room.</p>
+        <div className="space-y-6">
+          <h1 className="text-8xl font-black font-headline uppercase tracking-tighter leading-none">POP <br /> PULSE.</h1>
+          <p className="text-2xl font-bold opacity-70 uppercase tracking-[0.3em]">Command The Vibe.</p>
         </div>
 
-        <Card className="border-4 border-primary rounded-[4rem] overflow-hidden bg-white/10">
-          <CardHeader className="bg-primary/10 pb-12 pt-12 border-b-4 border-primary">
-            <CardTitle className="text-3xl font-black uppercase tracking-tighter">Ready?</CardTitle>
-            <CardDescription className="text-primary font-bold uppercase text-xs tracking-widest opacity-60">Create a session in seconds.</CardDescription>
+        <Card className="border-8 border-primary rounded-[5rem] overflow-hidden bg-white/10 shadow-none">
+          <CardHeader className="bg-primary/10 pb-16 pt-16 border-b-8 border-primary">
+            <CardTitle className="text-5xl font-black uppercase tracking-tighter">READY?</CardTitle>
+            <CardDescription className="text-primary font-bold uppercase text-xs tracking-[0.4em] mt-4 opacity-50">Zero lag. Maximum impact.</CardDescription>
           </CardHeader>
-          <CardContent className="p-10 space-y-4">
+          <CardContent className="p-12 space-y-6">
             <Button 
-              className="w-full h-24 text-2xl font-black rounded-[2.5rem] bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tighter" 
+              className="w-full h-28 text-3xl font-black rounded-[3rem] bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tighter shadow-none" 
               onClick={() => setIsCreating(true)}
             >
-              <Plus className="mr-3 h-8 w-8" /> New Pulse
+              <Plus className="mr-4 h-10 w-10" /> CREATE PULSE
             </Button>
-            <Button variant="outline" className="w-full h-20 text-lg font-black rounded-[2rem] border-4 border-primary/20 text-primary hover:bg-primary hover:text-background uppercase tracking-widest transition-all">
-              History
+            <Button variant="outline" className="w-full h-24 text-xl font-black rounded-[2.5rem] border-4 border-primary/20 text-primary hover:bg-primary hover:text-background uppercase tracking-[0.3em] transition-all shadow-none">
+              VIEW HISTORY
             </Button>
           </CardContent>
         </Card>
