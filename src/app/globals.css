@@ -4,53 +4,55 @@
 
 @layer base {
   :root {
-    --background: 0 0% 95%; /* #f3f3f1 - Default minimalist */
-    --foreground: 35 88% 16%; /* #4c2f05 */
-    --card: 0 0% 100%;
+    --background: 33 100% 54%; /* Bold Orange #ff9312 */
+    --foreground: 35 88% 16%; /* Deep Brown #4c2f05 */
+    --card: 33 100% 54%;
     --card-foreground: 35 88% 16%;
-    --popover: 0 0% 100%;
+    --popover: 33 100% 54%;
     --popover-foreground: 35 88% 16%;
-    --primary: 33 100% 54%; /* #ff9312 */
-    --primary-foreground: 35 88% 16%;
-    --secondary: 33 100% 45%;
-    --secondary-foreground: 35 88% 16%;
-    --muted: 0 0% 90%;
+    --primary: 35 88% 16%; /* Using Brown as primary for high contrast on orange */
+    --primary-foreground: 33 100% 54%;
+    --secondary: 35 88% 25%;
+    --secondary-foreground: 33 100% 54%;
+    --muted: 35 88% 16% / 0.1;
     --muted-foreground: 35 88% 16% / 0.6;
-    --accent: 33 100% 54%;
-    --accent-foreground: 35 88% 16%;
+    --accent: 35 88% 16%;
+    --accent-foreground: 33 100% 54%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 35 88% 16% / 0.15;
-    --input: 35 88% 16% / 0.15;
-    --ring: 33 100% 54%;
+    --border: 35 88% 16% / 0.2;
+    --input: 35 88% 16% / 0.2;
+    --ring: 35 88% 16%;
     --radius: 2.5rem;
   }
 
-  /* Theme Overrides */
+  /* Presenter Dashboard UI - Minimalist Override */
+  .presenter-ui {
+    --background: 60 5% 95%; /* #f3f3f1 - Light off-white */
+    --foreground: 35 88% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 35 88% 16%;
+    --primary: 33 100% 54%; /* Primary brand orange as accent */
+    --primary-foreground: 35 88% 16%;
+    --border: 35 88% 16% / 0.1;
+  }
+
+  /* Live Themes */
   .theme-orange {
-    --primary: 33 100% 54%;
     --background: 33 100% 54%;
     --foreground: 35 88% 16%;
   }
   .theme-green {
-    --primary: 82 100% 54%; /* Lime */
     --background: 82 100% 54%;
     --foreground: 120 88% 10%;
   }
   .theme-red {
-    --primary: 15 100% 54%;
     --background: 15 100% 54%;
     --foreground: 0 88% 10%;
   }
   .theme-blue {
-    --primary: 207 100% 54%;
     --background: 207 100% 54%;
     --foreground: 215 88% 10%;
-  }
-
-  /* Presenter UI Overrides */
-  .presenter-ui {
-    --background: 60 5% 95%; /* #f3f3f1 */
   }
 }
 
@@ -62,13 +64,19 @@
     @apply bg-background text-foreground font-body antialiased transition-colors duration-300;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-headline font-black tracking-tighter;
+    @apply font-headline font-black tracking-tighter uppercase;
   }
 }
 
-/* Remove all shadows for flat expressive look */
+/* Force shadow removal across the entire app */
 .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, .shadow-none {
   box-shadow: none !important;
+}
+
+/* No scroll utility for fullscreen presentations */
+.no-scroll {
+  height: 100vh;
+  overflow: hidden;
 }
 
 .animate-float {
@@ -79,10 +87,4 @@
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
-}
-
-/* No scroll utility */
-.no-scroll {
-  height: 100vh;
-  overflow: hidden;
 }

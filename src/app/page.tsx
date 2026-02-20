@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, Layout, BarChart3, Sparkles, ArrowRight, MousePointer2, Rocket, Globe, Users, Presentation } from "lucide-react";
+import { Zap, ArrowRight, Rocket, Globe, Users, Presentation } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
@@ -35,10 +35,10 @@ export default function Home() {
             <Link href="#" className="hover:opacity-50 transition-opacity">Showcase</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs hover:bg-primary hover:text-background">
+            <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs hover:bg-primary hover:text-background transition-colors">
               <Link href="/join">Login</Link>
             </Button>
-            <Button asChild className="rounded-full px-8 font-black uppercase text-xs bg-primary text-background hover:bg-transparent hover:text-primary border-4 border-primary transition-all">
+            <Button asChild className="rounded-full px-8 font-black uppercase text-xs bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all">
               <Link href="/presenter">Host a Session</Link>
             </Button>
           </div>
@@ -71,7 +71,7 @@ export default function Home() {
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="000000" 
                   maxLength={6}
-                  className="border-none bg-transparent focus-visible:ring-0 text-2xl font-black p-0 placeholder:opacity-10 uppercase h-auto"
+                  className="border-none bg-transparent focus-visible:ring-0 text-2xl font-black p-0 placeholder:opacity-10 uppercase h-auto text-primary"
                 />
               </div>
               <Button type="submit" disabled={joinCode.length < 6} size="lg" className="h-24 px-12 rounded-[2.5rem] text-2xl font-black bg-primary text-background group border-4 border-primary hover:bg-transparent hover:text-primary transition-all">
@@ -90,7 +90,7 @@ export default function Home() {
                 className="object-cover aspect-[4/5] contrast-125"
                 data-ai-hint="audience cheering"
               />
-              <div className="absolute inset-0 bg-primary/5 mix-blend-multiply" />
+              <div className="absolute inset-0 bg-primary/10 mix-blend-multiply" />
               <div className="absolute bottom-12 right-12 bg-background border-4 border-primary p-8 rounded-[3rem]">
                 <Zap className="h-12 w-12 fill-primary" />
               </div>
@@ -98,7 +98,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Big Statement Section */}
+        {/* Features Section */}
         <section className="bg-primary py-40 px-6 border-y-8 border-primary">
           <div className="max-w-7xl mx-auto space-y-32">
             <div className="text-center space-y-10">
@@ -112,23 +112,23 @@ export default function Home() {
               </p>
             </div>
             
-            <div className="grid md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: "WordCloud", text: "Visual Vibes" },
                 { label: "Sliders", text: "Pulse Checks" },
                 { label: "Polls", text: "Instant Data" },
-                { label: "AI", text: "Insightful" }
+                { label: "AI", text: "Refined" }
               ].map((stat, i) => (
                 <div key={i} className="bg-background p-10 rounded-[3rem] border-4 border-background text-center space-y-2 group hover:bg-transparent hover:border-background transition-colors cursor-default">
                   <p className="text-4xl font-black text-primary group-hover:text-background uppercase tracking-tighter leading-none">{stat.label}</p>
-                  <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40 group-hover:text-background group-hover:opacity-100">{stat.text}</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 group-hover:text-background group-hover:opacity-100">{stat.text}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* How It Works */}
+        {/* Steps Section */}
         <section className="py-40 px-6 max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-12">
             <div className="lg:col-span-1 space-y-10">
@@ -137,9 +137,9 @@ export default function Home() {
             </div>
             <div className="lg:col-span-2 grid md:grid-cols-2 gap-8">
               {[
-                { icon: Rocket, title: "Create", desc: "Build your interactive deck with WordClouds and Sliders." },
+                { icon: Rocket, title: "Create", desc: "Build your interactive deck with AI-powered questions." },
                 { icon: Globe, title: "Invite", desc: "Share your 6-digit code. Join instantly from any device." },
-                { icon: Presentation, title: "Present", desc: "Display results live as they flow from the audience." },
+                { icon: Presentation, title: "Present", desc: "Display results live in a distraction-free fullscreen view." },
                 { icon: Users, title: "Engage", desc: "Turn passive listeners into active participants." }
               ].map((step, i) => (
                 <div key={i} className="bg-white/5 border-4 border-primary/20 p-12 rounded-[4rem] space-y-6 hover:border-primary transition-all">

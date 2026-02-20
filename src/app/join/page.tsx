@@ -24,7 +24,7 @@ export default function JoinPage() {
           <div className="bg-primary w-24 h-24 rounded-[3rem] flex items-center justify-center mx-auto border-4 border-primary rotate-6">
             <Zap className="text-background h-12 w-12" />
           </div>
-          <h1 className="text-6xl font-black font-headline tracking-tighter uppercase">Enter.</h1>
+          <h1 className="text-6xl font-black font-headline tracking-tighter uppercase leading-none">Enter.</h1>
           <p className="text-xl font-bold opacity-80 uppercase tracking-wide">Enter the 6-digit pulse code</p>
         </div>
 
@@ -48,7 +48,7 @@ export default function JoinPage() {
               JOIN VIBE <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
             </Button>
             
-            <div className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.3em] opacity-40">
+            <div className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] opacity-40">
               <Sparkles className="h-4 w-4" /> Live Connection Established
             </div>
           </CardContent>
