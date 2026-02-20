@@ -1,10 +1,11 @@
-export type PollType = 'multiple-choice' | 'open-text' | 'rating';
+export type PollType = 'multiple-choice' | 'open-text' | 'rating' | 'slider' | 'word-cloud';
 
 export interface PollQuestion {
   id: string;
   type: PollType;
   question: string;
   options?: string[]; // For multiple choice
+  range?: { min: number; max: number; step: number }; // For slider
   createdAt: number;
 }
 
@@ -23,6 +24,6 @@ export interface PollResponse {
   sessionId: string;
   questionId: string;
   participantId: string;
-  value: string; // The choice index or open text response
+  value: string | number; // Choice index, open text, or slider value
   timestamp: number;
 }

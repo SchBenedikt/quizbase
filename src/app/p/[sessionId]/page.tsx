@@ -4,15 +4,16 @@ import { useState, use } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Zap, Send, Star, Heart } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Zap, Send, Star, Heart, Cloud, SlidersHorizontal } from "lucide-react";
 import { PollQuestion } from "@/app/types/poll";
 
 // Mock question for the participant view
 const MOCK_CURRENT_QUESTION: PollQuestion = {
   id: '1',
-  type: 'multiple-choice',
-  question: "What is the primary benefit of our new strategy?",
-  options: ["Growth", "Stability", "Innovation", "Efficiency"],
+  type: 'word-cloud',
+  question: "What's the one word that describes your weekend?",
   createdAt: Date.now()
 };
 
@@ -20,8 +21,9 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const resolvedParams = use(params);
   const [voted, setVoted] = useState(false);
   const [selection, setSelection] = useState<number | null>(null);
-  const [openText, setOpenText] = useState("");
+  const [textValue, setTextValue] = useState("");
   const [rating, setRating] = useState(0);
+  const [sliderValue, setSliderValue] = useState(50);
 
   const handleSubmit = () => {
     setVoted(true);
@@ -88,13 +90,29 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           </div>
         )}
 
-        {q.type === 'open-text' && (
-          <div className="space-y-4">
-            <Textarea 
-              placeholder="YOUR RESPONSE..."
-              value={openText}
-              onChange={(e) => setOpenText(e.target.value)}
-              className="min-h-[250px] text-2xl font-black p-10 rounded-[4rem] border-4 border-primary bg-white/10 focus-visible:ring-0 placeholder:opacity-20 uppercase shadow-none"
+        {q.type === 'word-cloud' && (
+          <div className="space-y-6">
+            <Input 
+              placeholder="ONE WORD..."
+              value={textValue}
+              onChange={(e) => setTextValue(e.target.value.toUpperCase())}
+              className="h-24 text-4xl font-black px-8 rounded-[3rem] border-4 border-primary bg-white/10 focus-visible:ring-0 placeholder:opacity-20 uppercase shadow-none"
+            />
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 text-center">Type your word to join the cloud</p>
+          </div>
+        )}
+
+        {q.type === 'slider' && (
+          <div className="space-y-12 py-10">
+            <div className="text-center">
+              <span className="text-9xl font-black tracking-tighter">{sliderValue}</span>
+            </div>
+            <Slider 
+              value={[sliderValue]}
+              onValueChange={(v) => setSliderValue(v[0])}
+              max={100}
+              step={1}
+              className="py-4"
             />
           </div>
         )}
@@ -114,7 +132,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         )}
 
         <Button 
-          disabled={selection === null && !openText && !rating}
+          disabled={selection === null && !textValue && !rating && q.type !== 'slider'}
           onClick={handleSubmit}
           className="w-full h-24 text-2xl font-black rounded-[3.5rem] bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all mt-8 uppercase tracking-tighter shadow-none"
         >

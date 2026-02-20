@@ -1,12 +1,25 @@
+"use client";
+
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, Layout, BarChart3, Sparkles, ArrowRight, MousePointer2, Rocket, Globe } from "lucide-react";
+import { Zap, Layout, BarChart3, Sparkles, ArrowRight, MousePointer2, Rocket, Globe, Users, Presentation } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function Home() {
+  const [joinCode, setJoinCode] = useState("");
+  const router = useRouter();
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-poll');
+
+  const handleJoin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (joinCode.length >= 6) {
+      router.push(`/p/${joinCode.toUpperCase()}`);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-primary">
@@ -26,7 +39,7 @@ export default function Home() {
               <Link href="/join">Login</Link>
             </Button>
             <Button asChild className="rounded-full px-8 font-black uppercase text-xs bg-primary text-background hover:bg-transparent hover:text-primary border-4 border-primary transition-all">
-              <Link href="/presenter">Get Started</Link>
+              <Link href="/presenter">Host a Session</Link>
             </Button>
           </div>
         </nav>
@@ -41,26 +54,30 @@ export default function Home() {
                 New Era of Interaction
               </div>
               <h1 className="text-8xl md:text-[10rem] font-black leading-[0.8] tracking-tighter uppercase">
-                Your <br />
-                Voice. <br />
-                <span className="opacity-30 italic">Live.</span>
+                YOUR <br />
+                VOICE. <br />
+                <span className="opacity-30 italic">LIVE.</span>
               </h1>
             </div>
             <p className="text-2xl md:text-3xl font-bold max-w-xl leading-none uppercase tracking-tight">
-              Static slides are dead. Transform your audience into an active energy field.
+              Transform your classroom or office into an active energy field.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 pt-6">
+            
+            <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-6 pt-6">
               <div className="flex-grow bg-white/10 rounded-[2.5rem] px-10 py-4 flex items-center border-4 border-primary">
-                <span className="font-black opacity-30 mr-2 text-xl">poppulse.me/</span>
+                <span className="font-black opacity-30 mr-2 text-xl">CODE:</span>
                 <Input 
-                  placeholder="USERNAME" 
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                  placeholder="000000" 
+                  maxLength={6}
                   className="border-none bg-transparent focus-visible:ring-0 text-2xl font-black p-0 placeholder:opacity-10 uppercase h-auto"
                 />
               </div>
-              <Button size="lg" className="h-24 px-12 rounded-[2.5rem] text-2xl font-black bg-primary text-background group border-4 border-primary hover:bg-transparent hover:text-primary transition-all">
-                CLAIM NOW <ArrowRight className="ml-3 h-10 w-10 group-hover:translate-x-2 transition-transform" />
+              <Button type="submit" disabled={joinCode.length < 6} size="lg" className="h-24 px-12 rounded-[2.5rem] text-2xl font-black bg-primary text-background group border-4 border-primary hover:bg-transparent hover:text-primary transition-all">
+                JOIN PULSE <ArrowRight className="ml-3 h-10 w-10 group-hover:translate-x-2 transition-transform" />
               </Button>
-            </div>
+            </form>
           </div>
 
           <div className="relative">
@@ -70,11 +87,11 @@ export default function Home() {
                 alt="PopPulse Interaction"
                 width={800}
                 height={1000}
-                className="object-cover aspect-[4/5] grayscale contrast-150"
+                className="object-cover aspect-[4/5] contrast-125"
                 data-ai-hint="audience cheering"
               />
-              <div className="absolute inset-0 bg-primary/10 mix-blend-multiply" />
-              <div className="absolute bottom-12 right-12 bg-background border-4 border-primary p-8 rounded-[3rem] animate-float">
+              <div className="absolute inset-0 bg-primary/5 mix-blend-multiply" />
+              <div className="absolute bottom-12 right-12 bg-background border-4 border-primary p-8 rounded-[3rem]">
                 <Zap className="h-12 w-12 fill-primary" />
               </div>
             </div>
@@ -86,23 +103,24 @@ export default function Home() {
           <div className="max-w-7xl mx-auto space-y-32">
             <div className="text-center space-y-10">
               <h2 className="text-7xl md:text-[12rem] font-black text-background leading-[0.75] uppercase tracking-tighter">
-                NO FRICTION. <br />
-                JUST FLOW.
+                STUDENTS. <br />
+                WORKERS. <br />
+                FLOW.
               </h2>
               <p className="text-background/90 text-2xl md:text-4xl font-black max-w-4xl mx-auto uppercase tracking-tighter leading-none italic">
-                The fastest way to get a room talking. No apps, no logins, no excuses.
+                From lecture halls to boardrooms. Word clouds, sliders, and real-time vibe checks.
               </p>
             </div>
             
             <div className="grid md:grid-cols-4 gap-4">
               {[
-                { label: "10ms", text: "Latency" },
-                { label: "1M+", text: "Participants" },
-                { label: "0", text: "Friction" },
-                { label: "100%", text: "Live" }
+                { label: "WordCloud", text: "Visual Vibes" },
+                { label: "Sliders", text: "Pulse Checks" },
+                { label: "Polls", text: "Instant Data" },
+                { label: "AI", text: "Insightful" }
               ].map((stat, i) => (
                 <div key={i} className="bg-background p-10 rounded-[3rem] border-4 border-background text-center space-y-2 group hover:bg-transparent hover:border-background transition-colors cursor-default">
-                  <p className="text-6xl font-black text-primary group-hover:text-background">{stat.label}</p>
+                  <p className="text-4xl font-black text-primary group-hover:text-background uppercase tracking-tighter leading-none">{stat.label}</p>
                   <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40 group-hover:text-background group-hover:opacity-100">{stat.text}</p>
                 </div>
               ))}
@@ -115,14 +133,14 @@ export default function Home() {
           <div className="grid lg:grid-cols-3 gap-12">
             <div className="lg:col-span-1 space-y-10">
               <h3 className="text-6xl font-black uppercase tracking-tighter leading-none">THE <br />PROCESS.</h3>
-              <p className="text-xl font-bold uppercase opacity-60">Three steps to pure engagement. It is really that simple.</p>
+              <p className="text-xl font-bold uppercase opacity-60">Three steps to pure engagement for any presentation.</p>
             </div>
             <div className="lg:col-span-2 grid md:grid-cols-2 gap-8">
               {[
-                { icon: Rocket, title: "Launch", desc: "Create your pulse session in under 30 seconds." },
-                { icon: Globe, title: "Broadcast", desc: "Share your unique code. Audience joins instantly." },
-                { icon: MousePointer2, title: "Interact", desc: "Watch live data flow into your screen." },
-                { icon: Sparkles, title: "Analyze", desc: "AI-driven summaries of the collective vibe." }
+                { icon: Rocket, title: "Create", desc: "Build your interactive deck with WordClouds and Sliders." },
+                { icon: Globe, title: "Invite", desc: "Share your 6-digit code. Join instantly from any device." },
+                { icon: Presentation, title: "Present", desc: "Display results live as they flow from the audience." },
+                { icon: Users, title: "Engage", desc: "Turn passive listeners into active participants." }
               ].map((step, i) => (
                 <div key={i} className="bg-white/5 border-4 border-primary/20 p-12 rounded-[4rem] space-y-6 hover:border-primary transition-all">
                   <div className="bg-primary text-background w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-4 border-primary">
@@ -133,32 +151,6 @@ export default function Home() {
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* Impact Section */}
-        <section className="bg-primary py-32 px-6 overflow-hidden">
-          <div className="flex animate-marquee whitespace-nowrap gap-12 items-center">
-            {Array(5).fill("IMPACTFUL").map((text, i) => (
-              <span key={i} className="text-[12rem] font-black text-background opacity-20 uppercase tracking-tighter italic">
-                {text}
-              </span>
-            ))}
-          </div>
-          <div className="max-w-7xl mx-auto mt-24 grid md:grid-cols-3 gap-8">
-            {[
-              { icon: Layout, title: "BOLD UI", desc: "High-contrast layouts designed for big screens." },
-              { icon: BarChart3, title: "DATA VIBE", desc: "Beautifully animated real-time results." },
-              { icon: Sparkles, title: "AI POWER", desc: "Refine questions and summarize feedback instantly." },
-            ].map((f, i) => (
-              <div key={i} className="bg-background border-4 border-background p-12 rounded-[4rem] space-y-6 hover:bg-transparent hover:border-background group transition-all">
-                <div className="bg-primary text-background w-20 h-20 rounded-[2rem] flex items-center justify-center group-hover:rotate-12 transition-transform border-4 border-primary">
-                  <f.icon className="h-10 w-10" />
-                </div>
-                <h3 className="text-4xl font-black uppercase text-primary group-hover:text-background">{f.title}</h3>
-                <p className="text-xl font-bold text-primary opacity-70 group-hover:text-background group-hover:opacity-100">{f.desc}</p>
-              </div>
-            ))}
           </div>
         </section>
       </main>
