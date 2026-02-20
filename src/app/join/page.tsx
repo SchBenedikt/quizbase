@@ -18,49 +18,48 @@ export default function JoinPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6 flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen bg-background p-6 flex items-center justify-center overflow-hidden text-primary">
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute -bottom-1/4 -left-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-1/4 -left-1/4 w-[700px] h-[700px] bg-primary/5 rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-md w-full relative z-10 space-y-12">
-        <div className="text-center space-y-4">
-          <div className="bg-primary w-16 h-16 rounded-[1.5rem] flex items-center justify-center mx-auto shadow-2xl shadow-primary/30">
-            <Zap className="text-white h-8 w-8" />
+        <div className="text-center space-y-6">
+          <div className="bg-primary w-24 h-24 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-2xl shadow-primary/30 rotate-3">
+            <Zap className="text-background h-12 w-12" />
           </div>
-          <h1 className="text-4xl font-black font-headline text-accent">PulsePoll</h1>
-          <p className="text-muted-foreground font-medium">Join a presentation instantly</p>
+          <h1 className="text-5xl font-black font-headline tracking-tighter">Enter the Pulse.</h1>
+          <p className="text-xl font-bold opacity-80">Type the 6-digit code to join the live session.</p>
         </div>
 
-        <Card className="border-none shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2.5rem] overflow-hidden bg-white/90 backdrop-blur-md">
-          <CardContent className="p-10 space-y-8">
+        <Card className="border-none shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] rounded-[3rem] overflow-hidden bg-white">
+          <CardContent className="p-12 space-y-10">
             <div className="space-y-4 text-center">
-              <label className="text-sm font-black text-muted-foreground uppercase tracking-[0.2em]">Session Code</label>
               <Input 
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="ABCDEF"
+                placeholder="ABC-DEF"
                 maxLength={6}
-                className="text-5xl font-black text-center h-24 border-none bg-secondary/20 focus-visible:ring-primary rounded-[1.5rem] uppercase tracking-widest placeholder:opacity-30"
+                className="text-6xl font-black text-center h-32 border-none bg-background/30 focus-visible:ring-primary rounded-[2rem] uppercase tracking-tighter placeholder:opacity-10"
               />
             </div>
             
             <Button 
               disabled={code.length < 6}
               onClick={handleJoin}
-              className="w-full h-20 text-xl font-bold rounded-2xl shadow-xl shadow-primary/30 group transition-all"
+              className="w-full h-24 text-2xl font-black rounded-3xl shadow-2xl shadow-primary/30 group transition-all"
             >
-              Join Session <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+              Join Presentation <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
             </Button>
             
-            <div className="flex items-center justify-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
-              <Sparkles className="h-3 w-3 text-primary" /> Dynamic Real-time Feedback
+            <div className="flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.2em] opacity-40">
+              <Sparkles className="h-4 w-4" /> Real-time active
             </div>
           </CardContent>
         </Card>
         
-        <p className="text-center text-xs text-muted-foreground">By joining, you agree to participate anonymously in this PulsePoll session.</p>
+        <p className="text-center text-sm font-bold opacity-40">Join anonymously. Be heard instantly.</p>
       </div>
     </div>
   );
