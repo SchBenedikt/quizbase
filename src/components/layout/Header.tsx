@@ -11,9 +11,12 @@ interface HeaderProps {
 
 export function Header({ className, variant = 'brand' }: HeaderProps) {
   return (
-    <header className={cn("px-6 py-8 max-w-7xl mx-auto w-full", className)}>
+    <header className={cn(
+      "fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300",
+      variant === 'brand' ? "bg-background" : "bg-[#f3f3f1]"
+    )}>
       <nav className={cn(
-        "border-4 rounded-full px-8 py-4 flex items-center justify-between transition-all",
+        "max-w-7xl mx-auto border-4 rounded-full px-8 py-4 flex items-center justify-between transition-all",
         variant === 'brand' 
           ? "bg-white/10 border-primary" 
           : "bg-white border-foreground"
@@ -21,10 +24,10 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
         <Link href="/" className="flex items-center gap-2">
           <span className="text-3xl font-black font-headline tracking-tighter uppercase">PopPulse*</span>
         </Link>
-        <div className="hidden lg:flex items-center gap-10 font-black text-xs uppercase tracking-[0.2em]">
-          <Link href="#" className="hover:opacity-50 transition-opacity">Manifesto</Link>
-          <Link href="#" className="hover:opacity-50 transition-opacity">The Tools</Link>
-          <Link href="#" className="hover:opacity-50 transition-opacity">Showcase</Link>
+        <div className="hidden lg:flex items-center gap-10 font-black text-[10px] uppercase tracking-[0.2em]">
+          <Link href="#features" className="hover:opacity-50 transition-opacity">Vibes</Link>
+          <Link href="#how-it-works" className="hover:opacity-50 transition-opacity">Process</Link>
+          <Link href="#impact" className="hover:opacity-50 transition-opacity">Impact</Link>
         </div>
         <div className="flex items-center gap-4">
           <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs hover:bg-primary hover:text-background transition-colors">
