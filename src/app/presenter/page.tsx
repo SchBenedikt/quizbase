@@ -4,10 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion, AppTheme } from "@/app/types/poll";
-import { Zap, ArrowLeft, Sparkles, Plus } from "lucide-react";
+import { Zap, ArrowLeft, Plus, History } from "lucide-react";
+import { Header } from "@/components/layout/Header";
 
 export default function PresenterPage() {
   const router = useRouter();
@@ -31,8 +32,9 @@ export default function PresenterPage() {
 
   if (isCreating) {
     return (
-      <div className="min-h-screen bg-[#f3f3f1] p-6 text-foreground presenter-ui">
-        <div className="max-w-4xl mx-auto space-y-12 py-10">
+      <div className="min-h-screen bg-[#f3f3f1] presenter-ui">
+        <Header variant="minimal" />
+        <div className="max-w-4xl mx-auto px-6 space-y-12 py-10 pb-40">
           <div className="flex items-center gap-6">
             <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-16 w-16 border-4 border-foreground">
               <ArrowLeft className="h-8 w-8" />
@@ -57,34 +59,70 @@ export default function PresenterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f3f1] p-6 flex flex-col items-center justify-center text-foreground presenter-ui">
-      <div className="max-w-md w-full text-center space-y-12">
-        <div className="bg-foreground w-24 h-24 rounded-[2.5rem] flex items-center justify-center mx-auto animate-float">
-          <Zap className="text-white h-12 w-12" />
-        </div>
-        <div className="space-y-4">
-          <h1 className="text-7xl font-black uppercase tracking-tighter leading-none">POPPULSE*</h1>
-          <p className="text-xl font-black opacity-40 uppercase tracking-[0.3em]">Command The Vibe.</p>
+    <div className="min-h-screen bg-[#f3f3f1] presenter-ui flex flex-col">
+      <Header variant="minimal" />
+      
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 grid lg:grid-cols-12 gap-12">
+        <div className="lg:col-span-8 space-y-12">
+          <div className="space-y-4">
+            <h1 className="text-7xl font-black uppercase tracking-tighter leading-none">COMMAND<br />CENTER.</h1>
+            <p className="text-xl font-black opacity-40 uppercase tracking-[0.3em]">Welcome back, Presenter.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+             <Card 
+               className="border-8 border-foreground rounded-[4rem] bg-primary group hover:bg-foreground transition-all cursor-pointer overflow-hidden"
+               onClick={() => setIsCreating(true)}
+             >
+                <CardContent className="p-12 space-y-8 flex flex-col h-full">
+                  <div className="bg-background w-20 h-20 rounded-[2rem] flex items-center justify-center">
+                    <Plus className="h-10 w-10 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-4xl font-black text-background uppercase tracking-tighter">NEW PULSE</h3>
+                    <p className="text-background/60 font-black text-[10px] uppercase tracking-[0.3em]">Start a live interactive session</p>
+                  </div>
+                </CardContent>
+             </Card>
+
+             <Card className="border-8 border-foreground rounded-[4rem] bg-white hover:bg-muted/10 transition-all cursor-pointer overflow-hidden">
+                <CardContent className="p-12 space-y-8 flex flex-col h-full">
+                  <div className="bg-foreground w-20 h-20 rounded-[2rem] flex items-center justify-center">
+                    <History className="h-10 w-10 text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-4xl font-black text-foreground uppercase tracking-tighter">HISTORY</h3>
+                    <p className="text-foreground/40 font-black text-[10px] uppercase tracking-[0.3em]">Access previous session data</p>
+                  </div>
+                </CardContent>
+             </Card>
+          </div>
         </div>
 
-        <Card className="border-8 border-foreground rounded-[4rem] overflow-hidden bg-white">
-          <CardHeader className="bg-foreground/5 pb-10 pt-10 border-b-8 border-foreground">
-            <CardTitle className="text-4xl font-black uppercase tracking-tighter">READY?</CardTitle>
-            <CardDescription className="text-foreground font-bold uppercase text-[10px] tracking-[0.4em] mt-2 opacity-50">Zero lag. Max engagement.</CardDescription>
-          </CardHeader>
-          <CardContent className="p-10 space-y-4">
-            <Button 
-              className="w-full h-24 text-2xl font-black rounded-[2rem] bg-foreground text-white hover:opacity-90 transition-all uppercase tracking-tighter" 
-              onClick={() => setIsCreating(true)}
-            >
-              <Plus className="mr-3 h-8 w-8" /> CREATE PULSE
-            </Button>
-            <Button variant="outline" className="w-full h-20 text-sm font-black rounded-[1.5rem] border-4 border-foreground/10 text-foreground hover:bg-foreground hover:text-white uppercase tracking-[0.3em] transition-all">
-              SESSION HISTORY
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+        <aside className="lg:col-span-4">
+          <Card className="border-8 border-foreground rounded-[4rem] bg-white h-fit sticky top-12">
+             <CardContent className="p-10 space-y-8">
+                <h4 className="text-2xl font-black uppercase tracking-tighter border-b-4 border-foreground pb-4">STATISTICS</h4>
+                <div className="space-y-6">
+                  {[
+                    { label: "Total Sessions", val: "14" },
+                    { label: "Participants Engaged", val: "1,204" },
+                    { label: "Vibes Captured", val: "8.4K" }
+                  ].map((stat, i) => (
+                    <div key={i} className="flex justify-between items-end border-b-2 border-foreground/5 pb-2">
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">{stat.label}</span>
+                      <span className="text-2xl font-black">{stat.val}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-primary/5 p-6 rounded-[2rem] border-4 border-primary/10">
+                   <p className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 mb-2">Pro Tip</p>
+                   <p className="text-xs font-bold uppercase leading-tight">Use Word Clouds for quick audience sentiment checks!</p>
+                </div>
+             </CardContent>
+          </Card>
+        </aside>
+      </main>
     </div>
   );
 }
