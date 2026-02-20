@@ -7,9 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion, PollSession } from "@/app/types/poll";
-import { db } from "@/app/lib/db";
-import { collection, addDoc, setDoc, doc } from "firebase/firestore";
-import { Zap, ArrowLeft, Loader2, Sparkles } from "lucide-react";
+import { Zap, ArrowLeft, Sparkles, Plus } from "lucide-react";
 
 export default function PresenterPage() {
   const router = useRouter();
@@ -27,50 +25,32 @@ export default function PresenterPage() {
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     const sessionId = Math.random().toString(36).substring(2, 12);
 
-    const session: PollSession = {
-      id: sessionId,
-      code,
-      title: sessionTitle,
-      questions,
-      currentQuestionIndex: 0,
-      status: 'active',
-      createdAt: Date.now()
-    };
-
-    try {
-      // In a real app, use doc(db, 'sessions', sessionId)
-      // await setDoc(doc(db, "sessions", sessionId), session);
-      // For this demo, we'll just navigate to the dashboard with local state or URL
-      router.push(`/presenter/${sessionId}?code=${code}&title=${encodeURIComponent(sessionTitle)}`);
-    } catch (e) {
-      console.error("Error creating session", e);
-    } finally {
-      setLoading(false);
-    }
+    router.push(`/presenter/${sessionId}?code=${code}&title=${encodeURIComponent(sessionTitle)}`);
+    setLoading(false);
   };
 
   if (isCreating) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-4xl mx-auto space-y-8">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full">
-              <ArrowLeft className="h-5 w-5" />
+      <div className="min-h-screen bg-background p-6 text-primary">
+        <div className="max-w-4xl mx-auto space-y-12">
+          <div className="flex items-center gap-6">
+            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-16 w-16 border-4 border-primary">
+              <ArrowLeft className="h-8 w-8" />
             </Button>
-            <div className="bg-primary/10 p-2 rounded-xl">
-              <Sparkles className="text-primary h-6 w-6" />
+            <div className="bg-primary/10 p-4 rounded-[2rem] border-4 border-primary/20">
+              <Sparkles className="text-primary h-8 w-8" />
             </div>
-            <h1 className="text-3xl font-bold font-headline text-accent">New Presentation</h1>
+            <h1 className="text-5xl font-black font-headline uppercase tracking-tighter">New Pulse</h1>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="title" className="text-sm font-bold text-muted-foreground uppercase">Presentation Title</Label>
+          <div className="space-y-4">
+            <label htmlFor="title" className="text-sm font-black uppercase tracking-[0.3em] opacity-40">Session Name</label>
             <Input 
               id="title"
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="e.g. Q4 Strategy Workshop"
-              className="text-2xl font-bold h-16 border-none bg-white shadow-sm focus-visible:ring-primary rounded-2xl px-6"
+              placeholder="e.g. STRATEGY 2025"
+              className="text-4xl font-black h-24 border-4 border-primary bg-white/10 rounded-[2.5rem] px-8 focus-visible:ring-0 uppercase placeholder:opacity-10"
             />
           </div>
 
@@ -81,42 +61,34 @@ export default function PresenterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center">
-      <div className="max-w-md w-full text-center space-y-8">
-        <div className="bg-primary w-20 h-20 rounded-[2rem] flex items-center justify-center mx-auto shadow-2xl shadow-primary/30 animate-float">
-          <Zap className="text-white h-10 w-10" />
+    <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center text-primary">
+      <div className="max-w-md w-full text-center space-y-12">
+        <div className="bg-primary w-24 h-24 rounded-[3rem] flex items-center justify-center mx-auto border-4 border-primary animate-float">
+          <Zap className="text-background h-12 w-12" />
         </div>
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold font-headline text-accent">Presenter Portal</h1>
-          <p className="text-muted-foreground">Transform your meetings with interactive polling.</p>
+        <div className="space-y-4">
+          <h1 className="text-6xl font-black font-headline uppercase tracking-tighter">Presenter.</h1>
+          <p className="text-xl font-bold opacity-70 uppercase tracking-widest">Command the room.</p>
         </div>
 
-        <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
-          <CardHeader className="bg-secondary/30 pb-10 pt-10">
-            <CardTitle className="text-2xl font-bold">Get Started</CardTitle>
-            <CardDescription>Create a new interactive session in seconds.</CardDescription>
+        <Card className="border-4 border-primary rounded-[4rem] overflow-hidden bg-white/10">
+          <CardHeader className="bg-primary/10 pb-12 pt-12 border-b-4 border-primary">
+            <CardTitle className="text-3xl font-black uppercase tracking-tighter">Ready?</CardTitle>
+            <CardDescription className="text-primary font-bold uppercase text-xs tracking-widest opacity-60">Create a session in seconds.</CardDescription>
           </CardHeader>
-          <CardContent className="p-8 space-y-4">
+          <CardContent className="p-10 space-y-4">
             <Button 
-              className="w-full h-16 text-lg rounded-2xl shadow-lg shadow-primary/20 transition-all active:scale-95" 
+              className="w-full h-24 text-2xl font-black rounded-[2.5rem] bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tighter" 
               onClick={() => setIsCreating(true)}
             >
-              <Plus className="mr-2 h-5 w-5" /> Create New Poll
+              <Plus className="mr-3 h-8 w-8" /> New Pulse
             </Button>
-            <Button variant="outline" className="w-full h-16 text-lg rounded-2xl border-2 border-primary/20 text-primary hover:bg-primary/5">
-              View My History
+            <Button variant="outline" className="w-full h-20 text-lg font-black rounded-[2rem] border-4 border-primary/20 text-primary hover:bg-primary hover:text-background uppercase tracking-widest transition-all">
+              History
             </Button>
           </CardContent>
         </Card>
       </div>
     </div>
   );
-}
-
-function Label({ children, ...props }: any) {
-  return <label {...props}>{children}</label>;
-}
-
-function Plus(props: any) {
-  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>;
 }

@@ -29,34 +29,34 @@ export function AIQuestionRefiner({ currentQuestion, onSelect }: AIQuestionRefin
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Button 
         type="button"
         variant="outline" 
-        size="sm"
+        size="lg"
         onClick={handleSuggest}
         disabled={loading || !currentQuestion}
-        className="rounded-full gap-2 border-primary/20 text-primary hover:bg-primary hover:text-white"
+        className="rounded-full h-14 px-8 gap-3 border-4 border-primary/20 text-primary font-black uppercase tracking-widest hover:bg-primary hover:text-background transition-all"
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-        Refine with AI
+        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+        AI Refine
       </Button>
 
       {suggestions.length > 0 && (
-        <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest px-1">AI Suggestions</p>
+        <div className="grid gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
+          <p className="text-[10px] font-black text-primary opacity-40 uppercase tracking-[0.4em] px-2">AI Proposals</p>
           {suggestions.map((suggestion, idx) => (
             <Card 
               key={idx} 
-              className="cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group"
+              className="cursor-pointer border-4 border-primary/10 hover:border-primary hover:bg-primary/5 transition-all group rounded-[2rem] overflow-hidden bg-white/5"
               onClick={() => {
-                onSelect(suggestion);
+                onSelect(suggestion.toUpperCase());
                 setSuggestions([]);
               }}
             >
-              <CardContent className="p-3 flex items-start gap-3">
-                <CheckCircle2 className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" />
-                <span className="text-sm leading-tight">{suggestion}</span>
+              <CardContent className="p-6 flex items-start gap-4">
+                <CheckCircle2 className="h-6 w-6 text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-1 shrink-0" />
+                <span className="text-xl font-black uppercase tracking-tighter leading-none">{suggestion}</span>
               </CardContent>
             </Card>
           ))}

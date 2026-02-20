@@ -8,7 +8,7 @@ import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion } from "@/app/types/poll";
 import { useSearchParams } from "next/navigation";
 
-// Mock questions for demo if Firestore not wired up
+// Mock questions for demo
 const MOCK_QUESTIONS: PollQuestion[] = [
   { id: '1', type: 'multiple-choice', question: "What is the primary benefit of our new strategy?", options: ["Growth", "Stability", "Innovation", "Efficiency"], createdAt: Date.now() },
   { id: '2', type: 'rating', question: "How confident do you feel about the Q4 targets?", createdAt: Date.now() },
@@ -23,9 +23,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const [results, setResults] = useState<Record<string, number>>({});
   
   const title = searchParams.get('title') || "New Presentation";
-  const code = searchParams.get('code') || "ABCDEF";
+  const code = searchParams.get('code') || "PULSE1";
 
-  // Simulate incoming results
   useEffect(() => {
     const timer = setInterval(() => {
       setParticipantCount(prev => prev + (Math.random() > 0.7 ? 1 : 0));
@@ -48,52 +47,51 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const q = MOCK_QUESTIONS[currentIdx];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-body">
+    <div className="min-h-screen bg-background flex flex-col font-body text-primary">
       {/* Header */}
-      <header className="px-8 py-4 flex items-center justify-between bg-white shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="bg-primary p-2 rounded-xl">
-            <Zap className="text-white h-5 w-5" />
+      <header className="px-12 py-6 flex items-center justify-between bg-white/10 border-b-4 border-primary">
+        <div className="flex items-center gap-6">
+          <div className="bg-primary p-3 rounded-2xl border-4 border-primary">
+            <Zap className="text-background h-6 w-6" />
           </div>
-          <h1 className="text-xl font-bold font-headline text-accent truncate max-w-xs">{title}</h1>
+          <h1 className="text-3xl font-black uppercase tracking-tighter truncate max-w-md">{title}</h1>
         </div>
         
-        <div className="flex items-center gap-6">
-          <div className="text-center bg-secondary/30 px-6 py-2 rounded-2xl border border-primary/10">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Join at PulsePoll.com</p>
-            <p className="text-2xl font-black text-primary tracking-tighter">{code}</p>
+        <div className="flex items-center gap-8">
+          <div className="text-center bg-primary text-background px-8 py-3 rounded-[2rem] border-4 border-primary">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Join at PulsePoll.com</p>
+            <p className="text-4xl font-black tracking-tighter">{code}</p>
           </div>
-          <div className="flex items-center gap-2 text-accent font-bold">
-            <Users className="h-5 w-5" />
-            <span>{participantCount}</span>
+          <div className="flex items-center gap-3 bg-white/10 px-6 py-3 rounded-full border-4 border-primary">
+            <Users className="h-6 w-6" />
+            <span className="text-2xl font-black">{participantCount}</span>
           </div>
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <Share2 className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="rounded-full h-14 w-14 border-4 border-primary hover:bg-primary hover:text-background transition-all">
+            <Share2 className="h-6 w-6" />
           </Button>
         </div>
       </header>
 
       {/* Main Display Area */}
-      <main className="flex-grow flex items-center justify-center p-12">
-        <div className="w-full max-w-5xl space-y-12 animate-in slide-in-from-bottom-4 duration-500">
-          <div className="space-y-4 text-center">
-             <div className="inline-block px-4 py-1 bg-accent/10 text-accent rounded-full text-xs font-bold uppercase tracking-widest">
-               Question {currentIdx + 1} of {MOCK_QUESTIONS.length}
+      <main className="flex-grow flex items-center justify-center p-16">
+        <div className="w-full max-w-6xl space-y-16 animate-in slide-in-from-bottom-8 duration-700">
+          <div className="space-y-6 text-center">
+             <div className="inline-block px-6 py-1 bg-primary text-background rounded-full text-sm font-black uppercase tracking-[0.4em]">
+               Q {currentIdx + 1} / {MOCK_QUESTIONS.length}
              </div>
-             <h2 className="text-5xl font-black font-headline leading-tight text-accent">
+             <h2 className="text-7xl md:text-9xl font-black leading-[0.8] uppercase tracking-tighter">
                {q.question}
              </h2>
           </div>
 
-          <div className="relative group">
-            <div className="absolute -inset-4 bg-primary/5 blur-3xl rounded-[3rem] opacity-50"></div>
-            <Card className="relative border-none shadow-2xl rounded-[3rem] bg-white/80 backdrop-blur-xl p-12 overflow-hidden">
+          <div className="relative">
+            <Card className="border-8 border-primary rounded-[5rem] bg-white/20 p-20 overflow-hidden">
                <ResultChart question={q} results={results} />
                
                {q.type === 'open-text' && (
-                 <div className="grid grid-cols-2 gap-4 mt-8">
-                   {["Great idea!", "Maybe focus on users?", "Efficiency is key", "Let's innovate more!"].map((text, i) => (
-                     <div key={i} className="bg-secondary/20 p-4 rounded-2xl text-accent font-medium animate-in fade-in zoom-in duration-300">
+                 <div className="grid grid-cols-2 gap-6 mt-12">
+                   {["BOLD IDEA!", "REALLY IMPACTFUL", "LETS DO IT", "EXCITING TIMES"].map((text, i) => (
+                     <div key={i} className="bg-primary text-background p-8 rounded-[3rem] text-2xl font-black uppercase tracking-tighter border-4 border-primary animate-in zoom-in duration-500">
                         {text}
                      </div>
                    ))}
@@ -105,24 +103,24 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       </main>
 
       {/* Control Bar */}
-      <footer className="p-8 flex items-center justify-center gap-4">
+      <footer className="p-12 flex items-center justify-center gap-6">
         <Button 
           variant="outline" 
           size="icon" 
           onClick={() => { setCurrentIdx(Math.max(0, currentIdx - 1)); setResults({}); }}
           disabled={currentIdx === 0}
-          className="h-14 w-14 rounded-full border-2 border-primary/20 text-primary shadow-xl"
+          className="h-20 w-20 rounded-full border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all"
         >
-          <ChevronLeft className="h-8 w-8" />
+          <ChevronLeft className="h-10 w-10" />
         </Button>
         
-        <div className="bg-accent/90 text-white px-8 py-3 rounded-2xl shadow-2xl flex items-center gap-4">
-           <Button variant="ghost" className="text-white hover:bg-white/10 rounded-xl">
-             <LayoutGrid className="h-5 w-5 mr-2" /> Grid View
+        <div className="bg-primary text-background px-12 py-4 rounded-[3rem] flex items-center gap-8 border-4 border-primary">
+           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-2xl font-black uppercase tracking-widest">
+             <LayoutGrid className="h-6 w-6 mr-3" /> GRID
            </Button>
-           <div className="w-px h-6 bg-white/20" />
-           <Button variant="ghost" className="text-white hover:bg-white/10 rounded-xl">
-             <Timer className="h-5 w-5 mr-2" /> Countdown
+           <div className="w-1 h-8 bg-background/20 rounded-full" />
+           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-2xl font-black uppercase tracking-widest">
+             <Timer className="h-6 w-6 mr-3" /> TIME
            </Button>
         </div>
 
@@ -131,9 +129,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           size="icon" 
           onClick={() => { setCurrentIdx(Math.min(MOCK_QUESTIONS.length - 1, currentIdx + 1)); setResults({}); }}
           disabled={currentIdx === MOCK_QUESTIONS.length - 1}
-          className="h-14 w-14 rounded-full border-2 border-primary/20 text-primary shadow-xl"
+          className="h-20 w-20 rounded-full border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all"
         >
-          <ChevronRight className="h-8 w-8" />
+          <ChevronRight className="h-10 w-10" />
         </Button>
       </footer>
     </div>
