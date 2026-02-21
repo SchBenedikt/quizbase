@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, GripVertical, ListChecks, Cloud, SlidersHorizontal, Palette, MessageSquare, Sparkles } from "lucide-react";
+import { Trash2, Plus, GripVertical, ListChecks, Cloud, SlidersHorizontal, Palette, MessageSquare } from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
 import { PollQuestion, PollType, AppTheme } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
@@ -14,9 +13,10 @@ import { cn } from "@/lib/utils";
 interface PollCreatorProps {
   onSave: (questions: PollQuestion[], theme: AppTheme) => void;
   initialQuestions?: PollQuestion[];
+  initialTheme?: AppTheme;
 }
 
-export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps) {
+export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'orange' }: PollCreatorProps) {
   const [questions, setQuestions] = useState<PollQuestion[]>(initialQuestions.length > 0 ? initialQuestions : [
     {
       id: Math.random().toString(36).substr(2, 9),
@@ -26,7 +26,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
       createdAt: Date.now()
     }
   ]);
-  const [selectedTheme, setSelectedTheme] = useState<AppTheme>('orange');
+  const [selectedTheme, setSelectedTheme] = useState<AppTheme>(initialTheme);
 
   const addQuestion = (type: PollType) => {
     const newQuestion: PollQuestion = {
@@ -65,7 +65,6 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
 
   return (
     <div className="space-y-16 pb-48 presenter-ui">
-      {/* Theme Section */}
       <section className="space-y-8">
         <div className="flex items-center gap-4 px-4">
           <Palette className="h-6 w-6 text-primary" />
@@ -94,7 +93,6 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
         </div>
       </section>
 
-      {/* Questions Section */}
       <section className="space-y-10">
         <div className="flex items-center justify-between sticky top-32 z-20 bg-[#f3f3f1]/90 backdrop-blur-md py-6 border-b-8 border-primary/10 px-4">
           <h2 className="text-3xl font-black uppercase tracking-tighter">Interaction Nodes</h2>
@@ -103,7 +101,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
             onClick={() => onSave(questions, selectedTheme)} 
             className="rounded-[2.5rem] h-16 px-12 text-xl font-black bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tighter shadow-none"
           >
-            Deploy Live Pulse
+            Save & Deploy
           </Button>
         </div>
 
@@ -180,7 +178,6 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
         </div>
       </section>
 
-      {/* Dynamic Command Hub */}
       <div className="fixed bottom-12 left-1/2 -translate-x-1/2 bg-primary p-4 rounded-[4rem] flex items-center gap-4 border-8 border-primary z-50">
         <Button onClick={() => addQuestion('multiple-choice')} className="rounded-full h-16 px-8 gap-3 bg-transparent hover:bg-white/10 text-white border-none font-black uppercase text-[10px] tracking-widest shadow-none">
           <ListChecks className="h-6 w-6" /> Poll
