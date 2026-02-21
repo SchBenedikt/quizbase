@@ -5,9 +5,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion, AppTheme } from "@/app/types/poll";
-import { Plus, History, TrendingUp, Users, Activity, ArrowLeft } from "lucide-react";
+import { Plus, History, TrendingUp, Users, Activity, ArrowLeft, Play, BarChart3, MoreVertical } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, setDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
@@ -37,7 +38,7 @@ export default function PresenterPage() {
 
   const handleStartSession = async (questions: PollQuestion[], theme: AppTheme) => {
     if (!sessionTitle) {
-      alert("Please enter a session identity first.");
+      alert("Please enter a session title first.");
       return;
     }
     if (!user) return;
@@ -57,7 +58,7 @@ export default function PresenterPage() {
         createdAt: serverTimestamp(),
       });
 
-      // Save each question to the poll subcollection
+      // Save questions to poll subcollection
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         const qRef = doc(collection(db, `users/${user.uid}/polls/${pollRef.id}/questions`));
@@ -95,29 +96,29 @@ export default function PresenterPage() {
     return (
       <div className="min-h-screen bg-[#f3f3f1] presenter-ui font-body">
         <Header variant="minimal" />
-        <div className="max-w-5xl mx-auto px-6 py-10 pb-40">
+        <div className="max-w-5xl mx-auto px-6 py-12 pb-40">
           <div className="flex items-center gap-6 mt-32 mb-12">
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={() => setIsCreating(false)} 
-              className="rounded-full h-16 w-16 border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all"
+              className="rounded-full h-14 w-14 border-4 border-primary text-primary hover:bg-primary hover:text-background transition-all"
             >
-              <ArrowLeft className="h-8 w-8" />
+              <ArrowLeft className="h-6 w-6" />
             </Button>
             <div className="space-y-1">
-              <h1 className="text-6xl font-black uppercase tracking-tighter text-primary">New Architecture</h1>
-              <p className="text-sm font-bold opacity-40 uppercase tracking-widest text-primary">Design your interactive energy field</p>
+              <h1 className="text-5xl font-black uppercase tracking-tighter text-primary">New Architecture</h1>
+              <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest text-primary">Initialize your interactive field</p>
             </div>
           </div>
           
           <div className="space-y-4 mb-12">
-            <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4 text-primary">Pulse Identity</label>
+            <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4 text-primary">Pulse Title</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="e.g. Quarterly Strategic Alignment"
-              className="text-4xl font-black h-24 border-8 border-primary bg-white rounded-[2rem] px-10 focus-visible:ring-0 uppercase placeholder:opacity-10 text-primary shadow-none"
+              placeholder="e.g. Quarterly Strategy Sync"
+              className="text-3xl font-black h-20 border-8 border-primary bg-white rounded-[2rem] px-10 focus-visible:ring-0 uppercase placeholder:opacity-10 text-primary shadow-none"
             />
           </div>
 
@@ -134,18 +135,18 @@ export default function PresenterPage() {
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 grid lg:grid-cols-12 gap-12 mt-32">
         <div className="lg:col-span-8 space-y-12">
           <div className="space-y-4">
-            <h1 className="text-8xl font-black uppercase tracking-tighter leading-none text-primary">Control Unit.</h1>
-            <p className="text-xl font-bold opacity-40 uppercase tracking-[0.3em] text-primary">Ready for pulse, {user.displayName?.split(' ')[0] || 'Presenter'}.</p>
+            <h1 className="text-7xl font-black uppercase tracking-tighter leading-none text-primary">Control Unit.</h1>
+            <p className="text-lg font-bold opacity-40 uppercase tracking-[0.3em] text-primary">Ready for pulse, {user.displayName?.split(' ')[0] || 'Presenter'}.</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
              <Card 
-               className="border-8 border-primary rounded-[4rem] bg-primary group hover:bg-primary/90 transition-all cursor-pointer overflow-hidden active:scale-95 shadow-none"
+               className="border-8 border-primary rounded-[4rem] bg-primary group hover:bg-primary/95 transition-all cursor-pointer overflow-hidden active:scale-95 shadow-none"
                onClick={() => setIsCreating(true)}
              >
-                <CardContent className="p-10 space-y-8 flex flex-col h-full">
-                  <div className="bg-background w-20 h-20 rounded-[2rem] flex items-center justify-center border-4 border-primary">
-                    <Plus className="h-10 w-10 text-primary" />
+                <CardContent className="p-10 space-y-10 flex flex-col h-full">
+                  <div className="bg-background w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-4 border-primary">
+                    <Plus className="h-8 w-8 text-primary" />
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-5xl font-black text-background uppercase tracking-tighter">New Pulse</h3>
@@ -155,61 +156,82 @@ export default function PresenterPage() {
              </Card>
 
              <Card className="border-8 border-primary rounded-[4rem] bg-white hover:bg-primary/5 transition-all cursor-pointer overflow-hidden active:scale-95 shadow-none">
-                <CardContent className="p-10 space-y-8 flex flex-col h-full">
-                  <div className="bg-primary w-20 h-20 rounded-[2rem] flex items-center justify-center border-4 border-primary">
-                    <History className="h-10 w-10 text-background" />
+                <CardContent className="p-10 space-y-10 flex flex-col h-full">
+                  <div className="bg-primary w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-4 border-primary">
+                    <History className="h-8 w-8 text-background" />
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-5xl font-black text-primary uppercase tracking-tighter">Vault</h3>
-                    <p className="text-primary/40 font-black text-[10px] uppercase tracking-[0.4em]">{polls?.length || 0} Stored Sessions</p>
+                    <p className="text-primary/40 font-black text-[10px] uppercase tracking-[0.4em]">{polls?.length || 0} Sessions Stored</p>
                   </div>
                 </CardContent>
              </Card>
           </div>
 
-          {/* Recent Activity List */}
-          <div className="space-y-6">
-            <h4 className="text-2xl font-black uppercase tracking-tighter text-primary opacity-30">Recent Activity</h4>
-            <div className="grid gap-4">
-              {polls?.slice(0, 3).map((poll) => (
-                <div key={poll.id} className="bg-white p-8 rounded-[2.5rem] border-4 border-primary/10 flex items-center justify-between group hover:border-primary transition-all">
-                  <div className="space-y-1">
-                    <p className="text-2xl font-black uppercase tracking-tighter">{poll.title}</p>
-                    <p className="text-[10px] font-black opacity-40 uppercase tracking-widest">{new Date(poll.createdAt?.toDate()).toLocaleDateString()}</p>
-                  </div>
-                  <div className={cn("px-6 py-2 rounded-full font-black text-xs uppercase border-2", `theme-${poll.theme}`)}>
-                    {poll.theme}
-                  </div>
+          {/* Real Pulse History */}
+          <div className="space-y-8">
+            <div className="flex items-center justify-between px-4">
+              <h4 className="text-2xl font-black uppercase tracking-tighter text-primary opacity-30">Pulse Archives</h4>
+              <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest text-primary">View All</Button>
+            </div>
+            <div className="grid gap-6">
+              {polls?.length === 0 ? (
+                <div className="p-20 text-center border-4 border-dashed border-primary/10 rounded-[4rem]">
+                   <p className="text-2xl font-black uppercase opacity-20 tracking-tighter">No Pulses Initialized Yet</p>
                 </div>
-              ))}
+              ) : (
+                polls?.slice(0, 5).map((poll) => (
+                  <div key={poll.id} className="bg-white p-8 rounded-[2.5rem] border-4 border-primary/10 flex items-center justify-between group hover:border-primary transition-all">
+                    <div className="flex items-center gap-8">
+                      <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border-4", `theme-${poll.theme} border-foreground`)}>
+                         <BarChart3 className="h-6 w-6 text-foreground" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-2xl font-black uppercase tracking-tighter text-primary">{poll.title}</p>
+                        <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">
+                          {new Date(poll.createdAt?.toDate()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                       <Button variant="ghost" className="h-12 px-6 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-primary/10 hover:border-primary">
+                         <Play className="h-3 w-3 mr-2" /> Launch
+                       </Button>
+                       <Button variant="ghost" size="icon" className="rounded-xl opacity-20 hover:opacity-100">
+                         <MoreVertical className="h-5 w-5" />
+                       </Button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
 
         <aside className="lg:col-span-4">
           <Card className="border-8 border-primary rounded-[4rem] bg-white h-fit sticky top-32 shadow-none">
-             <CardContent className="p-10 space-y-10">
+             <CardContent className="p-10 space-y-12">
                 <h4 className="text-3xl font-black uppercase tracking-tighter border-b-8 border-primary pb-4 text-primary">Live Pulse</h4>
-                <div className="space-y-10">
+                <div className="space-y-12">
                   {[
                     { label: "Active Nodes", val: polls?.length || "0", icon: Activity },
-                    { label: "Total Energy", val: "1.4k", icon: TrendingUp },
-                    { label: "Global Sync", val: "12k+", icon: Users }
+                    { label: "Energy Flux", val: "1.4k", icon: TrendingUp },
+                    { label: "Sync Count", val: "12k+", icon: Users }
                   ].map((stat, i) => (
-                    <div key={i} className="flex flex-col gap-1 group">
-                      <div className="flex items-center gap-4 mb-1">
-                        <div className="p-4 bg-primary/5 rounded-[1.2rem] border-4 border-primary/10">
-                          <stat.icon className="h-8 w-8 text-primary" />
+                    <div key={i} className="flex flex-col gap-2 group">
+                      <div className="flex items-center gap-4">
+                        <div className="p-4 bg-primary/5 rounded-[1.2rem] border-4 border-primary/10 transition-colors group-hover:bg-primary/10">
+                          <stat.icon className="h-7 w-7 text-primary" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 text-primary">{stat.label}</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 text-primary">{stat.label}</span>
                       </div>
-                      <span className="text-6xl font-black tracking-tighter text-primary">{stat.val}</span>
+                      <span className="text-7xl font-black tracking-tighter text-primary">{stat.val}</span>
                     </div>
                   ))}
                 </div>
-                <div className="bg-primary p-8 rounded-[2.5rem] border-4 border-primary">
-                   <p className="text-[8px] font-black uppercase tracking-[0.4em] text-background opacity-60 mb-2">System Vitals</p>
-                   <p className="text-lg font-black uppercase leading-tight text-background">Visual core running at peak efficiency.</p>
+                <div className="bg-primary p-10 rounded-[3rem] border-4 border-primary">
+                   <p className="text-[8px] font-black uppercase tracking-[0.5em] text-background opacity-60 mb-3">System Vitals</p>
+                   <p className="text-xl font-black uppercase leading-tight text-background">Visual engine running at peak interaction efficiency.</p>
                 </div>
              </CardContent>
           </Card>
