@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, use, useEffect } from "react";
@@ -82,6 +83,15 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     }
   };
 
+  const getContrastColor = (hex: string) => {
+    if (!hex) return 'black';
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? 'black' : 'white';
+  };
+
   if (sessionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -95,22 +105,32 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
         <h1 className="text-3xl font-black uppercase tracking-tighter opacity-30">Session Not Found</h1>
         <p className="text-sm font-bold opacity-60 mt-4 uppercase tracking-widest">Verify your session code.</p>
-        <Button onClick={() => window.location.href = '/join'} className="mt-12 bg-foreground text-background font-black rounded-[1.5rem] h-16 px-12 border-2 border-foreground shadow-none">Return to Lobby</Button>
+        <Button onClick={() => window.location.href = '/join'} className="mt-12 bg-foreground text-background font-black rounded-[1.5rem] h-16 px-12 border-2 border-foreground">Return to Lobby</Button>
       </div>
     );
   }
 
   const currentTheme = session.theme || 'orange';
+  const customColor = session.customColor;
+  const dynamicStyles = customColor ? {
+    backgroundColor: customColor,
+    color: getContrastColor(customColor),
+    borderColor: getContrastColor(customColor) + '22'
+  } : {};
 
   if (voted) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-700 bg-background" data-theme={currentTheme}>
-        <div className="bg-foreground p-14 rounded-[1.5rem] animate-float shadow-none">
+      <div 
+        className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-700 bg-background" 
+        data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
+        style={dynamicStyles}
+      >
+        <div className="bg-foreground p-14 rounded-[1.5rem] animate-float">
           <Heart className="h-20 w-20 text-background fill-background" />
         </div>
         <div className="space-y-4">
           <h1 className="text-5xl font-black uppercase tracking-tighter leading-none">Sync Confirmed!</h1>
-          <p className="font-bold text-xl max-w-xs mx-auto uppercase tracking-tight opacity-80">Stand by for next signal...</p>
+          <p className="font-bold text-xl max-w-xs mx-auto uppercase tracking-tight opacity-80">Stand by for the next signal...</p>
         </div>
       </div>
     );
@@ -118,21 +138,29 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background" data-theme={currentTheme}>
-        <p className="text-3xl font-black uppercase opacity-30 tracking-widest">Waiting for Presentation...</p>
+      <div 
+        className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background" 
+        data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
+        style={dynamicStyles}
+      >
+        <p className="text-3xl font-black uppercase opacity-30 tracking-widest">Waiting for Presenter...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-8 font-body bg-background transition-colors duration-700 shadow-none" data-theme={currentTheme}>
+    <div 
+      className="min-h-screen flex flex-col p-8 font-body bg-background transition-colors duration-700" 
+      data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
+      style={dynamicStyles}
+    >
       <div className="max-w-lg mx-auto w-full flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-3">
-            <Zap className="h-8 w-8 text-foreground fill-foreground" />
+            <Zap className="h-8 w-8 fill-current" />
             <span className="font-black text-2xl tracking-tighter uppercase">PopPulse*</span>
           </div>
-          <div className="px-6 py-2 border-2 border-foreground rounded-[1.5rem] text-xs font-black uppercase tracking-widest">
+          <div className="px-6 py-2 border-2 border-current rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest">
             Live
           </div>
         </div>
@@ -149,10 +177,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   key={idx}
                   variant={selection === idx ? "default" : "outline"}
                   className={cn(
-                    "h-24 text-xl font-black rounded-[1.5rem] border-2 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
+                    "h-24 text-xl font-black rounded-[1.5rem] border-2 transition-all active:scale-95 text-left justify-start px-8",
                     selection === idx 
                       ? "bg-foreground text-background border-foreground" 
-                      : "border-foreground/20 text-foreground bg-foreground/5 hover:bg-foreground/10"
+                      : "border-current/20 bg-black/5 hover:bg-black/10"
                   )}
                   onClick={() => setSelection(idx)}
                 >
@@ -169,7 +197,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           )}
 
           {currentQuestion.type === 'rating' && (
-            <div className="flex justify-center gap-3 py-10 bg-black/5 rounded-[1.5rem] border-2 border-foreground/10">
+            <div className="flex justify-center gap-3 py-10 bg-black/5 rounded-[1.5rem] border-2 border-current/10">
               {[1, 2, 3, 4, 5].map((s) => (
                 <Button
                   key={s}
@@ -181,7 +209,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   <Star 
                     className={cn(
                       "h-12 w-12 transition-all",
-                      s <= ratingValue ? "fill-foreground text-foreground" : "text-foreground/20"
+                      s <= ratingValue ? "fill-current" : "opacity-20"
                     )} 
                   />
                 </Button>
@@ -197,21 +225,21 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   maxLength={20}
-                  className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 border-foreground bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none"
+                  className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 border-current"
                 />
               ) : (
                 <Textarea 
                   placeholder="Your thoughts..."
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
-                  className="min-h-[250px] text-2xl font-black p-10 rounded-[1.5rem] border-2 border-foreground bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight"
+                  className="min-h-[250px] text-2xl font-black p-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 leading-tight border-current"
                 />
               )}
             </div>
           )}
 
           {currentQuestion.type === 'slider' && (
-            <div className="space-y-12 py-12 bg-black/5 rounded-[1.5rem] border-2 border-foreground/10 px-10">
+            <div className="space-y-12 py-12 bg-black/5 rounded-[1.5rem] border-2 border-current/10 px-10">
               <div className="text-center">
                 <span className="text-9xl font-black tracking-tighter leading-none">{sliderValue}</span>
               </div>
@@ -222,7 +250,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 step={1}
                 className="py-6"
               />
-              <div className="flex justify-between font-black text-xs uppercase tracking-widest opacity-40 px-4">
+              <div className="flex justify-between font-black text-[10px] uppercase tracking-widest opacity-40 px-4">
                 <span>Low</span>
                 <span>High</span>
               </div>
@@ -232,14 +260,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           <Button 
             disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
             onClick={handleSubmit}
-            className="w-full h-24 text-3xl font-black rounded-[1.5rem] bg-foreground text-background hover:opacity-90 transition-all mt-8 uppercase tracking-tighter shadow-none border-2 border-foreground"
+            className="w-full h-24 text-3xl font-black rounded-[1.5rem] bg-foreground text-background hover:opacity-90 transition-all mt-8 uppercase tracking-tighter border-2 border-foreground"
           >
             {loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}
           </Button>
         </main>
 
-        <footer className="mt-20 pt-12 text-center opacity-40 border-t-2 border-foreground/10">
-          <p className="text-xs font-black uppercase tracking-widest">Zero Retention. Instant Sync.</p>
+        <footer className="mt-20 pt-12 text-center opacity-40 border-t-2 border-current/10">
+          <p className="text-[10px] font-black uppercase tracking-widest">Instant Sync Active</p>
         </footer>
       </div>
     </div>

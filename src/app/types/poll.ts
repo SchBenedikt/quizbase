@@ -18,7 +18,8 @@ export interface PollSession {
   pollId: string;
   currentQuestionId: string | null;
   status: 'active' | 'ended';
-  theme?: 'orange' | 'red' | 'green' | 'blue';
+  theme?: 'orange' | 'red' | 'green' | 'blue' | 'custom';
+  customColor?: string; // Hex color code
   createdAt: any;
 }
 

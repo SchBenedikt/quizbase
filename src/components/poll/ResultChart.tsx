@@ -14,14 +14,7 @@ interface ResultChartProps {
 }
 
 export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
-  const colors = [
-    'hsl(var(--foreground))',
-    'hsl(var(--foreground) / 0.85)',
-    'hsl(var(--foreground) / 0.7)',
-    'hsl(var(--foreground) / 0.55)',
-    'hsl(var(--foreground) / 0.4)',
-    'hsl(var(--foreground) / 0.25)',
-  ];
+  const chartColor = 'currentColor';
 
   if (question.type === 'multiple-choice' && question.options) {
     const data = question.options.map((opt, idx) => ({
@@ -43,14 +36,14 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               tick={{ fill: 'currentColor', fontSize: 24, fontWeight: 900, fontFamily: 'Bricolage Grotesque' }}
             />
             <Tooltip 
-              cursor={{ fill: 'rgba(255,255,255,0.1)' }}
+              cursor={{ fill: 'rgba(0,0,0,0.05)' }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className="bg-foreground p-8 rounded-[1.5rem] border-2 border-background/20 shadow-none">
+                    <div className="bg-foreground p-8 rounded-[1.5rem] border-2 border-background shadow-none">
                       <p className="font-black text-background text-5xl leading-none">
                         {payload[0].value}
-                        <span className="text-xs uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">TOTAL VOTES</span>
+                        <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">TOTAL VOTES</span>
                       </p>
                     </div>
                   );
@@ -65,7 +58,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               animationDuration={1500}
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                <Cell key={`cell-${index}`} fill={chartColor} fillOpacity={1 - (index * 0.15)} />
               ))}
             </Bar>
           </BarChart>
@@ -89,7 +82,6 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               className="font-black uppercase tracking-tighter transition-all hover:scale-125 cursor-default animate-in zoom-in duration-1000"
               style={{ 
                 fontSize: `${Math.min(180, 48 + count * 24)}px`, 
-                color: colors[i % colors.length],
                 opacity: 0.8 + (count / Math.max(...entries.map(e => e[1]))) * 0.2
               }}
             >
@@ -110,7 +102,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
           <ScrollArea className="h-full w-full pr-12">
             <div className="grid gap-12 py-12 px-8">
               {allResponses.map((res, i) => (
-                <div key={i} className="bg-foreground text-background p-16 rounded-[1.5rem] border-2 border-foreground shadow-none animate-in slide-in-from-bottom-20 duration-1000">
+                <div key={i} className="bg-foreground text-background p-16 rounded-[1.5rem] border-2 border-foreground animate-in slide-in-from-bottom-20 duration-1000">
                   <p className="text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9]">{res.value}</p>
                 </div>
               ))}
@@ -133,7 +125,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               key={s} 
               className={cn(
                 "h-40 w-40 transition-all duration-1000",
-                s <= Math.round(avg) ? "fill-foreground text-foreground" : "text-foreground/10"
+                s <= Math.round(avg) ? "fill-current" : "opacity-10"
               )} 
             />
           ))}
@@ -152,9 +144,9 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
     return (
       <div className="h-full w-full max-w-[1400px] flex flex-col items-center justify-center space-y-32">
-        <div className="relative h-40 w-full bg-foreground/10 rounded-[1.5rem] border-2 border-foreground flex items-center px-16 overflow-hidden shadow-none">
+        <div className="relative h-40 w-full bg-black/5 rounded-[1.5rem] border-2 border-current flex items-center px-16 overflow-hidden">
            <div 
-             className="absolute left-0 h-full bg-foreground transition-all duration-1500 ease-out"
+             className="absolute left-0 h-full bg-current transition-all duration-1500 ease-out"
              style={{ width: `${average}%` }}
            />
            <div className="relative z-10 w-full flex justify-between font-black text-4xl mix-blend-difference text-white uppercase tracking-[0.5em]">
@@ -172,7 +164,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
   }
 
   return (
-    <div className="bg-transparent p-40 rounded-[1.5rem] text-center border-2 border-dashed border-foreground/10">
+    <div className="bg-transparent p-40 rounded-[1.5rem] text-center border-2 border-dashed border-current/10">
       <p className="text-5xl font-black uppercase opacity-10 tracking-[1em] animate-pulse">CONNECTING...</p>
     </div>
   );
