@@ -64,7 +64,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
             ) : (
               <Moon className="h-5 w-5" />
             )}
-            <span className="sr-only">Toggle theme</span>
+            <span className="sr-only">Theme umschalten</span>
           </Button>
 
           {!user ? (
@@ -73,23 +73,23 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                 <Link href="/login">Login</Link>
               </Button>
               <Button asChild className="rounded-[1rem] px-8 font-black uppercase text-xs tracking-widest bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all shadow-none">
-                <Link href="/login?signup=true">Sign Up</Link>
+                <Link href="/login?signup=true">Registrieren</Link>
               </Button>
             </>
           ) : (
             <>
               <Button variant="ghost" asChild className="rounded-[1rem] px-6 font-black uppercase text-xs tracking-widest shadow-none">
                 <Link href="/presenter" className="flex items-center gap-2">
-                   Vault
+                   Dashboard
                 </Link>
               </Button>
               <Button variant="ghost" asChild className="rounded-[1rem] px-6 font-black uppercase text-xs tracking-widest shadow-none">
                 <Link href="/profile" className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" /> Settings
+                  <Settings className="h-4 w-4" /> Profil
                 </Link>
               </Button>
               <Button onClick={handleSignOut} size="sm" variant="outline" className="rounded-[1rem] px-6 border-2 font-black uppercase text-xs tracking-widest shadow-none">
-                <LogOut className="h-3.5 w-3.5 mr-2" /> Out
+                <LogOut className="h-3.5 w-3.5 mr-2" /> Logout
               </Button>
             </>
           )}

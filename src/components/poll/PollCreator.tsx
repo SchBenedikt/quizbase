@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -20,8 +21,8 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
     {
       id: Math.random().toString(36).substr(2, 9),
       type: 'multiple-choice',
-      question: "What's our focus today?",
-      options: ["Growth", "Innovation", "Quality"],
+      question: "Was ist unser heutiger Fokus?",
+      options: ["Wachstum", "Innovation", "Qualität"],
       createdAt: Date.now()
     }
   ]);
@@ -59,15 +60,15 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
       <section className="space-y-6">
         <div className="flex items-center justify-between sticky top-24 z-20 bg-background/90 py-4 border-b-2 mb-6">
           <div className="space-y-0.5">
-            <h2 className="text-xl font-bold tracking-tight uppercase">Flow</h2>
-            <p className="text-xs font-bold opacity-40 uppercase tracking-widest">{questions.length} Nodes</p>
+            <h2 className="text-xl font-bold tracking-tight uppercase">Ablauf</h2>
+            <p className="text-xs font-bold opacity-40 uppercase tracking-widest">{questions.length} Fragen</p>
           </div>
           <Button 
             type="button"
             onClick={() => onSave(questions)} 
             className="rounded-[1.5rem] h-12 px-8 font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all uppercase text-xs shadow-none border-2 border-primary"
           >
-            Save Pulse
+            Speichern
           </Button>
         </div>
 
@@ -90,7 +91,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
 
                   <div className="flex-grow space-y-6">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold uppercase tracking-widest opacity-40">Interaction</Label>
+                      <Label className="text-xs font-bold uppercase tracking-widest opacity-40">Interaktionstyp</Label>
                       <div className="px-4 py-1.5 bg-muted rounded-[1.5rem] text-[10px] font-bold uppercase opacity-60 border-2 border-transparent">
                         {q.type.replace('-', ' ')}
                       </div>
@@ -100,7 +101,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
                       <Input 
                         value={q.question} 
                         onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
-                        placeholder="Type your question..."
+                        placeholder="Geben Sie Ihre Frage ein..."
                         className="text-xl font-bold h-16 border-2 bg-muted rounded-[1.5rem] px-6 focus-visible:ring-1 shadow-none"
                       />
                       <Button 
@@ -147,7 +148,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
                           onClick={() => updateQuestion(q.id, { options: [...q.options!, `Option ${q.options!.length + 1}`] })} 
                           className="rounded-[1rem] border-dashed border-2 h-12 text-xs font-bold uppercase tracking-widest mt-2 shadow-none"
                         >
-                          <Plus className="mr-2 h-4 w-4" /> Add Choice
+                          <Plus className="mr-2 h-4 w-4" /> Option hinzufügen
                         </Button>
                       </div>
                     )}
@@ -161,11 +162,11 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
 
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-foreground text-background p-3 rounded-[1.5rem] flex items-center gap-2 z-50 shadow-none border-2 border-foreground">
         {[
-          { type: 'multiple-choice', icon: ListChecks, label: 'Poll' },
+          { type: 'multiple-choice', icon: ListChecks, label: 'Umfrage' },
           { type: 'word-cloud', icon: Cloud, label: 'Cloud' },
-          { type: 'open-text', icon: MessageSquare, label: 'Open' },
-          { type: 'rating', icon: Star, label: 'Rate' },
-          { type: 'slider', icon: SlidersHorizontal, label: 'Slide' }
+          { type: 'open-text', icon: MessageSquare, label: 'Offen' },
+          { type: 'rating', icon: Star, label: 'Bewertung' },
+          { type: 'slider', icon: SlidersHorizontal, label: 'Regler' }
         ].map((tool) => (
           <Button 
             key={tool.type}

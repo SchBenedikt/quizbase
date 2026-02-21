@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, use } from "react";
@@ -21,7 +22,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
   const { data: session, isLoading: sessionLoading } = useDoc<PollSession>(sessionRef);
 
-  const title = session?.title || "Live Pulse";
+  const title = session?.title || "Live Präsentation";
   const code = session?.code || "---";
   const currentTheme = session?.theme || 'orange';
 
@@ -85,17 +86,17 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     if (!allResponses || !session?.currentQuestionId) return;
     const currentResponses = allResponses.filter(r => r.questionId === session.currentQuestionId).map(r => r.value.toString());
     if (currentResponses.length < 3) {
-      toast({ title: "Need more data", description: "Wait for more responses." });
+      toast({ title: "Zu wenig Daten", description: "Warten Sie auf weitere Antworten." });
       return;
     }
 
     setIsSummarizing(true);
     try {
       const { summary } = await aiOpenTextSummarizer({ responses: currentResponses });
-      toast({ title: "AI Synthesis", description: summary });
+      toast({ title: "KI-Zusammenfassung", description: summary });
     } catch (e) {
       console.error(e);
-      toast({ variant: "destructive", title: "Sync Error", description: "AI engine unreachable." });
+      toast({ variant: "destructive", title: "Fehler", description: "Zusammenfassung fehlgeschlagen." });
     } finally {
       setIsSummarizing(false);
     }
@@ -124,7 +125,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         
         <div className="flex items-center gap-16">
           <div className="flex flex-col items-end">
-            <p className="text-xs font-black uppercase tracking-widest opacity-50">JOIN PULSE</p>
+            <p className="text-xs font-black uppercase tracking-widest opacity-50">TEILNEHMEN</p>
             <p className="text-6xl font-black tracking-tighter leading-none mt-1">{code}</p>
           </div>
           <div className="flex items-center gap-6 bg-white/10 px-8 py-4 rounded-[1.5rem] border-2 border-white/20">
@@ -138,7 +139,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         <div className="w-full max-w-[85rem] h-full flex flex-col gap-12">
           <div className="text-center shrink-0 space-y-4">
              <div className="inline-block px-6 py-2 bg-foreground text-background rounded-[1.5rem] text-xs font-black uppercase tracking-widest">
-               SIGNAL {currentIdx + 1} / {questions.length}
+               FRAGE {currentIdx + 1} / {questions.length}
              </div>
              <h2 className="text-6xl md:text-8xl lg:text-[7rem] font-black leading-[0.8] tracking-tighter max-w-7xl mx-auto uppercase">
                {q.question}
@@ -157,7 +158,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                 className="absolute top-8 right-8 h-14 px-8 rounded-[1rem] bg-foreground text-background font-black uppercase text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all gap-3 shadow-none"
               >
                 {isSummarizing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
-                AI SUMMARIZE
+                KI-ANALYSE
               </Button>
             )}
           </div>
@@ -190,27 +191,27 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
            <Popover>
              <PopoverTrigger asChild>
                 <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-[1rem] hover:bg-white/10 transition-all shadow-none">
-                  <Palette className="h-5 w-5 mr-3" /> Vibe
+                  <Palette className="h-5 w-5 mr-3" /> Design
                 </Button>
              </PopoverTrigger>
              <PopoverContent className="w-64 p-4 rounded-[1.5rem] border-2 border-white/10 bg-background flex flex-col gap-2 shadow-none">
-                <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Vibrant Orange</Button>
-                <Button onClick={() => setTheme('red')} className="bg-[#f24822] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Electric Red</Button>
-                <Button onClick={() => setTheme('green')} className="bg-[#14ae5c] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Neon Green</Button>
-                <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Deep Blue</Button>
+                <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Orange</Button>
+                <Button onClick={() => setTheme('red')} className="bg-[#f24822] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Rot</Button>
+                <Button onClick={() => setTheme('green')} className="bg-[#14ae5c] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Grün</Button>
+                <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Blau</Button>
              </PopoverContent>
            </Popover>
            <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-[1rem] hover:bg-white/10 transition-all shadow-none">
              <Timer className="h-5 w-5 mr-3" /> Timer
            </Button>
            <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-[1rem] hover:bg-white/10 transition-all shadow-none">
-             <Monitor className="h-5 w-5 mr-3" /> Screen
+             <Monitor className="h-5 w-5 mr-3" /> Bildschirm
            </Button>
         </div>
 
         <div className="flex items-center gap-3 opacity-30">
            <Zap className="h-7 w-7 fill-foreground" />
-           <span className="font-black text-xs uppercase tracking-widest">OS v4.0</span>
+           <span className="font-black text-xs uppercase tracking-widest">Presenter Studio v4.0</span>
         </div>
       </footer>
     </div>

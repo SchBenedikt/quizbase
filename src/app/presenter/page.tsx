@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -38,7 +39,7 @@ export default function PresenterPage() {
 
   const handleStartSession = async (questions: PollQuestion[]) => {
     if (!sessionTitle) {
-      toast({ variant: "destructive", title: "Missing Identity", description: "Give your pulse a name." });
+      toast({ variant: "destructive", title: "Titel fehlt", description: "Bitte geben Sie Ihrer Umfrage einen Namen." });
       return;
     }
     if (!user) return;
@@ -89,7 +90,7 @@ export default function PresenterPage() {
 
       router.push(`/presenter/${sessionRef.id}`);
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Transmission Failed", description: e.message });
+      toast({ variant: "destructive", title: "Start fehlgeschlagen", description: e.message });
     } finally {
       setLoading(false);
     }
@@ -99,7 +100,7 @@ export default function PresenterPage() {
     if (!user) return;
     const pollRef = doc(db, `users/${user.uid}/polls/${pollId}`);
     deleteDocumentNonBlocking(pollRef);
-    toast({ title: "Pulse Erased", description: "Document removed from vault." });
+    toast({ title: "Umfrage gelöscht", description: "Die Umfrage wurde aus Ihrem Dashboard entfernt." });
   };
 
   const handleLaunchExisting = async (poll: any) => {
@@ -126,7 +127,7 @@ export default function PresenterPage() {
 
       router.push(`/presenter/${sessionRef.id}`);
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Launch Failed", description: e.message });
+      toast({ variant: "destructive", title: "Präsentation fehlgeschlagen", description: e.message });
     } finally {
       setLoading(false);
     }
@@ -145,15 +146,15 @@ export default function PresenterPage() {
             <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-[1.5rem] h-14 w-14 border-2 shadow-none">
               <ArrowLeft className="h-6 w-6" />
             </Button>
-            <h1 className="text-4xl font-black uppercase tracking-tighter">Create Pulse</h1>
+            <h1 className="text-4xl font-black uppercase tracking-tighter">Neue Umfrage erstellen</h1>
           </div>
           
-          <div className="bg-white p-12 rounded-[1.5rem] border-2 mb-12 shadow-none">
-            <label className="text-xs font-black uppercase tracking-widest opacity-40 ml-2 mb-4 block">Identity Signature</label>
+          <div className="bg-white dark:bg-card p-12 rounded-[1.5rem] border-2 mb-12 shadow-none">
+            <label className="text-xs font-black uppercase tracking-widest opacity-40 ml-2 mb-4 block">Titel der Umfrage</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="e.g. Q1 STRATEGY VIBE"
+              placeholder="z.B. Feedback Q1 Strategie"
               className="text-4xl font-black h-24 border-none bg-transparent focus-visible:ring-0 placeholder:opacity-10 shadow-none p-0 uppercase"
             />
           </div>
@@ -175,16 +176,16 @@ export default function PresenterPage() {
               <div className="w-16 h-16 rounded-[1.5rem] bg-primary flex items-center justify-center border-2 border-primary">
                 <Zap className="h-8 w-8 text-primary-foreground fill-current" />
               </div>
-              <h1 className="text-5xl font-black tracking-tighter uppercase">Vault</h1>
+              <h1 className="text-5xl font-black tracking-tighter uppercase">Dashboard</h1>
             </div>
-            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Secure Pulse Repository</p>
+            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Ihre gespeicherten Umfragen</p>
           </div>
           <Button 
             size="lg" 
             onClick={() => setIsCreating(true)}
             className="h-20 px-12 rounded-[1.5rem] text-lg font-black bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tight shadow-none"
           >
-            <Plus className="mr-3 h-6 w-6" /> NEW PULSE
+            <Plus className="mr-3 h-6 w-6" /> NEUE UMFRAGE
           </Button>
         </div>
 
@@ -192,10 +193,10 @@ export default function PresenterPage() {
           <div className="relative w-full max-w-lg">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 opacity-30" />
             <Input 
-              placeholder="Search pulse archive..."
+              placeholder="Umfragen durchsuchen..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-16 pl-16 pr-8 rounded-[1rem] border-2 bg-white focus-visible:ring-0 font-bold text-lg shadow-none"
+              className="h-16 pl-16 pr-8 rounded-[1rem] border-2 bg-white dark:bg-card focus-visible:ring-0 font-bold text-lg shadow-none"
             />
           </div>
 
@@ -205,11 +206,11 @@ export default function PresenterPage() {
             ) : !filteredPolls || filteredPolls.length === 0 ? (
               <div className="p-40 text-center border-2 border-dashed rounded-[1.5rem] bg-muted/30 space-y-4">
                  <Sparkles className="h-12 w-12 mx-auto opacity-10" />
-                 <p className="text-sm font-black uppercase opacity-30 tracking-widest">No pulses archived</p>
+                 <p className="text-sm font-black uppercase opacity-30 tracking-widest">Keine Umfragen gefunden</p>
               </div>
             ) : (
               filteredPolls.map((poll) => (
-                <div key={poll.id} className="bg-white p-8 rounded-[1.5rem] border-2 flex flex-col sm:flex-row items-center justify-between gap-8 group hover:border-primary transition-all shadow-none">
+                <div key={poll.id} className="bg-white dark:bg-card p-8 rounded-[1.5rem] border-2 flex flex-col sm:flex-row items-center justify-between gap-8 group hover:border-primary transition-all shadow-none">
                   <div className="flex items-center gap-8 w-full sm:w-auto">
                     <div className="w-16 h-16 rounded-[1rem] flex items-center justify-center border-2 shrink-0 bg-muted group-hover:bg-primary/5 transition-colors">
                        <BarChart3 className="h-7 w-7 text-primary" />
@@ -217,7 +218,7 @@ export default function PresenterPage() {
                     <div className="space-y-1 truncate">
                       <p className="text-2xl font-black tracking-tighter truncate uppercase leading-tight">{poll.title}</p>
                       <p className="text-xs font-black opacity-40 uppercase tracking-widest">
-                        Sync: {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString() : 'N/A'}
+                        Erstellt am: {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString('de-DE') : 'N/A'}
                       </p>
                     </div>
                   </div>
@@ -227,14 +228,14 @@ export default function PresenterPage() {
                        onClick={() => handleLaunchExisting(poll)}
                        className="h-12 px-6 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-primary hover:text-primary-foreground transition-all shadow-none"
                      >
-                       <Play className="h-4 w-4 mr-2 fill-current" /> Launch
+                       <Play className="h-4 w-4 mr-2 fill-current" /> Starten
                      </Button>
                      <Button 
                        variant="ghost" 
                        onClick={() => router.push(`/presenter/edit/${poll.id}`)}
                        className="h-12 px-6 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-muted shadow-none"
                      >
-                       <Edit2 className="h-4 w-4 mr-2" /> Edit
+                       <Edit2 className="h-4 w-4 mr-2" /> Bearbeiten
                      </Button>
                      <Button 
                        variant="ghost" 

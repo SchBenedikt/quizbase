@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -31,16 +32,16 @@ export default function Home() {
           <div className="space-y-12">
             <div className="space-y-4">
               <div className="inline-block px-4 py-2 bg-foreground text-background rounded-[1.5rem] text-xs font-black uppercase tracking-widest">
-                Interaction Protocol v4.0
+                Interaktions-System v4.0
               </div>
               <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-black leading-[0.8] tracking-tighter uppercase">
-                Your <br />
-                Voice. <br />
+                Ihre <br />
+                Stimme. <br />
                 <span className="opacity-30 italic">Live.</span>
               </h1>
             </div>
             <p className="text-xl md:text-2xl font-bold max-w-xl leading-tight uppercase tracking-tight opacity-80">
-              Transform any room into an active data field. No apps, no friction. Just energy.
+              Verwandeln Sie jeden Raum in ein interaktives Erlebnis. Keine Apps, kein Stress. Pure Energie.
             </p>
             
             <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6">
@@ -55,7 +56,7 @@ export default function Home() {
                 />
               </div>
               <Button type="submit" disabled={joinCode.length < 6} className="h-20 px-12 rounded-[1.5rem] text-xl font-black bg-foreground text-background border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all group shrink-0 shadow-none">
-                JOIN NOW <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
+                JETZT TEILNEHMEN <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
               </Button>
             </form>
           </div>
@@ -64,7 +65,7 @@ export default function Home() {
             <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-foreground transform lg:rotate-2 transition-all group-hover:rotate-0 duration-1000">
               <Image 
                 src={heroImage?.imageUrl || "https://picsum.photos/seed/poppulse1/800/1000"} 
-                alt="PopPulse Interaction"
+                alt="PopPulse Interaktion"
                 width={800}
                 height={1000}
                 className="object-cover aspect-[4/5] contrast-125 transition-all group-hover:scale-105 duration-1000"
@@ -82,18 +83,18 @@ export default function Home() {
           <div className="max-w-7xl mx-auto space-y-32">
             <div className="text-center space-y-6">
               <h2 className="text-5xl md:text-[7rem] font-black leading-[0.8] uppercase tracking-tighter">
-                Studio <br />
-                Grade Flow.
+                Echte <br />
+                Interaktion.
               </h2>
-              <p className="text-xs font-black uppercase tracking-widest opacity-40">Built for high-stakes interaction</p>
+              <p className="text-xs font-black uppercase tracking-widest opacity-40">Entwickelt für maximale Reichweite</p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { icon: Cloud, title: "Clouds", desc: "Watch collective truth crystallize in real-time." },
-                { icon: ListChecks, title: "Pulse", desc: "Instant consensus. Decisions at the speed of light." },
-                { icon: SlidersHorizontal, title: "Nuance", desc: "High-fidelity sliders for deep qualitative data." },
-                { icon: Sparkles, title: "AI Gen", desc: "Refine questions with neural clarity in seconds." }
+                { icon: Cloud, title: "Wortwolken", desc: "Sehen Sie, was Ihre Zielgruppe wirklich denkt." },
+                { icon: ListChecks, title: "Umfragen", desc: "Sofortige Ergebnisse. Entscheidungen in Echtzeit." },
+                { icon: SlidersHorizontal, title: "Regler", desc: "Hochpräzise Daten für tiefe Einblicke." },
+                { icon: Sparkles, title: "KI-Hilfe", desc: "Optimieren Sie Ihre Fragen in Sekundenschnelle." }
               ].map((tool, i) => (
                 <div key={i} className="bg-background text-foreground p-10 rounded-[1.5rem] border-2 border-background space-y-6 transition-all hover:-translate-y-2">
                   <div className="w-16 h-16 rounded-[1.5rem] bg-foreground text-background flex items-center justify-center border-2 border-foreground">
@@ -111,25 +112,25 @@ export default function Home() {
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-32 items-center">
             <div className="space-y-12">
               <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85]">
-                Engage <br />
-                Everyone. <br />
-                <span className="opacity-20 italic">Everywhere.</span>
+                Begeistern <br />
+                Sie alle. <br />
+                <span className="opacity-20 italic">Überall.</span>
               </h2>
               <p className="text-xl font-bold uppercase opacity-70 leading-tight max-w-lg">
-                PopPulse* removes the friction of accounts, letting human energy take center stage in any room.
+                PopPulse* entfernt alle Barrieren. Keine Registrierung für Teilnehmer – der Mensch steht im Mittelpunkt.
               </p>
               <div className="flex gap-6 items-center p-8 bg-foreground/5 rounded-[1.5rem] border-2 border-foreground/10">
                 <Users2 className="h-10 w-10 text-primary" />
                 <div>
-                  <h4 className="text-xl font-black uppercase tracking-tighter">100% Inclusion</h4>
-                  <p className="font-bold opacity-40 uppercase text-xs tracking-widest">Total Participation Protocol</p>
+                  <h4 className="text-xl font-black uppercase tracking-tighter">100% Teilhabe</h4>
+                  <p className="font-bold opacity-40 uppercase text-xs tracking-widest">Jeder kommt zu Wort</p>
                 </div>
               </div>
             </div>
             <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-foreground -rotate-1 group">
               <Image 
                 src="https://picsum.photos/seed/audience/800/800"
-                alt="Engaged Audience"
+                alt="Engagiertes Publikum"
                 width={800}
                 height={800}
                 className="object-cover aspect-square contrast-110 group-hover:scale-105 transition-transform duration-1000"
@@ -142,18 +143,18 @@ export default function Home() {
         <section className="py-60 px-6 text-center bg-foreground text-background">
           <div className="max-w-4xl mx-auto space-y-16">
             <h2 className="text-7xl md:text-[10rem] font-black uppercase tracking-tighter leading-[0.75]">
-              Ready to <br />
-              Pulse?
+              Bereit für <br />
+              Ihr Event?
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-6">
               <Button size="lg" onClick={() => router.push('/login')} className="h-20 px-16 rounded-[1.5rem] text-xl font-black bg-background text-foreground border-2 border-background hover:bg-transparent hover:text-background transition-all shadow-none">
-                START STUDIO
+                JETZT STARTEN
               </Button>
               <Button variant="outline" size="lg" onClick={() => router.push('/join')} className="h-20 px-16 rounded-[1.5rem] text-xl font-black border-2 border-background hover:bg-background hover:text-foreground transition-all shadow-none">
-                JOIN SESSION
+                TEILNEHMEN
               </Button>
             </div>
-            <p className="text-sm font-black uppercase tracking-[0.4em] opacity-40 pt-12">Zero Friction. Instant Sync. Built for the bold.</p>
+            <p className="text-sm font-black uppercase tracking-[0.4em] opacity-40 pt-12">Kein Account nötig. Sofortiger Start.</p>
           </div>
         </section>
       </main>
@@ -161,12 +162,12 @@ export default function Home() {
       <footer className="py-24 px-6 max-w-7xl mx-auto w-full flex flex-col md:flex-row items-center justify-between gap-12 font-black border-t-2 border-foreground">
         <div className="flex flex-col gap-4">
           <span className="text-3xl tracking-tighter uppercase leading-none">PopPulse*</span>
-          <p className="text-xs opacity-40 uppercase tracking-widest">Amplifying Human Energy globally</p>
+          <p className="text-xs opacity-40 uppercase tracking-widest">Globale Echtzeit-Interaktion</p>
         </div>
         <div className="flex gap-12 text-xs uppercase tracking-widest opacity-40">
-          <Link href="#" className="hover:text-primary transition-colors">Privacy</Link>
-          <Link href="#" className="hover:text-primary transition-colors">Terms</Link>
-          <Link href="#" className="hover:text-primary transition-colors">OS Status</Link>
+          <Link href="#" className="hover:text-primary transition-colors">Datenschutz</Link>
+          <Link href="#" className="hover:text-primary transition-colors">Impressum</Link>
+          <Link href="#" className="hover:text-primary transition-colors">Status</Link>
         </div>
       </footer>
     </div>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
@@ -13,7 +14,6 @@ interface ResultChartProps {
 }
 
 export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
-  // Use current theme foreground for text and chart elements
   const colors = [
     'hsl(var(--foreground))',
     'hsl(var(--foreground) / 0.85)',
@@ -50,7 +50,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
                     <div className="bg-foreground p-8 rounded-[1.5rem] border-2 border-background/20 shadow-none">
                       <p className="font-black text-background text-5xl leading-none">
                         {payload[0].value}
-                        <span className="text-xs uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">TOTAL PULSES</span>
+                        <span className="text-xs uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">STIMMEN GESAMT</span>
                       </p>
                     </div>
                   );
@@ -81,7 +81,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     return (
       <div className="h-full w-full flex flex-wrap items-center justify-center gap-16 p-20 overflow-hidden">
         {entries.length === 0 ? (
-          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] animate-pulse">Awaiting Signals...</p>
+          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] animate-pulse">Warten auf Antworten...</p>
         ) : (
           sorted.map(([word, count], i) => (
             <span 
@@ -105,7 +105,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     return (
       <div className="h-full w-full max-w-6xl flex flex-col items-center">
         {allResponses.length === 0 ? (
-          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] my-auto animate-pulse">Silence is Golden...</p>
+          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] my-auto animate-pulse">Bisher keine Antworten...</p>
         ) : (
           <ScrollArea className="h-full w-full pr-12">
             <div className="grid gap-12 py-12 px-8">
@@ -140,7 +140,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
         </div>
         <div className="text-center space-y-4">
           <span className="text-[24rem] font-black tracking-tighter leading-[0.7]">{avg.toFixed(1)}</span>
-          <p className="text-5xl font-black opacity-20 uppercase tracking-[1em] mt-8">AVG PULSE</p>
+          <p className="text-5xl font-black opacity-20 uppercase tracking-[1em] mt-8">DURCHSCHNITT</p>
         </div>
       </div>
     );
@@ -159,13 +159,13 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
            />
            <div className="relative z-10 w-full flex justify-between font-black text-4xl mix-blend-difference text-white uppercase tracking-[0.5em]">
              <span>0</span>
-             <span>PULSE INTENSITY</span>
+             <span>INTENSITÄT</span>
              <span>100</span>
            </div>
         </div>
         <div className="text-center">
           <span className="text-[28rem] font-black tracking-tighter leading-[0.7]">{average.toFixed(0)}</span>
-          <p className="text-6xl font-black opacity-20 uppercase tracking-[1.2em] mt-8">SYNERGY</p>
+          <p className="text-6xl font-black opacity-20 uppercase tracking-[1.2em] mt-8">ERGEBNIS</p>
         </div>
       </div>
     );
@@ -173,7 +173,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
   return (
     <div className="bg-transparent p-40 rounded-[1.5rem] text-center border-2 border-dashed border-foreground/10">
-      <p className="text-5xl font-black uppercase opacity-10 tracking-[1em] animate-pulse">CONNECTING...</p>
+      <p className="text-5xl font-black uppercase opacity-10 tracking-[1em] animate-pulse">VERBINDUNG...</p>
     </div>
   );
 }
