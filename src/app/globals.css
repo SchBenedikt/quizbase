@@ -1,11 +1,10 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* DEFAULT VIBRANT ORANGE THEME - High Saturation */
+    /* DEFAULT VIBRANT ORANGE THEME */
     --background: 33 100% 50%;
     --foreground: 37 92% 10%;
     --card: 33 100% 55%;
@@ -51,25 +50,25 @@
   }
 
   [data-theme='red'] {
-    --background: 0 85% 50%;
-    --foreground: 0 0% 100%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 85% 50%;
-    --secondary: 0 85% 45%;
-    --accent: 0 0% 100% / 0.2;
-    --ring: 0 0% 100%;
-    --border: 0 0% 100% / 0.2;
+    --background: 354 82% 26%;
+    --foreground: 300 48% 84%;
+    --primary: 300 48% 84%;
+    --primary-foreground: 354 82% 26%;
+    --secondary: 354 82% 22%;
+    --accent: 300 48% 84% / 0.2;
+    --ring: 300 48% 84%;
+    --border: 300 48% 84% / 0.2;
   }
 
   [data-theme='green'] {
-    --background: 142 76% 40%;
-    --foreground: 0 0% 100%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 142 76% 40%;
-    --secondary: 142 76% 35%;
-    --accent: 0 0% 100% / 0.2;
-    --ring: 0 0% 100%;
-    --border: 0 0% 100% / 0.2;
+    --background: 67 83% 52%;
+    --foreground: 107 50% 21%;
+    --primary: 107 50% 21%;
+    --primary-foreground: 67 83% 52%;
+    --secondary: 67 83% 45%;
+    --accent: 107 50% 21% / 0.2;
+    --ring: 107 50% 21%;
+    --border: 107 50% 21% / 0.2;
   }
 
   [data-theme='blue'] {
@@ -83,7 +82,6 @@
     --border: 0 0% 100% / 0.2;
   }
 
-  /* NEUTRAL STUDIO UI FOR PRESENTERS - THEME AWARE */
   .presenter-ui {
     --background: 0 0% 100%;
     --foreground: 0 0% 10%;
@@ -139,8 +137,4 @@
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
-}
-
-.flat-card {
-  @apply bg-white/5 border-white/10 backdrop-blur-none;
 }

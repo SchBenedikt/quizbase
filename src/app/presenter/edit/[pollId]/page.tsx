@@ -124,13 +124,13 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       <Header variant="minimal" />
       <div className="max-w-[1400px] mx-auto px-6 py-12 pb-40">
         <div className="flex items-center gap-6 mt-32 mb-12">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/presenter')} className="rounded-[1.5rem] h-14 w-14 border-2">
+          <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="rounded-[1.5rem] h-14 w-14 border-2">
             <ArrowLeft className="h-6 w-6" />
           </Button>
           <div className="flex-1">
             <h1 className="text-5xl font-black uppercase tracking-tighter">Edit Survey</h1>
             {lastSaved && (
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mt-1 flex items-center gap-2">
+              <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 mt-1 flex items-center gap-2">
                 <CheckCircle2 className="h-3 w-3" /> Autosaved {new Date(lastSaved).toLocaleTimeString()}
               </p>
             )}

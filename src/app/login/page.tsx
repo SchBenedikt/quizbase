@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -33,7 +32,7 @@ export default function LoginPage() {
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
-      router.push("/presenter");
+      router.push("/dashboard");
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -49,7 +48,7 @@ export default function LoginPage() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push("/presenter");
+      router.push("/dashboard");
     } catch (error: any) {
       toast({
         variant: "destructive",

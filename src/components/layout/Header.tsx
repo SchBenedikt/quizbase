@@ -63,10 +63,10 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
               asChild 
               className={cn(
                 "rounded-[1rem] px-5 font-black uppercase text-xs tracking-widest h-10 transition-all shadow-none",
-                pathname === '/presenter' ? "bg-foreground text-background" : "hover:bg-foreground/10"
+                pathname === '/dashboard' ? "bg-foreground text-background" : "hover:bg-foreground/10"
               )}
             >
-              <Link href="/presenter">
+              <Link href="/dashboard">
                 <LayoutDashboard className="h-3.5 w-3.5 mr-2" /> Dashboard
               </Link>
             </Button>
