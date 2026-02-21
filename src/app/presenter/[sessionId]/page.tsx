@@ -73,7 +73,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   if (sessionLoading || !questions) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-background">
+      <div className="h-screen w-screen flex items-center justify-center bg-[#f3f3f1]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
@@ -84,29 +84,29 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
 
   return (
-    <div className={cn("no-scroll h-screen w-screen overflow-hidden flex flex-col font-body", `theme-${theme}`)}>
+    <div className={cn("no-scroll h-screen w-screen overflow-hidden flex flex-col font-body bg-background transition-colors duration-500", `theme-${theme}`)}>
       <header className="h-[12vh] px-12 flex items-center justify-between bg-white border-b-8 border-foreground shrink-0 z-10">
         <div className="flex items-center gap-6 overflow-hidden">
           <div className="bg-foreground p-3 rounded-[1rem] shrink-0">
             <Zap className="text-background h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-black uppercase tracking-tighter truncate max-w-lg">{title}</h1>
+          <h1 className="text-2xl font-black uppercase tracking-tighter truncate max-w-lg text-foreground">{title}</h1>
         </div>
         
         <div className="flex items-center gap-8">
           <div className="flex flex-col items-end">
-            <p className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 mb-1">Join Pulse</p>
-            <p className="text-5xl font-black tracking-tighter leading-none">{code}</p>
+            <p className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 mb-1 text-foreground">Join Pulse</p>
+            <p className="text-5xl font-black tracking-tighter leading-none text-foreground">{code}</p>
           </div>
           <div className="h-12 w-1.5 bg-foreground/10 rounded-full" />
-          <div className="flex items-center gap-3 bg-foreground/5 px-6 py-3 rounded-[1.5rem] border-4 border-foreground">
+          <div className="flex items-center gap-3 bg-foreground/5 px-6 py-3 rounded-[1.5rem] border-4 border-foreground text-foreground">
             <Users className="h-6 w-6" />
             <span className="text-3xl font-black leading-none">{currentResponses.length}</span>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 p-8 bg-background flex flex-col items-center justify-center overflow-hidden">
+      <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center overflow-hidden">
         <div className="w-full max-w-7xl h-full flex flex-col gap-6">
           <div className="space-y-2 text-center shrink-0">
              <div className="inline-block px-6 py-1 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-[0.4em]">

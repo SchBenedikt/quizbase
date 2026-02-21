@@ -9,7 +9,7 @@ import { Zap, Send, Heart, Loader2 } from "lucide-react";
 import { PollQuestion, AppTheme } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 import { useFirestore, useDoc, useMemoFirebase } from "@/firebase";
-import { doc, collection, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
+import { doc, collection, addDoc, serverTimestamp, getDoc } from "firebase/firestore";
 
 export default function ParticipantView({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
@@ -23,13 +23,17 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   useEffect(() => {
     if (session?.currentQuestionId && session.userId && session.pollId) {
       const fetchQ = async () => {
-        const qRef = doc(db, `users/${session.userId}/polls/${session.pollId}/questions/${session.currentQuestionId}`);
-        const snap = await getDocs(query(collection(db, `users/${session.userId}/polls/${session.pollId}/questions`), where("id", "==", session.currentQuestionId)));
-        if (!snap.empty) {
-          setCurrentQuestion(snap.docs[0].data() as PollQuestion);
-          setVoted(false);
-          setSelection(null);
-          setTextValue("");
+        try {
+          const qRef = doc(db, `users/${session.userId}/polls/${session.pollId}/questions/${session.currentQuestionId}`);
+          const snap = await getDoc(qRef);
+          if (snap.exists()) {
+            setCurrentQuestion({ ...snap.data(), id: snap.id } as PollQuestion);
+            setVoted(false);
+            setSelection(null);
+            setTextValue("");
+          }
+        } catch (error) {
+          console.error("Failed to fetch current question:", error);
         }
       };
       fetchQ();
@@ -58,7 +62,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         sessionId: resolvedParams.sessionId,
         questionId: currentQuestion.id,
         value,
-        userId: session.userId, // Storing owner ID in response helps with security rules
+        userId: session.userId, 
         createdAt: serverTimestamp(),
       });
       setVoted(true);
@@ -69,7 +73,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     }
   };
 
-  if (sessionLoading || !session) {
+  if (sessionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f3f3f1]">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -77,9 +81,18 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     );
   }
 
+  if (!session) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-[#f3f3f1]">
+        <h1 className="text-4xl font-black uppercase tracking-tighter opacity-20">Session Not Found</h1>
+        <Button onClick={() => window.location.href = '/join'} className="mt-8 bg-primary text-background font-black rounded-full h-14 px-8 border-4 border-primary">Return to Join</Button>
+      </div>
+    );
+  }
+
   if (voted) {
     return (
-      <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-12 animate-in fade-in duration-500", `theme-${theme}`)}>
+      <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-12 animate-in fade-in duration-500 bg-background", `theme-${theme}`)}>
         <div className="bg-foreground p-12 rounded-[5rem] animate-float border-8 border-background">
           <Heart className="h-24 w-24 text-background fill-background" />
         </div>
@@ -93,26 +106,26 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (!currentQuestion) {
     return (
-      <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center", `theme-${theme}`)}>
-        <p className="text-4xl font-black uppercase opacity-20 tracking-tighter">Waiting for Presenter...</p>
+      <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background", `theme-${theme}`)}>
+        <p className="text-4xl font-black uppercase opacity-20 tracking-tighter text-foreground">Waiting for Presenter...</p>
       </div>
     );
   }
 
   return (
-    <div className={cn("min-h-screen flex flex-col p-8 font-body max-w-lg mx-auto", `theme-${theme}`)}>
+    <div className={cn("min-h-screen flex flex-col p-8 font-body max-w-lg mx-auto bg-background transition-colors duration-500", `theme-${theme}`)}>
       <div className="flex items-center justify-between mb-16">
         <div className="flex items-center gap-3">
           <Zap className="h-8 w-8 text-foreground fill-foreground" />
-          <span className="font-black text-3xl tracking-tighter uppercase">PopPulse*</span>
+          <span className="font-black text-3xl tracking-tighter uppercase text-foreground">PopPulse*</span>
         </div>
-        <div className="px-6 py-2 border-4 border-foreground rounded-full text-[10px] font-black uppercase tracking-[0.4em]">
+        <div className="px-6 py-2 border-4 border-foreground rounded-full text-[10px] font-black uppercase tracking-[0.4em] text-foreground">
           LIVE
         </div>
       </div>
 
       <main className="space-y-12 flex-1">
-        <h2 className="text-5xl md:text-6xl font-black leading-[1] uppercase tracking-tighter">
+        <h2 className="text-5xl md:text-6xl font-black leading-[1] uppercase tracking-tighter text-foreground">
           {currentQuestion.question}
         </h2>
 
@@ -124,7 +137,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 variant={selection === idx ? "default" : "outline"}
                 className={cn(
                   "h-24 text-xl font-black rounded-[2.5rem] border-4 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
-                  selection === idx ? "bg-foreground text-background border-foreground" : "border-foreground/20 bg-white/20"
+                  selection === idx ? "bg-foreground text-background border-foreground" : "border-foreground/20 bg-white/20 text-foreground"
                 )}
                 onClick={() => setSelection(idx)}
               >
@@ -148,14 +161,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
                 maxLength={20}
-                className="h-24 text-4xl font-black px-10 rounded-[3rem] border-4 border-foreground bg-white/20 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none"
+                className="h-24 text-4xl font-black px-10 rounded-[3rem] border-4 border-foreground bg-white/20 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none text-foreground"
               />
             ) : (
               <Textarea 
                 placeholder="Share your thoughts..."
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
-                className="min-h-[200px] text-2xl font-black p-10 rounded-[3rem] border-4 border-foreground bg-white/20 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight"
+                className="min-h-[200px] text-2xl font-black p-10 rounded-[3rem] border-4 border-foreground bg-white/20 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight text-foreground"
               />
             )}
           </div>
@@ -164,7 +177,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         {currentQuestion.type === 'slider' && (
           <div className="space-y-12 py-10">
             <div className="text-center">
-              <span className="text-[10rem] font-black tracking-tighter leading-none">{sliderValue}</span>
+              <span className="text-[10rem] font-black tracking-tighter leading-none text-foreground">{sliderValue}</span>
             </div>
             <Slider 
               value={[sliderValue]}
@@ -185,7 +198,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       </main>
 
       <footer className="mt-16 pt-12 text-center opacity-30 border-t-4 border-foreground/10">
-        <p className="text-[10px] font-black uppercase tracking-[0.5em]">PopPulse: Secure. Instant. Zero Friction.</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-foreground">PopPulse: Secure. Instant. Zero Friction.</p>
       </footer>
     </div>
   );

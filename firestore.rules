@@ -42,7 +42,9 @@ service cloud.firestore {
       allow delete: if isExistingOwner(userId);
 
       match /questions/{questionId} {
-        allow get, list: if isOwner(userId);
+        // Participants need to be able to get the question details to participate
+        allow get: if true;
+        allow list: if isOwner(userId);
         allow create, update, delete: if isOwner(userId);
       }
     }
