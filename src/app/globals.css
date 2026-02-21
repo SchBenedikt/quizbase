@@ -24,7 +24,7 @@
     --border: 37 92% 10% / 0.1;
     --input: 37 92% 10% / 0.1;
     --ring: 37 92% 10%;
-    --radius: 1rem;
+    --radius: 1.5rem;
   }
 
   [data-theme='red'] {
@@ -71,7 +71,7 @@
     --muted: 0 0% 97% !important;
     --muted-foreground: 0 0% 40% !important;
     --border: 0 0% 0% / 0.1 !important;
-    --radius: 0.75rem;
+    --radius: 1.5rem;
   }
 }
 

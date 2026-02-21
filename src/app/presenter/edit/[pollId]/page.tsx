@@ -100,18 +100,18 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       <Header variant="minimal" />
       <div className="max-w-5xl mx-auto px-6 py-12 pb-40">
         <div className="flex items-center gap-6 mt-32 mb-12">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/presenter')} className="rounded-full h-14 w-14 border-2">
+          <Button variant="ghost" size="icon" onClick={() => router.push('/presenter')} className="rounded-[1.5rem] h-14 w-14 border-2">
             <ArrowLeft className="h-6 w-6" />
           </Button>
           <h1 className="text-5xl font-black uppercase tracking-tighter">Edit Pulse</h1>
         </div>
         
         <div className="space-y-4 mb-12">
-          <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4">Pulse Title</label>
+          <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Pulse Title</label>
           <Input 
             value={sessionTitle} 
             onChange={(e) => setSessionTitle(e.target.value)}
-            className="text-3xl font-black h-20 border-2 bg-card rounded-[2rem] px-10 focus-visible:ring-0 uppercase shadow-none"
+            className="text-3xl font-black h-20 border-2 bg-card rounded-[1.5rem] px-10 focus-visible:ring-0 uppercase shadow-none"
           />
         </div>
 

@@ -127,7 +127,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             <p className="text-xs font-black uppercase tracking-widest opacity-50">JOIN PULSE</p>
             <p className="text-6xl font-black tracking-tighter leading-none mt-1">{code}</p>
           </div>
-          <div className="flex items-center gap-6 bg-white/10 px-8 py-4 rounded-2xl border-2 border-white/20">
+          <div className="flex items-center gap-6 bg-white/10 px-8 py-4 rounded-[1.5rem] border-2 border-white/20">
             <Users className="h-8 w-8" />
             <span className="text-5xl font-black leading-none">{currentResponses.length}</span>
           </div>
@@ -137,7 +137,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-16 flex flex-col items-center justify-center relative">
         <div className="w-full max-w-[85rem] h-full flex flex-col gap-12">
           <div className="text-center shrink-0 space-y-4">
-             <div className="inline-block px-6 py-2 bg-foreground text-background rounded-full text-sm font-black uppercase tracking-widest">
+             <div className="inline-block px-6 py-2 bg-foreground text-background rounded-[1.5rem] text-xs font-black uppercase tracking-widest">
                SIGNAL {currentIdx + 1} / {questions.length}
              </div>
              <h2 className="text-6xl md:text-8xl lg:text-[7rem] font-black leading-[0.8] tracking-tighter max-w-7xl mx-auto uppercase">
@@ -146,7 +146,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           </div>
 
           <div className="flex-1 min-h-0 w-full relative">
-            <Card className="h-full border-4 rounded-[3rem] bg-black/5 border-white/10 p-16 flex items-center justify-center overflow-hidden shadow-none">
+            <Card className="h-full border-2 rounded-[1.5rem] bg-black/5 border-white/10 p-16 flex items-center justify-center overflow-hidden shadow-none">
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
             
@@ -154,7 +154,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <Button 
                 onClick={handleSummarize}
                 disabled={isSummarizing}
-                className="absolute top-8 right-8 h-14 px-8 rounded-xl bg-foreground text-background font-black uppercase text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all gap-3 shadow-none"
+                className="absolute top-8 right-8 h-14 px-8 rounded-[1rem] bg-foreground text-background font-black uppercase text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all gap-3 shadow-none"
               >
                 {isSummarizing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
                 AI SUMMARIZE
@@ -171,7 +171,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             size="icon" 
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="h-14 w-14 rounded-full border-2 border-white/20 bg-white/5 hover:bg-foreground hover:text-background transition-all shadow-none"
+            className="h-14 w-14 rounded-[1.5rem] border-2 border-white/20 bg-white/5 hover:bg-foreground hover:text-background transition-all shadow-none"
           >
             <ChevronLeft className="h-7 w-7" />
           </Button>
@@ -180,30 +180,30 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             size="icon" 
             onClick={handleNext}
             disabled={currentIdx === questions.length - 1}
-            className="h-14 w-14 rounded-full border-2 border-white/20 bg-white/5 hover:bg-foreground hover:text-background transition-all shadow-none"
+            className="h-14 w-14 rounded-[1.5rem] border-2 border-white/20 bg-white/5 hover:bg-foreground hover:text-background transition-all shadow-none"
           >
             <ChevronRight className="h-7 w-7" />
           </Button>
         </div>
         
-        <div className="flex items-center gap-4 bg-white/5 p-2 rounded-2xl border-2 border-white/10">
+        <div className="flex items-center gap-4 bg-white/5 p-2 rounded-[1.5rem] border-2 border-white/10">
            <Popover>
              <PopoverTrigger asChild>
-                <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-xl hover:bg-white/10 transition-all shadow-none">
+                <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-[1rem] hover:bg-white/10 transition-all shadow-none">
                   <Palette className="h-5 w-5 mr-3" /> Vibe
                 </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-64 p-4 rounded-2xl border-2 border-white/10 bg-background flex flex-col gap-2 shadow-none">
-                <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] hover:opacity-90 text-white rounded-xl font-black uppercase text-[10px] h-12 border-2 border-white/20 shadow-none">Vibrant Orange</Button>
-                <Button onClick={() => setTheme('red')} className="bg-[#f24822] hover:opacity-90 text-white rounded-xl font-black uppercase text-[10px] h-12 border-2 border-white/20 shadow-none">Electric Red</Button>
-                <Button onClick={() => setTheme('green')} className="bg-[#14ae5c] hover:opacity-90 text-white rounded-xl font-black uppercase text-[10px] h-12 border-2 border-white/20 shadow-none">Neon Green</Button>
-                <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] hover:opacity-90 text-white rounded-xl font-black uppercase text-[10px] h-12 border-2 border-white/20 shadow-none">Deep Blue</Button>
+             <PopoverContent className="w-64 p-4 rounded-[1.5rem] border-2 border-white/10 bg-background flex flex-col gap-2 shadow-none">
+                <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Vibrant Orange</Button>
+                <Button onClick={() => setTheme('red')} className="bg-[#f24822] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Electric Red</Button>
+                <Button onClick={() => setTheme('green')} className="bg-[#14ae5c] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Neon Green</Button>
+                <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] hover:opacity-90 text-white rounded-[1rem] font-black uppercase text-xs h-12 border-2 border-white/20 shadow-none">Deep Blue</Button>
              </PopoverContent>
            </Popover>
-           <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-xl hover:bg-white/10 transition-all shadow-none">
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-[1rem] hover:bg-white/10 transition-all shadow-none">
              <Timer className="h-5 w-5 mr-3" /> Timer
            </Button>
-           <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-xl hover:bg-white/10 transition-all shadow-none">
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-xs h-12 px-8 rounded-[1rem] hover:bg-white/10 transition-all shadow-none">
              <Monitor className="h-5 w-5 mr-3" /> Screen
            </Button>
         </div>

@@ -47,10 +47,10 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className="bg-foreground p-8 rounded-[2.5rem] border-8 border-background/20 shadow-2xl">
+                    <div className="bg-foreground p-8 rounded-[1.5rem] border-2 border-background/20 shadow-none">
                       <p className="font-black text-background text-5xl leading-none">
                         {payload[0].value}
-                        <span className="text-[12px] uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">TOTAL PULSES</span>
+                        <span className="text-xs uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">TOTAL PULSES</span>
                       </p>
                     </div>
                   );
@@ -60,7 +60,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
             />
             <Bar 
               dataKey="value" 
-              radius={[0, 60, 60, 0]} 
+              radius={[0, 40, 40, 0]} 
               barSize={120}
               animationDuration={1500}
             >
@@ -110,7 +110,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
           <ScrollArea className="h-full w-full pr-12">
             <div className="grid gap-12 py-12 px-8">
               {allResponses.map((res, i) => (
-                <div key={i} className="bg-foreground text-background p-16 rounded-[4rem] border-8 border-foreground shadow-xl animate-in slide-in-from-bottom-20 duration-1000">
+                <div key={i} className="bg-foreground text-background p-16 rounded-[1.5rem] border-2 border-foreground shadow-none animate-in slide-in-from-bottom-20 duration-1000">
                   <p className="text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9]">{res.value}</p>
                 </div>
               ))}
@@ -152,7 +152,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
     return (
       <div className="h-full w-full max-w-6xl flex flex-col items-center justify-center space-y-32">
-        <div className="relative h-40 w-full bg-foreground/10 rounded-full border-8 border-foreground flex items-center px-16 overflow-hidden">
+        <div className="relative h-40 w-full bg-foreground/10 rounded-[1.5rem] border-2 border-foreground flex items-center px-16 overflow-hidden">
            <div 
              className="absolute left-0 h-full bg-foreground transition-all duration-1500 ease-out"
              style={{ width: `${average}%` }}
@@ -172,7 +172,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
   }
 
   return (
-    <div className="bg-transparent p-40 rounded-[5rem] text-center border-8 border-dashed border-foreground/10">
+    <div className="bg-transparent p-40 rounded-[1.5rem] text-center border-2 border-dashed border-foreground/10">
       <p className="text-5xl font-black uppercase opacity-10 tracking-[1em] animate-pulse">CONNECTING...</p>
     </div>
   );

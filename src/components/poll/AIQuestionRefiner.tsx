@@ -36,7 +36,7 @@ export function AIQuestionRefiner({ currentQuestion, onSelect }: AIQuestionRefin
         size="lg"
         onClick={handleSuggest}
         disabled={loading || !currentQuestion}
-        className="rounded-full h-14 px-8 gap-3 border-4 border-primary/20 text-primary font-black uppercase tracking-widest hover:bg-primary hover:text-background transition-all"
+        className="rounded-[1.5rem] h-14 px-8 gap-3 border-2 border-primary/20 text-primary font-black uppercase tracking-widest hover:bg-primary hover:text-background transition-all"
       >
         {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
         AI Refine
@@ -44,11 +44,11 @@ export function AIQuestionRefiner({ currentQuestion, onSelect }: AIQuestionRefin
 
       {suggestions.length > 0 && (
         <div className="grid gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
-          <p className="text-[10px] font-black text-primary opacity-40 uppercase tracking-[0.4em] px-2">AI Proposals</p>
+          <p className="text-xs font-black text-primary opacity-40 uppercase tracking-[0.4em] px-2">AI Proposals</p>
           {suggestions.map((suggestion, idx) => (
             <Card 
               key={idx} 
-              className="cursor-pointer border-4 border-primary/10 hover:border-primary hover:bg-primary/5 transition-all group rounded-[2rem] overflow-hidden bg-white/5"
+              className="cursor-pointer border-2 border-primary/10 hover:border-primary hover:bg-primary/5 transition-all group rounded-[1.5rem] overflow-hidden bg-white/5 shadow-none"
               onClick={() => {
                 onSelect(suggestion.toUpperCase());
                 setSuggestions([]);

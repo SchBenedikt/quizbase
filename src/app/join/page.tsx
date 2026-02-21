@@ -21,15 +21,15 @@ export default function JoinPage() {
     <div className="min-h-screen bg-background p-6 flex items-center justify-center text-primary">
       <div className="max-w-md w-full relative z-10 space-y-12">
         <div className="text-center space-y-6">
-          <div className="bg-primary w-24 h-24 rounded-[3rem] flex items-center justify-center mx-auto border-4 border-primary rotate-6">
+          <div className="bg-primary w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-2 border-primary rotate-6">
             <Zap className="text-background h-12 w-12" />
           </div>
           <h1 className="text-6xl font-black font-headline tracking-tighter uppercase leading-none">Enter.</h1>
           <p className="text-xl font-bold opacity-80 uppercase tracking-wide">Enter the 6-digit pulse code</p>
         </div>
 
-        <Card className="border-8 border-primary rounded-[5rem] overflow-hidden bg-white/10 shadow-none">
-          <CardContent className="p-12 space-y-10">
+        <Card className="border-2 border-primary rounded-[1.5rem] overflow-hidden bg-white/10 shadow-none">
+          <CardContent className="p-10 space-y-10">
             <div className="space-y-4 text-center">
               <Input 
                 value={code}
@@ -43,18 +43,18 @@ export default function JoinPage() {
             <Button 
               disabled={code.length < 6}
               onClick={handleJoin}
-              className="w-full h-24 text-2xl font-black rounded-[3rem] bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all group"
+              className="w-full h-24 text-2xl font-black rounded-[1.5rem] bg-primary text-background border-2 border-primary hover:bg-transparent hover:text-primary transition-all group"
             >
               JOIN VIBE <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
             </Button>
             
-            <div className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.3em] opacity-40">
+            <div className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.3em] opacity-40">
               <Sparkles className="h-4 w-4" /> Live Connection Established
             </div>
           </CardContent>
         </Card>
         
-        <p className="text-center text-[10px] font-black uppercase opacity-40 tracking-[0.4em]">Zero Friction. Zero Data. Pure Pulse.</p>
+        <p className="text-center text-xs font-black uppercase opacity-40 tracking-[0.4em]">Zero Friction. Zero Data. Pure Pulse.</p>
       </div>
     </div>
   );

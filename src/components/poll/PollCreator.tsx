@@ -65,7 +65,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
           <Button 
             type="button"
             onClick={() => onSave(questions)} 
-            className="rounded-xl h-12 px-8 font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all uppercase text-xs shadow-none border-2 border-primary"
+            className="rounded-[1.5rem] h-12 px-8 font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all uppercase text-xs shadow-none border-2 border-primary"
           >
             Save Pulse
           </Button>
@@ -73,11 +73,11 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
 
         <div className="grid gap-6">
           {questions.map((q, idx) => (
-            <Card key={q.id} className="border-2 rounded-[2rem] bg-card overflow-hidden transition-all hover:border-primary/40 shadow-none">
+            <Card key={q.id} className="border-2 rounded-[1.5rem] bg-card overflow-hidden transition-all hover:border-primary/40 shadow-none">
               <CardContent className="p-8">
                 <div className="flex gap-6">
                   <div className="flex flex-col gap-2 shrink-0">
-                    <div className="bg-muted text-foreground/40 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg border-2 border-transparent">
+                    <div className="bg-muted text-foreground/40 w-12 h-12 rounded-[1rem] flex items-center justify-center font-bold text-lg border-2 border-transparent">
                       {idx + 1}
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => moveQuestion(idx, 'up')} disabled={idx === 0} className="h-10 w-12">
@@ -91,7 +91,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
                   <div className="flex-grow space-y-6">
                     <div className="flex items-center justify-between">
                       <Label className="text-xs font-bold uppercase tracking-widest opacity-40">Interaction</Label>
-                      <div className="px-4 py-1.5 bg-muted rounded-full text-[10px] font-bold uppercase opacity-60 border-2 border-transparent">
+                      <div className="px-4 py-1.5 bg-muted rounded-[1.5rem] text-[10px] font-bold uppercase opacity-60 border-2 border-transparent">
                         {q.type.replace('-', ' ')}
                       </div>
                     </div>
@@ -101,14 +101,14 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
                         value={q.question} 
                         onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
                         placeholder="Type your question..."
-                        className="text-xl font-bold h-16 border-2 bg-muted rounded-2xl px-6 focus-visible:ring-1 shadow-none"
+                        className="text-xl font-bold h-16 border-2 bg-muted rounded-[1.5rem] px-6 focus-visible:ring-1 shadow-none"
                       />
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => removeQuestion(q.id)} 
                         disabled={questions.length <= 1}
-                        className="h-16 w-16 rounded-2xl hover:text-destructive border-2 border-transparent"
+                        className="h-16 w-16 rounded-[1.5rem] hover:text-destructive border-2 border-transparent"
                       >
                         <Trash2 className="h-6 w-6" />
                       </Button>
@@ -130,7 +130,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
                                 newOpts[oIdx] = e.target.value;
                                 updateQuestion(q.id, { options: newOpts });
                               }}
-                              className="h-12 border-2 bg-muted/30 rounded-xl px-6 font-bold text-sm shadow-none"
+                              className="h-12 border-2 bg-muted/30 rounded-[1rem] px-6 font-bold text-sm shadow-none"
                             />
                             {q.options!.length > 2 && (
                                <Button variant="ghost" size="icon" onClick={() => {
@@ -145,7 +145,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
                         <Button 
                           variant="outline" 
                           onClick={() => updateQuestion(q.id, { options: [...q.options!, `Option ${q.options!.length + 1}`] })} 
-                          className="rounded-xl border-dashed border-2 h-12 text-xs font-bold uppercase tracking-widest mt-2 shadow-none"
+                          className="rounded-[1rem] border-dashed border-2 h-12 text-xs font-bold uppercase tracking-widest mt-2 shadow-none"
                         >
                           <Plus className="mr-2 h-4 w-4" /> Add Choice
                         </Button>
@@ -159,7 +159,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
         </div>
       </section>
 
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-foreground text-background p-3 rounded-2xl flex items-center gap-2 z-50 shadow-none border-2 border-foreground">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-foreground text-background p-3 rounded-[1.5rem] flex items-center gap-2 z-50 shadow-none border-2 border-foreground">
         {[
           { type: 'multiple-choice', icon: ListChecks, label: 'Poll' },
           { type: 'word-cloud', icon: Cloud, label: 'Cloud' },

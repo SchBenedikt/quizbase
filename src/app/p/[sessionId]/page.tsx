@@ -95,7 +95,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
         <h1 className="text-3xl font-black uppercase tracking-tighter opacity-30">Session Not Found</h1>
         <p className="text-sm font-bold opacity-60 mt-4 uppercase tracking-widest">Verify your pulse code.</p>
-        <Button onClick={() => window.location.href = '/join'} className="mt-12 bg-foreground text-background font-black rounded-2xl h-16 px-12 border-2 border-foreground shadow-none">Return to Lobby</Button>
+        <Button onClick={() => window.location.href = '/join'} className="mt-12 bg-foreground text-background font-black rounded-[1.5rem] h-16 px-12 border-2 border-foreground shadow-none">Return to Lobby</Button>
       </div>
     );
   }
@@ -105,7 +105,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (voted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-700 bg-background" data-theme={currentTheme}>
-        <div className="bg-foreground p-14 rounded-[3rem] animate-float">
+        <div className="bg-foreground p-14 rounded-[1.5rem] animate-float">
           <Heart className="h-20 w-20 text-background fill-background" />
         </div>
         <div className="space-y-4">
@@ -132,7 +132,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             <Zap className="h-8 w-8 text-foreground fill-foreground" />
             <span className="font-black text-2xl tracking-tighter uppercase">PopPulse*</span>
           </div>
-          <div className="px-6 py-2 border-2 border-foreground rounded-full text-xs font-black uppercase tracking-widest">
+          <div className="px-6 py-2 border-2 border-foreground rounded-[1.5rem] text-xs font-black uppercase tracking-widest">
             Live
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   key={idx}
                   variant={selection === idx ? "default" : "outline"}
                   className={cn(
-                    "h-24 text-xl font-black rounded-3xl border-2 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
+                    "h-24 text-xl font-black rounded-[1.5rem] border-2 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
                     selection === idx 
                       ? "bg-foreground text-background border-foreground" 
                       : "border-foreground/20 text-foreground bg-foreground/5 hover:bg-foreground/10"
@@ -157,7 +157,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   onClick={() => setSelection(idx)}
                 >
                   <div className={cn(
-                    "w-12 h-12 rounded-xl flex items-center justify-center mr-6 shrink-0 transition-colors border-2 text-lg font-black",
+                    "w-12 h-12 rounded-[1rem] flex items-center justify-center mr-6 shrink-0 transition-colors border-2 text-lg font-black",
                     selection === idx ? "bg-background text-foreground border-background" : "bg-foreground text-background border-foreground"
                   )}>
                     {String.fromCharCode(65 + idx)}
@@ -169,14 +169,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           )}
 
           {currentQuestion.type === 'rating' && (
-            <div className="flex justify-center gap-3 py-10 bg-black/5 rounded-[2.5rem] border-2 border-foreground/10">
+            <div className="flex justify-center gap-3 py-10 bg-black/5 rounded-[1.5rem] border-2 border-foreground/10">
               {[1, 2, 3, 4, 5].map((s) => (
                 <Button
                   key={s}
                   variant="ghost"
                   size="icon"
                   onClick={() => setRatingValue(s)}
-                  className="h-16 w-16 rounded-full"
+                  className="h-16 w-16 rounded-[1.5rem]"
                 >
                   <Star 
                     className={cn(
@@ -197,21 +197,21 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   maxLength={20}
-                  className="h-24 text-3xl font-black px-10 rounded-3xl border-2 border-foreground bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none"
+                  className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 border-foreground bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none"
                 />
               ) : (
                 <Textarea 
                   placeholder="Your thoughts..."
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
-                  className="min-h-[250px] text-2xl font-black p-10 rounded-[2.5rem] border-2 border-foreground bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight"
+                  className="min-h-[250px] text-2xl font-black p-10 rounded-[1.5rem] border-2 border-foreground bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight"
                 />
               )}
             </div>
           )}
 
           {currentQuestion.type === 'slider' && (
-            <div className="space-y-12 py-12 bg-black/5 rounded-[2.5rem] border-2 border-foreground/10 px-10">
+            <div className="space-y-12 py-12 bg-black/5 rounded-[1.5rem] border-2 border-foreground/10 px-10">
               <div className="text-center">
                 <span className="text-9xl font-black tracking-tighter leading-none">{sliderValue}</span>
               </div>
@@ -232,7 +232,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           <Button 
             disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
             onClick={handleSubmit}
-            className="w-full h-24 text-3xl font-black rounded-3xl bg-foreground text-background hover:opacity-90 transition-all mt-8 uppercase tracking-tighter shadow-none border-2 border-foreground"
+            className="w-full h-24 text-3xl font-black rounded-[1.5rem] bg-foreground text-background hover:opacity-90 transition-all mt-8 uppercase tracking-tighter shadow-none border-2 border-foreground"
           >
             {loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}
           </Button>

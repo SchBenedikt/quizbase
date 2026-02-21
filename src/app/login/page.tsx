@@ -1,11 +1,9 @@
-
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { Zap, Mail, Lock, ArrowRight } from "lucide-react";
 import { useAuth } from "@/firebase";
 import { 
@@ -83,16 +81,16 @@ export default function LoginPage() {
       {/* Right Form Side */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-24 bg-[#f3f3f1]">
         <div className="w-full max-w-md space-y-12">
-          <div className="flex bg-white/50 p-2 rounded-full border-4 border-[#4c2f05]/10 mb-8">
+          <div className="flex bg-white/50 p-2 rounded-[1.5rem] border-2 border-[#4c2f05]/10 mb-8">
             <button 
               onClick={() => setIsSignUp(false)}
-              className={`flex-1 py-4 rounded-full font-black uppercase text-sm transition-all ${!isSignUp ? 'bg-[#4c2f05] text-[#ff9312]' : 'text-[#4c2f05] opacity-40'}`}
+              className={`flex-1 py-4 rounded-[1.5rem] font-black uppercase text-sm transition-all ${!isSignUp ? 'bg-[#4c2f05] text-[#ff9312]' : 'text-[#4c2f05] opacity-40'}`}
             >
               Login
             </button>
             <button 
               onClick={() => setIsSignUp(true)}
-              className={`flex-1 py-4 rounded-full font-black uppercase text-sm transition-all ${isSignUp ? 'bg-[#4c2f05] text-[#ff9312]' : 'text-[#4c2f05] opacity-40'}`}
+              className={`flex-1 py-4 rounded-[1.5rem] font-black uppercase text-sm transition-all ${isSignUp ? 'bg-[#4c2f05] text-[#ff9312]' : 'text-[#4c2f05] opacity-40'}`}
             >
               Sign Up
             </button>
@@ -110,24 +108,24 @@ export default function LoginPage() {
           <form onSubmit={handleAuth} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 ml-2 text-[#4c2f05]">Email Address</label>
+                <label className="text-xs font-black uppercase tracking-[0.4em] opacity-40 ml-2 text-[#4c2f05]">Email Address</label>
                 <Input 
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="m@example.com"
-                  className="h-16 px-6 rounded-2xl border-4 border-[#4c2f05]/10 bg-white focus-visible:ring-0 font-bold text-[#4c2f05] shadow-none"
+                  className="h-16 px-6 rounded-[1.5rem] border-2 border-[#4c2f05]/10 bg-white focus-visible:ring-0 font-bold text-[#4c2f05] shadow-none"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 ml-2 text-[#4c2f05]">Password</label>
+                <label className="text-xs font-black uppercase tracking-[0.4em] opacity-40 ml-2 text-[#4c2f05]">Password</label>
                 <Input 
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="h-16 px-6 rounded-2xl border-4 border-[#4c2f05]/10 bg-white focus-visible:ring-0 font-bold text-[#4c2f05] shadow-none"
+                  className="h-16 px-6 rounded-[1.5rem] border-2 border-[#4c2f05]/10 bg-white focus-visible:ring-0 font-bold text-[#4c2f05] shadow-none"
                   required
                 />
               </div>
@@ -136,7 +134,7 @@ export default function LoginPage() {
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full h-20 text-xl font-black rounded-2xl bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all uppercase tracking-tighter"
+              className="w-full h-20 text-xl font-black rounded-[1.5rem] bg-[#4c2f05] text-[#ff9312] border-2 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all uppercase tracking-tighter"
             >
               {isSignUp ? "Create Account" : "Login"} 
               <ArrowRight className="ml-3 h-6 w-6" />
@@ -144,14 +142,14 @@ export default function LoginPage() {
           </form>
 
           <div className="relative">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t-4 border-[#4c2f05]/10"></span></div>
-            <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.4em] text-[#4c2f05]"><span className="bg-[#f3f3f1] px-4">Or continue with</span></div>
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t-2 border-[#4c2f05]/10"></span></div>
+            <div className="relative flex justify-center text-xs font-black uppercase tracking-[0.4em] text-[#4c2f05]"><span className="bg-[#f3f3f1] px-4">Or continue with</span></div>
           </div>
 
           <Button 
             variant="outline" 
             onClick={handleGoogleSignIn}
-            className="w-full h-16 rounded-2xl border-4 border-[#4c2f05]/10 bg-white font-black uppercase tracking-widest text-[#4c2f05] hover:bg-[#4c2f05]/5 transition-all shadow-none"
+            className="w-full h-16 rounded-[1.5rem] border-2 border-[#4c2f05]/10 bg-white font-black uppercase tracking-widest text-[#4c2f05] hover:bg-[#4c2f05]/5 transition-all shadow-none"
           >
             <Zap className="mr-2 h-5 w-5 fill-[#4c2f05]" /> Google
           </Button>
