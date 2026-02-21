@@ -1,29 +1,64 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    /* DEFAULT ORANGE THEME */
+    --background: 37 40% 95%;
+    --foreground: 37 92% 16%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 37 92% 16%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --popover-foreground: 37 92% 16%;
+    --primary: 33 100% 54%;
+    --primary-foreground: 37 92% 16%;
+    --secondary: 33 100% 96%;
+    --secondary-foreground: 33 100% 54%;
+    --muted: 33 30% 90%;
+    --muted-foreground: 37 92% 30%;
+    --accent: 33 100% 90%;
+    --accent-foreground: 33 100% 54%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --radius: 0.75rem;
+    --destructive-foreground: 210 40% 98%;
+    --border: 37 92% 16% / 0.1;
+    --input: 37 92% 16% / 0.1;
+    --ring: 33 100% 54%;
+    --radius: 1.25rem;
+  }
+
+  [data-theme='red'] {
+    --background: 11 40% 95%;
+    --foreground: 11 84% 15%;
+    --primary: 11 89% 54%;
+    --primary-foreground: 11 84% 15%;
+    --secondary: 11 100% 96%;
+    --accent: 11 100% 90%;
+    --ring: 11 89% 54%;
+    --border: 11 84% 15% / 0.1;
+  }
+
+  [data-theme='green'] {
+    --background: 148 40% 95%;
+    --foreground: 148 79% 10%;
+    --primary: 148 79% 38%;
+    --primary-foreground: 148 40% 95%;
+    --secondary: 148 79% 96%;
+    --accent: 148 79% 90%;
+    --ring: 148 79% 38%;
+    --border: 148 79% 10% / 0.1;
+  }
+
+  [data-theme='blue'] {
+    --background: 205 40% 95%;
+    --foreground: 205 92% 15%;
+    --primary: 205 100% 53%;
+    --primary-foreground: 205 92% 15%;
+    --secondary: 205 100% 96%;
+    --accent: 205 100% 90%;
+    --ring: 205 100% 53%;
+    --border: 205 92% 15% / 0.1;
   }
 
   .presenter-ui {

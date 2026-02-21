@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -48,6 +49,7 @@
         "userId": { "type": "string" },
         "code": { "type": "string" },
         "status": { "type": "string", "enum": ["active", "ended"] },
+        "theme": { "type": "string", "enum": ["orange", "red", "green", "blue"] },
         "currentQuestionId": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },

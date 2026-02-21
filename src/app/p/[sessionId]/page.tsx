@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, use, useEffect } from "react";
@@ -6,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Zap, Heart, Loader2, Star } from "lucide-react";
-import { PollQuestion } from "@/app/types/poll";
+import { PollQuestion, PollSession } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, collection, addDoc, serverTimestamp, getDoc, query, where, limit } from "firebase/firestore";
@@ -23,7 +24,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     );
   }, [db, resolvedParams.sessionId]);
 
-  const { data: sessionDocs, isLoading: sessionLoading } = useCollection(sessionQuery);
+  const { data: sessionDocs, isLoading: sessionLoading } = useCollection<PollSession>(sessionQuery);
   const session = sessionDocs?.[0] || null;
 
   const [currentQuestion, setCurrentQuestion] = useState<PollQuestion | null>(null);
@@ -100,9 +101,11 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     );
   }
 
+  const currentTheme = session.theme || 'orange';
+
   if (voted) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-500 bg-background">
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-500 bg-background" data-theme={currentTheme}>
         <div className="bg-primary p-12 rounded-[3.5rem] animate-float">
           <Heart className="h-24 w-24 text-primary-foreground fill-primary-foreground" />
         </div>
@@ -116,14 +119,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (!currentQuestion) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background" data-theme={currentTheme}>
         <p className="text-2xl font-bold uppercase opacity-20 tracking-tight">Waiting for Transmission...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-8 font-body bg-background transition-colors duration-500">
+    <div className="min-h-screen flex flex-col p-8 font-body bg-background transition-colors duration-500" data-theme={currentTheme}>
       <div className="max-w-lg mx-auto w-full flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-3">

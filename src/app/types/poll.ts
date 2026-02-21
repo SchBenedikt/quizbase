@@ -1,3 +1,4 @@
+
 export type PollType = 'multiple-choice' | 'open-text' | 'rating' | 'slider' | 'word-cloud';
 
 export interface PollQuestion {
@@ -17,6 +18,7 @@ export interface PollSession {
   pollId: string;
   currentQuestionId: string | null;
   status: 'active' | 'ended';
+  theme?: 'orange' | 'red' | 'green' | 'blue';
   createdAt: any;
 }
 

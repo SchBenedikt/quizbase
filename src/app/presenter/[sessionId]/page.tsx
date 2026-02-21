@@ -1,26 +1,28 @@
+
 "use client";
 
 import { useState, useEffect, use } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2, Settings } from "lucide-react";
+import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2, Settings, Palette } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
-import { PollQuestion } from "@/app/types/poll";
+import { PollQuestion, PollSession } from "@/app/types/poll";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, collection, updateDoc, query, orderBy } from "firebase/firestore";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
-  const searchParams = useSearchParams();
   const db = useFirestore();
   
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
-  const { data: session, isLoading: sessionLoading } = useDoc(sessionRef);
+  const { data: session, isLoading: sessionLoading } = useDoc<PollSession>(sessionRef);
 
   const title = session?.title || "Live Pulse";
   const code = session?.code || "---";
+  const currentTheme = session?.theme || 'orange';
 
   const questionsQuery = useMemoFirebase(() => {
     if (!session) return null;
@@ -72,6 +74,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   };
 
+  const setTheme = (theme: string) => {
+    if (!sessionRef) return;
+    updateDoc(sessionRef, { theme });
+  };
+
   if (sessionLoading || !questions) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-background">
@@ -86,7 +93,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
 
   return (
-    <div className="no-scroll h-screen w-screen flex flex-col font-body bg-background">
+    <div className="no-scroll h-screen w-screen flex flex-col font-body bg-background transition-colors duration-500" data-theme={currentTheme}>
       <header className="h-[12vh] px-12 flex items-center justify-between border-b shrink-0 z-10 bg-background/50 backdrop-blur-md">
         <div className="flex items-center gap-6">
           <Zap className="h-10 w-10 text-primary fill-primary" />
@@ -147,9 +154,19 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
         
         <div className="flex items-center gap-4 bg-muted p-2 rounded-full border-2">
-           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full">
-             <LayoutGrid className="h-5 w-5 mr-3" /> Grid
-           </Button>
+           <Popover>
+             <PopoverTrigger asChild>
+                <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full">
+                  <Palette className="h-5 w-5 mr-3" /> Vibe
+                </Button>
+             </PopoverTrigger>
+             <PopoverContent className="w-48 p-4 rounded-[2rem] border-4 flex flex-col gap-2">
+                <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] hover:bg-[#ff9312]/90 text-white rounded-full font-black uppercase text-[10px]">Orange</Button>
+                <Button onClick={() => setTheme('red')} className="bg-[#f24822] hover:bg-[#f24822]/90 text-white rounded-full font-black uppercase text-[10px]">Red</Button>
+                <Button onClick={() => setTheme('green')} className="bg-[#14ae5c] hover:bg-[#14ae5c]/90 text-white rounded-full font-black uppercase text-[10px]">Green</Button>
+                <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] hover:bg-[#0d99ff]/90 text-white rounded-full font-black uppercase text-[10px]">Blue</Button>
+             </PopoverContent>
+           </Popover>
            <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full">
              <Timer className="h-5 w-5 mr-3" /> Timer
            </Button>
