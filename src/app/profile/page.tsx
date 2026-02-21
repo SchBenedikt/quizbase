@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Bell, Eye, Palette, Moon, Sun, Monitor } from "lucide-react";
+import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Eye, Moon, Sun, Monitor } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useAuth, useFirestore } from "@/firebase";
 import { updateProfile } from "firebase/auth";
@@ -47,7 +47,7 @@ export default function ProfilePage() {
 
       toast({ 
         title: "Identity Synced", 
-        description: "Your profile has been updated across all pulses." 
+        description: "Your profile has been updated across all surveys." 
       });
     } catch (e: any) {
       toast({ 
@@ -66,14 +66,14 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-background presenter-ui font-body flex flex-col">
       <Header variant="minimal" />
       
-      <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-32 space-y-12 pb-40">
+      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 py-32 space-y-12 pb-40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Button 
               variant="outline" 
               size="icon" 
               onClick={() => router.back()} 
-              className="rounded-[1.5rem] h-12 w-12 border-2 text-foreground hover:bg-muted"
+              className="rounded-[1.5rem] h-12 w-12 border-2 text-foreground hover:bg-muted shadow-none"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -113,7 +113,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-sm font-black uppercase tracking-widest opacity-40 ml-2">Protocol Address</label>
+                      <label className="text-sm font-black uppercase tracking-widest opacity-40 ml-2">Email Address</label>
                       <div className="relative">
                         <Mail className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 opacity-20" />
                         <Input 
@@ -140,7 +140,7 @@ export default function ProfilePage() {
           <TabsContent value="security" className="mt-0">
             <div className="grid md:grid-cols-2 gap-6">
               {[
-                { icon: Shield, title: "Auth Check", desc: "Two-step verification for presenter vault." },
+                { icon: Shield, title: "Auth Check", desc: "Two-step verification for presenter dashboard." },
                 { icon: Smartphone, title: "Terminal Sync", desc: "Manage active presenter devices." },
               ].map((item, i) => (
                 <Card key={i} className="border-2 rounded-[1.5rem] p-8 space-y-4 bg-card shadow-none">
@@ -161,21 +161,21 @@ export default function ProfilePage() {
                       <Button 
                         variant={mounted && theme === 'light' ? 'default' : 'outline'}
                         onClick={() => setTheme('light')}
-                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2"
+                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2 shadow-none"
                       >
                         <Sun className="h-4 w-4" /> Light
                       </Button>
                       <Button 
                         variant={mounted && theme === 'dark' ? 'default' : 'outline'}
                         onClick={() => setTheme('dark')}
-                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2"
+                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2 shadow-none"
                       >
                         <Moon className="h-4 w-4" /> Dark
                       </Button>
                       <Button 
                         variant={mounted && theme === 'system' ? 'default' : 'outline'}
                         onClick={() => setTheme('system')}
-                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2"
+                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2 shadow-none"
                       >
                         <Monitor className="h-4 w-4" /> System
                       </Button>
@@ -186,26 +186,14 @@ export default function ProfilePage() {
 
                 <div className="flex items-center justify-between">
                    <div className="space-y-1">
-                      <h4 className="text-xl font-black uppercase tracking-tight">Vibe Pre-selection</h4>
-                      <p className="text-sm font-bold opacity-40 uppercase">Default theme for your next pulse.</p>
+                      <h4 className="text-xl font-black uppercase tracking-tight">Default Vibe</h4>
+                      <p className="text-sm font-bold opacity-40 uppercase">Default theme for your next survey.</p>
                    </div>
                    <div className="flex gap-3">
                       <div className="w-8 h-8 rounded-full bg-[#ff9312] border-2 border-foreground" />
                       <div className="w-8 h-8 rounded-full bg-[#14ae5c] opacity-20 border-2 border-transparent" />
                       <div className="w-8 h-8 rounded-full bg-[#f24822] opacity-20 border-2 border-transparent" />
                       <div className="w-8 h-8 rounded-full bg-[#0d99ff] opacity-20 border-2 border-transparent" />
-                   </div>
-                </div>
-
-                <div className="h-px bg-foreground/10 w-full" />
-
-                <div className="flex items-center justify-between">
-                   <div className="space-y-1">
-                      <h4 className="text-xl font-black uppercase tracking-tight">Audio Feedback</h4>
-                      <p className="text-sm font-bold opacity-40 uppercase">Play sound on every incoming pulse.</p>
-                   </div>
-                   <div className="w-14 h-7 bg-primary/10 rounded-full relative cursor-pointer border-2 border-primary/20">
-                      <div className="absolute right-1 top-1 w-4 h-4 bg-primary rounded-full" />
                    </div>
                 </div>
              </Card>

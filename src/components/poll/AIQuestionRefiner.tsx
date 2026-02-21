@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -36,7 +37,7 @@ export function AIQuestionRefiner({ currentQuestion, onSelect }: AIQuestionRefin
         size="lg"
         onClick={handleSuggest}
         disabled={loading || !currentQuestion}
-        className="rounded-[1.5rem] h-14 px-8 gap-3 border-2 border-primary/20 text-primary font-black uppercase tracking-widest hover:bg-primary hover:text-background transition-all"
+        className="rounded-[1.5rem] h-14 px-8 gap-3 border-2 border-primary/20 text-primary font-black uppercase tracking-widest hover:bg-primary hover:text-background transition-all shadow-none"
       >
         {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
         AI Refine

@@ -30,7 +30,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     }));
 
     return (
-      <div className="h-full w-full max-w-6xl animate-in fade-in duration-1000 flex items-center px-12">
+      <div className="h-full w-full max-w-[1400px] animate-in fade-in duration-1000 flex items-center px-12">
         <ResponsiveContainer width="100%" height="90%">
           <BarChart data={data} layout="vertical" margin={{ left: 60, right: 100, top: 0, bottom: 0 }}>
             <XAxis type="number" hide />
@@ -50,7 +50,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
                     <div className="bg-foreground p-8 rounded-[1.5rem] border-2 border-background/20 shadow-none">
                       <p className="font-black text-background text-5xl leading-none">
                         {payload[0].value}
-                        <span className="text-xs uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">STIMMEN GESAMT</span>
+                        <span className="text-xs uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">TOTAL VOTES</span>
                       </p>
                     </div>
                   );
@@ -81,7 +81,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     return (
       <div className="h-full w-full flex flex-wrap items-center justify-center gap-16 p-20 overflow-hidden">
         {entries.length === 0 ? (
-          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] animate-pulse">Warten auf Antworten...</p>
+          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] animate-pulse">Waiting for responses...</p>
         ) : (
           sorted.map(([word, count], i) => (
             <span 
@@ -103,9 +103,9 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
   if (question.type === 'open-text') {
     return (
-      <div className="h-full w-full max-w-6xl flex flex-col items-center">
+      <div className="h-full w-full max-w-[1400px] flex flex-col items-center">
         {allResponses.length === 0 ? (
-          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] my-auto animate-pulse">Bisher keine Antworten...</p>
+          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] my-auto animate-pulse">No responses yet...</p>
         ) : (
           <ScrollArea className="h-full w-full pr-12">
             <div className="grid gap-12 py-12 px-8">
@@ -140,7 +140,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
         </div>
         <div className="text-center space-y-4">
           <span className="text-[24rem] font-black tracking-tighter leading-[0.7]">{avg.toFixed(1)}</span>
-          <p className="text-5xl font-black opacity-20 uppercase tracking-[1em] mt-8">DURCHSCHNITT</p>
+          <p className="text-5xl font-black opacity-20 uppercase tracking-[1em] mt-8">AVERAGE</p>
         </div>
       </div>
     );
@@ -151,21 +151,21 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const average = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
 
     return (
-      <div className="h-full w-full max-w-6xl flex flex-col items-center justify-center space-y-32">
-        <div className="relative h-40 w-full bg-foreground/10 rounded-[1.5rem] border-2 border-foreground flex items-center px-16 overflow-hidden">
+      <div className="h-full w-full max-w-[1400px] flex flex-col items-center justify-center space-y-32">
+        <div className="relative h-40 w-full bg-foreground/10 rounded-[1.5rem] border-2 border-foreground flex items-center px-16 overflow-hidden shadow-none">
            <div 
              className="absolute left-0 h-full bg-foreground transition-all duration-1500 ease-out"
              style={{ width: `${average}%` }}
            />
            <div className="relative z-10 w-full flex justify-between font-black text-4xl mix-blend-difference text-white uppercase tracking-[0.5em]">
              <span>0</span>
-             <span>INTENSITÄT</span>
+             <span>INTENSITY</span>
              <span>100</span>
            </div>
         </div>
         <div className="text-center">
           <span className="text-[28rem] font-black tracking-tighter leading-[0.7]">{average.toFixed(0)}</span>
-          <p className="text-6xl font-black opacity-20 uppercase tracking-[1.2em] mt-8">ERGEBNIS</p>
+          <p className="text-6xl font-black opacity-20 uppercase tracking-[1.2em] mt-8">RESULT</p>
         </div>
       </div>
     );
@@ -173,7 +173,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
   return (
     <div className="bg-transparent p-40 rounded-[1.5rem] text-center border-2 border-dashed border-foreground/10">
-      <p className="text-5xl font-black uppercase opacity-10 tracking-[1em] animate-pulse">VERBINDUNG...</p>
+      <p className="text-5xl font-black uppercase opacity-10 tracking-[1em] animate-pulse">CONNECTING...</p>
     </div>
   );
 }

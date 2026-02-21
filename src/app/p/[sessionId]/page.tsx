@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, use, useEffect } from "react";
@@ -94,7 +95,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
         <h1 className="text-3xl font-black uppercase tracking-tighter opacity-30">Session Not Found</h1>
-        <p className="text-sm font-bold opacity-60 mt-4 uppercase tracking-widest">Verify your pulse code.</p>
+        <p className="text-sm font-bold opacity-60 mt-4 uppercase tracking-widest">Verify your session code.</p>
         <Button onClick={() => window.location.href = '/join'} className="mt-12 bg-foreground text-background font-black rounded-[1.5rem] h-16 px-12 border-2 border-foreground shadow-none">Return to Lobby</Button>
       </div>
     );
@@ -105,7 +106,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (voted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-700 bg-background" data-theme={currentTheme}>
-        <div className="bg-foreground p-14 rounded-[1.5rem] animate-float">
+        <div className="bg-foreground p-14 rounded-[1.5rem] animate-float shadow-none">
           <Heart className="h-20 w-20 text-background fill-background" />
         </div>
         <div className="space-y-4">
@@ -119,7 +120,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (!currentQuestion) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background" data-theme={currentTheme}>
-        <p className="text-3xl font-black uppercase opacity-30 tracking-widest">Waiting for Transmission...</p>
+        <p className="text-3xl font-black uppercase opacity-30 tracking-widest">Waiting for Presentation...</p>
       </div>
     );
   }

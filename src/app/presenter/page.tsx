@@ -39,7 +39,7 @@ export default function PresenterPage() {
 
   const handleStartSession = async (questions: PollQuestion[]) => {
     if (!sessionTitle) {
-      toast({ variant: "destructive", title: "Titel fehlt", description: "Bitte geben Sie Ihrer Umfrage einen Namen." });
+      toast({ variant: "destructive", title: "Title missing", description: "Please give your survey a name." });
       return;
     }
     if (!user) return;
@@ -90,7 +90,7 @@ export default function PresenterPage() {
 
       router.push(`/presenter/${sessionRef.id}`);
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Start fehlgeschlagen", description: e.message });
+      toast({ variant: "destructive", title: "Launch failed", description: e.message });
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ export default function PresenterPage() {
     if (!user) return;
     const pollRef = doc(db, `users/${user.uid}/polls/${pollId}`);
     deleteDocumentNonBlocking(pollRef);
-    toast({ title: "Umfrage gelöscht", description: "Die Umfrage wurde aus Ihrem Dashboard entfernt." });
+    toast({ title: "Survey deleted", description: "The survey has been removed from your dashboard." });
   };
 
   const handleLaunchExisting = async (poll: any) => {
@@ -127,7 +127,7 @@ export default function PresenterPage() {
 
       router.push(`/presenter/${sessionRef.id}`);
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Präsentation fehlgeschlagen", description: e.message });
+      toast({ variant: "destructive", title: "Launch failed", description: e.message });
     } finally {
       setLoading(false);
     }
@@ -141,20 +141,20 @@ export default function PresenterPage() {
     return (
       <div className="min-h-screen bg-background presenter-ui font-body">
         <Header variant="minimal" />
-        <div className="max-w-4xl mx-auto px-6 py-40">
+        <div className="max-w-[1400px] mx-auto px-6 py-40">
           <div className="flex items-center gap-6 mb-16">
             <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-[1.5rem] h-14 w-14 border-2 shadow-none">
               <ArrowLeft className="h-6 w-6" />
             </Button>
-            <h1 className="text-4xl font-black uppercase tracking-tighter">Neue Umfrage erstellen</h1>
+            <h1 className="text-4xl font-black uppercase tracking-tighter">Create New Survey</h1>
           </div>
           
           <div className="bg-white dark:bg-card p-12 rounded-[1.5rem] border-2 mb-12 shadow-none">
-            <label className="text-xs font-black uppercase tracking-widest opacity-40 ml-2 mb-4 block">Titel der Umfrage</label>
+            <label className="text-xs font-black uppercase tracking-widest opacity-40 ml-2 mb-4 block">Survey Title</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="z.B. Feedback Q1 Strategie"
+              placeholder="e.g., Q1 Strategy Feedback"
               className="text-4xl font-black h-24 border-none bg-transparent focus-visible:ring-0 placeholder:opacity-10 shadow-none p-0 uppercase"
             />
           </div>
@@ -169,7 +169,7 @@ export default function PresenterPage() {
     <div className="min-h-screen bg-background presenter-ui flex flex-col font-body">
       <Header variant="minimal" />
       
-      <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-32 space-y-16">
+      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 py-32 space-y-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -178,25 +178,25 @@ export default function PresenterPage() {
               </div>
               <h1 className="text-5xl font-black tracking-tighter uppercase">Dashboard</h1>
             </div>
-            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Ihre gespeicherten Umfragen</p>
+            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Manage your surveys</p>
           </div>
           <Button 
             size="lg" 
             onClick={() => setIsCreating(true)}
             className="h-20 px-12 rounded-[1.5rem] text-lg font-black bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tight shadow-none"
           >
-            <Plus className="mr-3 h-6 w-6" /> NEUE UMFRAGE
+            <Plus className="mr-3 h-6 w-6" /> NEW SURVEY
           </Button>
         </div>
 
         <div className="space-y-8">
-          <div className="relative w-full max-w-lg">
+          <div className="relative w-full max-w-xl">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 opacity-30" />
             <Input 
-              placeholder="Umfragen durchsuchen..."
+              placeholder="Search surveys..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-16 pl-16 pr-8 rounded-[1rem] border-2 bg-white dark:bg-card focus-visible:ring-0 font-bold text-lg shadow-none"
+              className="h-16 pl-16 pr-8 rounded-[1.5rem] border-2 bg-white dark:bg-card focus-visible:ring-0 font-bold text-lg shadow-none"
             />
           </div>
 
@@ -206,7 +206,7 @@ export default function PresenterPage() {
             ) : !filteredPolls || filteredPolls.length === 0 ? (
               <div className="p-40 text-center border-2 border-dashed rounded-[1.5rem] bg-muted/30 space-y-4">
                  <Sparkles className="h-12 w-12 mx-auto opacity-10" />
-                 <p className="text-sm font-black uppercase opacity-30 tracking-widest">Keine Umfragen gefunden</p>
+                 <p className="text-sm font-black uppercase opacity-30 tracking-widest">No surveys found</p>
               </div>
             ) : (
               filteredPolls.map((poll) => (
@@ -218,7 +218,7 @@ export default function PresenterPage() {
                     <div className="space-y-1 truncate">
                       <p className="text-2xl font-black tracking-tighter truncate uppercase leading-tight">{poll.title}</p>
                       <p className="text-xs font-black opacity-40 uppercase tracking-widest">
-                        Erstellt am: {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString('de-DE') : 'N/A'}
+                        Created on: {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString('en-US') : 'N/A'}
                       </p>
                     </div>
                   </div>
@@ -228,14 +228,14 @@ export default function PresenterPage() {
                        onClick={() => handleLaunchExisting(poll)}
                        className="h-12 px-6 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-primary hover:text-primary-foreground transition-all shadow-none"
                      >
-                       <Play className="h-4 w-4 mr-2 fill-current" /> Starten
+                       <Play className="h-4 w-4 mr-2 fill-current" /> Launch
                      </Button>
                      <Button 
                        variant="ghost" 
                        onClick={() => router.push(`/presenter/edit/${poll.id}`)}
                        className="h-12 px-6 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-muted shadow-none"
                      >
-                       <Edit2 className="h-4 w-4 mr-2" /> Bearbeiten
+                       <Edit2 className="h-4 w-4 mr-2" /> Edit
                      </Button>
                      <Button 
                        variant="ghost" 

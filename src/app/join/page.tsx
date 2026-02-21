@@ -22,11 +22,11 @@ export default function JoinPage() {
     <div className="min-h-screen bg-background p-6 flex items-center justify-center text-primary">
       <div className="max-w-md w-full relative z-10 space-y-12">
         <div className="text-center space-y-6">
-          <div className="bg-primary w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-2 border-primary rotate-6">
+          <div className="bg-primary w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-2 border-primary rotate-6 shadow-none">
             <Zap className="text-background h-12 w-12" />
           </div>
           <h1 className="text-6xl font-black font-headline tracking-tighter uppercase leading-none">Code.</h1>
-          <p className="text-xl font-bold opacity-80 uppercase tracking-wide">6-stelliger Code eingeben</p>
+          <p className="text-xl font-bold opacity-80 uppercase tracking-wide">Enter 6-digit Code</p>
         </div>
 
         <Card className="border-2 border-primary rounded-[1.5rem] overflow-hidden bg-white/10 shadow-none">
@@ -44,18 +44,18 @@ export default function JoinPage() {
             <Button 
               disabled={code.length < 6}
               onClick={handleJoin}
-              className="w-full h-24 text-2xl font-black rounded-[1.5rem] bg-primary text-background border-2 border-primary hover:bg-transparent hover:text-primary transition-all group"
+              className="w-full h-24 text-2xl font-black rounded-[1.5rem] bg-primary text-background border-2 border-primary hover:bg-transparent hover:text-primary transition-all group shadow-none"
             >
-              BEITRETEN <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
+              JOIN SESSION <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
             </Button>
             
             <div className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.3em] opacity-40">
-              <Sparkles className="h-4 w-4" /> Sichere Verbindung aktiv
+              <Sparkles className="h-4 w-4" /> SECURE CONNECTION ACTIVE
             </div>
           </CardContent>
         </Card>
         
-        <p className="text-center text-xs font-black uppercase opacity-40 tracking-[0.4em]">Keine Registrierung. Sofortige Teilnahme.</p>
+        <p className="text-center text-xs font-black uppercase opacity-40 tracking-[0.4em]">No registration. Instant participation.</p>
       </div>
     </div>
   );
