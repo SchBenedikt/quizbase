@@ -37,12 +37,12 @@
     --border: 35 88% 16% / 0.1;
   }
 
-  /* Theme Overrides - Using !important where needed for deep nested components */
+  /* Theme Overrides - High Specificity */
   .theme-orange {
-    --background: 33 100% 54%;
-    --foreground: 35 88% 16%;
-    --primary: 35 88% 16%;
-    --primary-foreground: 33 100% 54%;
+    --background: 33 100% 54% !important;
+    --foreground: 35 88% 16% !important;
+    --primary: 35 88% 16% !important;
+    --primary-foreground: 33 100% 54% !important;
   }
   .theme-green {
     --background: 82 100% 54% !important;

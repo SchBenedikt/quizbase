@@ -9,18 +9,16 @@ import { PollQuestion, AppTheme } from "@/app/types/poll";
 import { useSearchParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
-import { doc, collection, updateDoc, query, orderBy } from "firebase/firestore";
+import { doc, collection, updateDoc, query, orderBy, getDocs } from "firebase/firestore";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
   const searchParams = useSearchParams();
   const db = useFirestore();
   
-  // Real session data
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
   const { data: session, isLoading: sessionLoading } = useDoc(sessionRef);
 
-  // Use session theme first, fallback to search params, then default orange
   const theme = (session?.theme as AppTheme) || (searchParams.get('theme') as AppTheme) || 'orange';
   const title = session?.title || searchParams.get('title') || "Session Display";
   const code = session?.code || searchParams.get('code') || "---";
@@ -53,6 +51,13 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   }, [allResponses, session?.currentQuestionId]);
 
+  // Handle auto-pick first question if none set
+  useEffect(() => {
+    if (session && !session.currentQuestionId && questions && questions.length > 0) {
+      updateDoc(sessionRef, { currentQuestionId: questions[0].id });
+    }
+  }, [session, questions, sessionRef]);
+
   const handleNext = () => {
     if (!questions || !session) return;
     const currentIdx = questions.findIndex(q => q.id === session.currentQuestionId);
@@ -81,6 +86,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   const currentIdx = questions.findIndex(q => q.id === session?.currentQuestionId);
   const q = questions[currentIdx] || questions[0];
+  if (!q) return null;
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
 
   return (
@@ -95,7 +101,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         
         <div className="flex items-center gap-8">
           <div className="flex flex-col items-end">
-            <p className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 mb-1 text-foreground">Join Pulse</p>
+            <p className="text-sm font-black uppercase tracking-[0.4em] opacity-40 mb-1 text-foreground">Join Code</p>
             <p className="text-5xl font-black tracking-tighter leading-none text-foreground">{code}</p>
           </div>
           <div className="h-12 w-1.5 bg-foreground/10 rounded-full" />
@@ -109,10 +115,10 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center overflow-hidden">
         <div className="w-full max-w-7xl h-full flex flex-col gap-6">
           <div className="space-y-2 text-center shrink-0">
-             <div className="inline-block px-6 py-1 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-[0.4em]">
-               Stage {currentIdx + 1} of {questions.length}
+             <div className="inline-block px-6 py-1 bg-foreground text-background rounded-full text-sm font-black uppercase tracking-[0.4em]">
+               Node {currentIdx + 1} of {questions.length}
              </div>
-             <h2 className="text-4xl md:text-6xl font-black leading-[1.1] uppercase tracking-tighter text-foreground max-w-4xl mx-auto">
+             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] uppercase tracking-tighter text-foreground max-w-5xl mx-auto">
                {q.question}
              </h2>
           </div>

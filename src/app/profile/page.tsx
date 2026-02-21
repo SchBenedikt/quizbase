@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Save, User, Mail, Shield } from "lucide-react";
+import { ArrowLeft, Save, User, Mail } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useAuth } from "@/firebase";
 import { updateProfile } from "firebase/auth";
@@ -61,7 +61,7 @@ export default function ProfilePage() {
             <form onSubmit={handleUpdate} className="space-y-10">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4">Display Name</label>
+                  <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Display Name</label>
                   <div className="relative">
                     <User className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-primary opacity-20" />
                     <Input 
@@ -74,7 +74,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4">Email Address</label>
+                  <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Email Address</label>
                   <div className="relative">
                     <Mail className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 text-primary opacity-20" />
                     <Input 
@@ -94,11 +94,6 @@ export default function ProfilePage() {
                 {loading ? "Syncing..." : "Update Identity"} <Save className="ml-3 h-8 w-8" />
               </Button>
             </form>
-
-            <div className="pt-10 border-t-4 border-primary/5 flex items-center gap-6 opacity-30">
-              <Shield className="h-8 w-8" />
-              <p className="text-[10px] font-black uppercase tracking-[0.3em]">Encrypted Pulse Protection v4.0</p>
-            </div>
           </CardContent>
         </Card>
       </main>

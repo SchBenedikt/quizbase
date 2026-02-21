@@ -7,10 +7,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion, AppTheme } from "@/app/types/poll";
-import { Plus, History, TrendingUp, Users, Activity, ArrowLeft, Play, BarChart3, MoreVertical, Edit2, UserCircle } from "lucide-react";
+import { Plus, Activity, ArrowLeft, Play, BarChart3, Edit2, UserCircle, Trash2, TrendingUp, Users } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, setDoc, serverTimestamp, query, orderBy, deleteDoc } from "firebase/firestore";
+import { collection, doc, setDoc, serverTimestamp, query, orderBy, deleteDoc, getDocs, where } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,6 +22,7 @@ export default function PresenterPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [sessionTitle, setSessionTitle] = useState("");
   const [loading, setLoading] = useState(false);
+  const [totalSessions, setTotalSessions] = useState(0);
 
   const pollsQuery = useMemoFirebase(() => {
     if (!user) return null;
@@ -35,6 +36,13 @@ export default function PresenterPage() {
       router.push("/login");
     }
   }, [user, isUserLoading, router]);
+
+  useEffect(() => {
+    if (user) {
+      const q = query(collection(db, "sessions"), where("userId", "==", user.uid));
+      getDocs(q).then(snap => setTotalSessions(snap.size));
+    }
+  }, [user, db, polls]);
 
   const handleStartSession = async (questions: PollQuestion[], theme: AppTheme) => {
     if (!sessionTitle) {
@@ -82,12 +90,34 @@ export default function PresenterPage() {
     }
   };
 
-  const handleLaunchExisting = (poll: any) => {
-    router.push(`/presenter/launch/${poll.id}`);
+  const handleDeletePoll = async (pollId: string) => {
+    if (!user) return;
+    if (!confirm("Are you sure you want to delete this pulse? All its data will be removed.")) return;
+
+    try {
+      await deleteDoc(doc(db, `users/${user.uid}/polls/${pollId}`));
+      toast({ title: "Pulse Deleted", description: "The interaction node has been decommissioned." });
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Delete Failed", description: e.message });
+    }
   };
 
-  const handleEditPoll = (pollId: string) => {
-    router.push(`/presenter/edit/${pollId}`);
+  const handleLaunchExisting = (poll: any) => {
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const sessionRef = doc(collection(db, "sessions"));
+    
+    setDoc(sessionRef, {
+      id: sessionRef.id,
+      pollId: poll.id,
+      userId: user?.uid,
+      code,
+      status: "active",
+      currentQuestionId: null, // Logic in Presenter view picks first
+      theme: poll.theme,
+      createdAt: serverTimestamp(),
+    }).then(() => {
+      router.push(`/presenter/${sessionRef.id}?code=${code}&title=${encodeURIComponent(poll.title)}&theme=${poll.theme}`);
+    });
   };
 
   if (isUserLoading || !user) return null;
@@ -103,12 +133,12 @@ export default function PresenterPage() {
             </Button>
             <div className="space-y-1">
               <h1 className="text-5xl font-black uppercase tracking-tighter text-primary">New Architecture</h1>
-              <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest text-primary">Initialize your interactive field</p>
+              <p className="text-sm font-bold opacity-40 uppercase tracking-widest text-primary">Initialize your interactive field</p>
             </div>
           </div>
           
           <div className="space-y-4 mb-12">
-            <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4 text-primary">Pulse Title</label>
+            <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4 text-primary">Pulse Title</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
@@ -145,7 +175,7 @@ export default function PresenterPage() {
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-5xl font-black text-background uppercase tracking-tighter">New Pulse</h3>
-                    <p className="text-background/60 font-black text-[10px] uppercase tracking-[0.4em]">Initialize Interaction</p>
+                    <p className="text-background/60 font-black text-xs uppercase tracking-[0.4em]">Initialize Interaction</p>
                   </div>
                 </CardContent>
              </Card>
@@ -160,7 +190,7 @@ export default function PresenterPage() {
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-5xl font-black text-primary uppercase tracking-tighter">Profile</h3>
-                    <p className="text-primary/40 font-black text-[10px] uppercase tracking-[0.4em]">Manage Identity</p>
+                    <p className="text-primary/40 font-black text-xs uppercase tracking-[0.4em]">Manage Identity</p>
                   </div>
                 </CardContent>
              </Card>
@@ -171,12 +201,12 @@ export default function PresenterPage() {
               <h4 className="text-2xl font-black uppercase tracking-tighter text-primary opacity-30">Pulse Archives</h4>
             </div>
             <div className="grid gap-6">
-              {polls?.length === 0 ? (
+              {!polls || polls.length === 0 ? (
                 <div className="p-20 text-center border-4 border-dashed border-primary/10 rounded-[4rem]">
                    <p className="text-2xl font-black uppercase opacity-20 tracking-tighter">No Pulses Initialized Yet</p>
                 </div>
               ) : (
-                polls?.map((poll) => (
+                polls.map((poll) => (
                   <div key={poll.id} className="bg-white p-8 rounded-[2.5rem] border-4 border-primary/10 flex items-center justify-between group hover:border-primary transition-all">
                     <div className="flex items-center gap-8">
                       <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border-4", `theme-${poll.theme} border-foreground`)}>
@@ -184,7 +214,7 @@ export default function PresenterPage() {
                       </div>
                       <div className="space-y-1">
                         <p className="text-2xl font-black uppercase tracking-tighter text-primary">{poll.title}</p>
-                        <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">
+                        <p className="text-xs font-black opacity-30 uppercase tracking-[0.2em]">
                           {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString() : 'Syncing...'}
                         </p>
                       </div>
@@ -193,16 +223,23 @@ export default function PresenterPage() {
                        <Button 
                          variant="ghost" 
                          onClick={() => handleLaunchExisting(poll)}
-                         className="h-12 px-6 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-primary/10 hover:border-primary"
+                         className="h-12 px-6 rounded-xl font-black uppercase text-xs tracking-widest border-2 border-primary/10 hover:border-primary"
                        >
                          <Play className="h-3 w-3 mr-2" /> Launch
                        </Button>
                        <Button 
                          variant="ghost" 
-                         onClick={() => handleEditPoll(poll.id)}
-                         className="h-12 px-6 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-primary/10 hover:border-primary"
+                         onClick={() => router.push(`/presenter/edit/${poll.id}`)}
+                         className="h-12 px-6 rounded-xl font-black uppercase text-xs tracking-widest border-2 border-primary/10 hover:border-primary"
                        >
                          <Edit2 className="h-3 w-3 mr-2" /> Edit
+                       </Button>
+                       <Button 
+                         variant="ghost" 
+                         onClick={() => handleDeletePoll(poll.id)}
+                         className="h-12 px-6 rounded-xl font-black uppercase text-xs tracking-widest border-2 border-primary/10 hover:text-destructive hover:border-destructive"
+                       >
+                         <Trash2 className="h-3 w-3" />
                        </Button>
                     </div>
                   </div>
@@ -219,15 +256,15 @@ export default function PresenterPage() {
                 <div className="space-y-12">
                   {[
                     { label: "Active Nodes", val: polls?.length || 0, icon: Activity },
-                    { label: "Global Energy", val: "1.2k", icon: TrendingUp },
-                    { label: "Total Syncs", val: "840", icon: Users }
+                    { label: "Global Energy", val: (polls?.length || 0) * 12 + 42, icon: TrendingUp },
+                    { label: "Total Syncs", val: totalSessions, icon: Users }
                   ].map((stat, i) => (
                     <div key={i} className="flex flex-col gap-2 group">
                       <div className="flex items-center gap-4">
                         <div className="p-4 bg-primary/5 rounded-[1.2rem] border-4 border-primary/10 transition-colors group-hover:bg-primary/10">
                           <stat.icon className="h-7 w-7 text-primary" />
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 text-primary">{stat.label}</span>
+                        <span className="text-sm font-black uppercase tracking-[0.4em] opacity-40 text-primary">{stat.label}</span>
                       </div>
                       <span className="text-7xl font-black tracking-tighter text-primary">{stat.val}</span>
                     </div>
