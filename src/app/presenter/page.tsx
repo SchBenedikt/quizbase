@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,7 +10,8 @@ import { PollQuestion, AppTheme } from "@/app/types/poll";
 import { Plus, ArrowLeft, Play, BarChart3, Edit2, Trash2, Search, Zap, Loader2 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, setDoc, serverTimestamp, query, orderBy, deleteDoc, getDocs } from "firebase/firestore";
+import { collection, doc, setDoc, serverTimestamp, query, orderBy, getDocs } from "firebase/firestore";
+import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -98,18 +100,11 @@ export default function PresenterPage() {
     }
   };
 
-  const handleDeletePoll = async (pollId: string) => {
+  const handleDeletePoll = (pollId: string) => {
     if (!user) return;
-    setDeletingId(pollId);
-    try {
-      const pollRef = doc(db, `users/${user.uid}/polls/${pollId}`);
-      await deleteDoc(pollRef);
-      toast({ title: "Removed", description: "The pulse was deleted from your vault." });
-    } catch (e: any) {
-      toast({ variant: "destructive", title: "Failed", description: e.message });
-    } finally {
-      setDeletingId(null);
-    }
+    const pollRef = doc(db, `users/${user.uid}/polls/${pollId}`);
+    deleteDocumentNonBlocking(pollRef);
+    toast({ title: "Pulse Removed", description: "The poll has been deleted from your vault." });
   };
 
   const handleLaunchExisting = async (poll: any) => {
@@ -156,7 +151,7 @@ export default function PresenterPage() {
           </div>
           
           <div className="bg-card p-8 rounded-3xl border border-border mb-8">
-            <label className="text-sm font-bold uppercase tracking-widest opacity-40 ml-1">Pulse Title</label>
+            <label className="text-xs font-bold uppercase tracking-widest opacity-40 ml-1">Pulse Title</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
@@ -182,7 +177,7 @@ export default function PresenterPage() {
               <Zap className="h-8 w-8 text-primary fill-primary" />
               <h1 className="text-4xl font-bold tracking-tight">Vault</h1>
             </div>
-            <p className="text-xs font-bold opacity-40 uppercase tracking-[0.3em]">System Online. Welcome, {user.displayName?.split(' ')[0] || 'Presenter'}.</p>
+            <p className="text-[10px] font-bold opacity-50 uppercase tracking-[0.3em]">System Online. Welcome back.</p>
           </div>
           <Button 
             size="lg" 
@@ -212,8 +207,8 @@ export default function PresenterPage() {
               </div>
               <div className="w-px h-8 bg-border" />
               <div className="text-center">
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">Syncs</p>
-                <p className="text-xl font-bold">{polls?.length ? (polls.length * 42) : 0}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">Vibe Level</p>
+                <p className="text-xl font-bold">Optimal</p>
               </div>
             </div>
           </div>
@@ -257,11 +252,10 @@ export default function PresenterPage() {
                      <Button 
                        variant="ghost" 
                        size="icon"
-                       disabled={deletingId === poll.id}
                        onClick={() => handleDeletePoll(poll.id)}
                        className="h-12 w-12 rounded-xl hover:text-destructive hover:bg-destructive/10"
                      >
-                       {deletingId === poll.id ? <Loader2 className="h-5 w-5 animate-spin" /> : <Trash2 className="h-5 w-5" />}
+                       <Trash2 className="h-5 w-5" />
                      </Button>
                   </div>
                 </div>

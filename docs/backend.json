@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -49,10 +50,11 @@
         "userId": { "type": "string" },
         "code": { "type": "string" },
         "status": { "type": "string", "enum": ["active", "ended"] },
+        "theme": { "type": "string", "enum": ["orange", "green", "red", "blue"] },
         "currentQuestionId": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "pollId", "userId", "code", "status", "createdAt"]
+      "required": ["id", "pollId", "userId", "code", "status", "theme", "createdAt"]
     },
     "Response": {
       "title": "Response",

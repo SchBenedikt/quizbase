@@ -1,9 +1,11 @@
+
 "use client";
 
 import { useState, useEffect, use } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2, Palette } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, AppTheme } from "@/app/types/poll";
 import { useSearchParams } from "next/navigation";
@@ -74,6 +76,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   };
 
+  const changeTheme = (newTheme: AppTheme) => {
+    if (!sessionRef) return;
+    updateDoc(sessionRef, { theme: newTheme });
+  };
+
   if (sessionLoading || !questions) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-muted transition-colors duration-500">
@@ -87,6 +94,13 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   if (!q) return null;
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
 
+  const themeOptions: { name: AppTheme; color: string }[] = [
+    { name: 'orange', color: '#ff9312' },
+    { name: 'green', color: '#14ae5c' },
+    { name: 'red', color: '#f24822' },
+    { name: 'blue', color: '#0d99ff' },
+  ];
+
   return (
     <div className={cn("no-scroll h-screen w-screen flex flex-col font-body bg-background transition-colors duration-500", `theme-${theme}`)}>
       <header className="h-[12vh] px-12 flex items-center justify-between border-b border-foreground/10 shrink-0 z-10 bg-background/50 backdrop-blur-sm">
@@ -97,8 +111,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         
         <div className="flex items-center gap-10">
           <div className="flex flex-col items-end">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 text-foreground">Pulse Code</p>
-            <p className="text-3xl font-black tracking-tighter text-foreground leading-none mt-1">{code}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] opacity-50 text-foreground">Pulse Code</p>
+            <p className="text-4xl font-black tracking-tighter text-foreground leading-none mt-1">{code}</p>
           </div>
           <div className="flex items-center gap-3 bg-foreground/10 px-5 py-2 rounded-2xl border border-foreground/20 text-foreground">
             <Users className="h-5 w-5" />
@@ -110,7 +124,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center overflow-hidden">
         <div className="w-full max-w-6xl h-full flex flex-col gap-6">
           <div className="text-center shrink-0">
-             <div className="inline-block px-5 py-1 bg-foreground text-background rounded-full text-[10px] font-bold uppercase tracking-[0.4em] mb-3">
+             <div className="inline-block px-5 py-1 bg-foreground text-background rounded-full text-xs font-bold uppercase tracking-[0.3em] mb-3">
                Node {currentIdx + 1} of {questions.length}
              </div>
              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-foreground max-w-4xl mx-auto uppercase">
@@ -126,16 +140,27 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
       </main>
 
-      <footer className="h-[10vh] flex items-center justify-center gap-8 border-t border-foreground/10 shrink-0 px-12 bg-background/50 backdrop-blur-sm">
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={handlePrev}
-          disabled={currentIdx === 0}
-          className="h-10 w-10 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </Button>
+      <footer className="h-[10vh] flex items-center justify-between gap-8 border-t border-foreground/10 shrink-0 px-12 bg-background/50 backdrop-blur-sm">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={handlePrev}
+            disabled={currentIdx === 0}
+            className="h-12 w-12 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={handleNext}
+            disabled={currentIdx === questions.length - 1}
+            className="h-12 w-12 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+        </div>
         
         <div className="flex items-center gap-6 bg-foreground/5 px-6 py-2 rounded-2xl border border-foreground/10 text-foreground">
            <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[10px] h-9 px-3 hover:bg-foreground/10">
@@ -145,17 +170,34 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
            <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[10px] h-9 px-3 hover:bg-foreground/10">
              <Timer className="h-4 w-4 mr-2" /> Timer
            </Button>
+           <div className="w-px h-5 bg-foreground/10" />
+           <Popover>
+             <PopoverTrigger asChild>
+               <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[10px] h-9 px-3 hover:bg-foreground/10">
+                 <Palette className="h-4 w-4 mr-2" /> Vibe
+               </Button>
+             </PopoverTrigger>
+             <PopoverContent className="w-48 p-3 rounded-2xl border-4 border-foreground bg-background">
+               <div className="grid grid-cols-2 gap-2">
+                 {themeOptions.map((opt) => (
+                   <button
+                     key={opt.name}
+                     onClick={() => changeTheme(opt.name)}
+                     className={cn(
+                       "h-10 rounded-xl border-2 transition-all",
+                       theme === opt.name ? "border-foreground" : "border-transparent opacity-50 hover:opacity-100"
+                     )}
+                     style={{ backgroundColor: opt.color }}
+                   />
+                 ))}
+               </div>
+             </PopoverContent>
+           </Popover>
         </div>
 
-        <Button 
-          variant="outline" 
-          size="icon" 
-          onClick={handleNext}
-          disabled={currentIdx === questions.length - 1}
-          className="h-10 w-10 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
+        <div className="w-24 flex justify-end">
+           <Zap className="h-6 w-6 text-foreground/20" />
+        </div>
       </footer>
     </div>
   );
