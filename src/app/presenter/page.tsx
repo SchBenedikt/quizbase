@@ -26,7 +26,7 @@ export default function PresenterPage() {
 
   const pollsQuery = useMemoFirebase(() => {
     if (!user) return null;
-    return query(collection(db, `users/${user.uid}/polls`), orderBy("createdAt", "desc"));
+    return query(collection(db, `users/${user.uid}/surveys`), orderBy("createdAt", "desc"));
   }, [user, db]);
 
   const { data: polls, isLoading: pollsLoading } = useCollection(pollsQuery);
@@ -48,7 +48,7 @@ export default function PresenterPage() {
     try {
       const code = Math.random().toString(36).substring(2, 8).toUpperCase();
       const sessionRef = doc(collection(db, "sessions"));
-      const pollRef = doc(collection(db, `users/${user.uid}/polls`));
+      const pollRef = doc(collection(db, `users/${user.uid}/surveys`));
 
       await setDoc(pollRef, {
         id: pollRef.id,
@@ -60,7 +60,7 @@ export default function PresenterPage() {
       const savedQuestionIds: string[] = [];
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
-        const qRef = doc(collection(db, `users/${user.uid}/polls/${pollRef.id}/questions`));
+        const qRef = doc(collection(db, `users/${user.uid}/surveys/${pollRef.id}/questions`));
         
         const qData: any = {
           id: qRef.id,
@@ -98,7 +98,7 @@ export default function PresenterPage() {
 
   const handleDeletePoll = (pollId: string) => {
     if (!user) return;
-    const pollRef = doc(db, `users/${user.uid}/polls/${pollId}`);
+    const pollRef = doc(db, `users/${user.uid}/surveys/${pollId}`);
     deleteDocumentNonBlocking(pollRef);
     toast({ title: "Survey deleted", description: "The survey has been removed from your dashboard." });
   };
@@ -110,7 +110,7 @@ export default function PresenterPage() {
     const sessionRef = doc(collection(db, "sessions"));
     
     try {
-      const qCol = collection(db, `users/${user.uid}/polls/${poll.id}/questions`);
+      const qCol = collection(db, `users/${user.uid}/surveys/${poll.id}/questions`);
       const qSnap = await getDocs(query(qCol, orderBy("order", "asc")));
       const firstQId = qSnap.docs[0]?.id || null;
 
@@ -154,7 +154,7 @@ export default function PresenterPage() {
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="e.g., Q1 Strategy Feedback"
+              placeholder="e.g., Annual Strategy Review"
               className="text-4xl font-black h-24 border-none bg-transparent focus-visible:ring-0 placeholder:opacity-10 shadow-none p-0 uppercase"
             />
           </div>
@@ -178,7 +178,7 @@ export default function PresenterPage() {
               </div>
               <h1 className="text-5xl font-black tracking-tighter uppercase">Dashboard</h1>
             </div>
-            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Manage your surveys</p>
+            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Manage your interactions</p>
           </div>
           <Button 
             size="lg" 

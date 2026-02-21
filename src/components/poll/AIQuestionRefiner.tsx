@@ -3,9 +3,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, CheckCircle2 } from "lucide-react";
+import { Sparkles, Loader2, CheckCircle2, X } from "lucide-react";
 import { aiQuestionSuggester } from "@/ai/flows/ai-question-suggester";
 import { Card, CardContent } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface AIQuestionRefinerProps {
   currentQuestion: string;
@@ -15,6 +16,7 @@ interface AIQuestionRefinerProps {
 export function AIQuestionRefiner({ currentQuestion, onSelect }: AIQuestionRefinerProps) {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
 
   const handleSuggest = async () => {
     if (!currentQuestion) return;
@@ -30,39 +32,48 @@ export function AIQuestionRefiner({ currentQuestion, onSelect }: AIQuestionRefin
   };
 
   return (
-    <div className="space-y-6">
-      <Button 
-        type="button"
-        variant="outline" 
-        size="lg"
-        onClick={handleSuggest}
-        disabled={loading || !currentQuestion}
-        className="rounded-[1.5rem] h-14 px-8 gap-3 border-2 border-primary/20 text-primary font-black uppercase tracking-widest hover:bg-primary hover:text-background transition-all shadow-none"
-      >
-        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
-        AI Refine
-      </Button>
-
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button 
+          type="button"
+          variant="ghost" 
+          size="icon"
+          onClick={handleSuggest}
+          disabled={loading || !currentQuestion}
+          className="rounded-[1rem] h-12 w-12 text-primary hover:bg-primary/10 transition-all shadow-none"
+        >
+          {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+        </Button>
+      </PopoverTrigger>
+      
       {suggestions.length > 0 && (
-        <div className="grid gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
-          <p className="text-xs font-black text-primary opacity-40 uppercase tracking-[0.4em] px-2">AI Proposals</p>
-          {suggestions.map((suggestion, idx) => (
-            <Card 
-              key={idx} 
-              className="cursor-pointer border-2 border-primary/10 hover:border-primary hover:bg-primary/5 transition-all group rounded-[1.5rem] overflow-hidden bg-white/5 shadow-none"
-              onClick={() => {
-                onSelect(suggestion.toUpperCase());
-                setSuggestions([]);
-              }}
-            >
-              <CardContent className="p-6 flex items-start gap-4">
-                <CheckCircle2 className="h-6 w-6 text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-1 shrink-0" />
-                <span className="text-xl font-black uppercase tracking-tighter leading-none">{suggestion}</span>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <PopoverContent className="w-[450px] p-6 rounded-[1.5rem] border-2 border-foreground/10 bg-background flex flex-col gap-4 shadow-none mr-12" align="end">
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-black text-primary opacity-40 uppercase tracking-[0.4em]">AI Proposals</p>
+            <Button variant="ghost" size="icon" onClick={() => setSuggestions([])} className="h-8 w-8 rounded-full">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="grid gap-3">
+            {suggestions.map((suggestion, idx) => (
+              <Card 
+                key={idx} 
+                className="cursor-pointer border-2 border-primary/10 hover:border-primary hover:bg-primary/5 transition-all group rounded-[1.25rem] overflow-hidden bg-white/5 shadow-none"
+                onClick={() => {
+                  onSelect(suggestion.toUpperCase());
+                  setSuggestions([]);
+                  setOpen(false);
+                }}
+              >
+                <CardContent className="p-4 flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity mt-0.5 shrink-0" />
+                  <span className="text-sm font-bold uppercase tracking-tight leading-tight">{suggestion}</span>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </PopoverContent>
       )}
-    </div>
+    </Popover>
   );
 }

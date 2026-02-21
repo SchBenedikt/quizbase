@@ -20,8 +20,8 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
     {
       id: Math.random().toString(36).substr(2, 9),
       type: 'multiple-choice',
-      question: "What is our focus today?",
-      options: ["Growth", "Innovation", "Quality"],
+      question: "WHAT IS OUR PRIMARY GOAL?",
+      options: ["Growth", "Innovation", "Stability"],
       createdAt: Date.now()
     }
   ]);
@@ -57,17 +57,17 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
   return (
     <div className="space-y-12 pb-48 presenter-ui">
       <section className="space-y-6">
-        <div className="flex items-center justify-between sticky top-24 z-20 bg-background/90 py-4 border-b-2 mb-6">
+        <div className="flex items-center justify-between sticky top-24 z-20 bg-background/90 dark:bg-background/90 backdrop-blur-sm py-4 border-b-2 mb-6">
           <div className="space-y-0.5">
-            <h2 className="text-xl font-bold tracking-tight uppercase">Flow</h2>
-            <p className="text-xs font-bold opacity-40 uppercase tracking-widest">{questions.length} Questions</p>
+            <h2 className="text-xl font-bold tracking-tight uppercase">Interaction Flow</h2>
+            <p className="text-xs font-bold opacity-40 uppercase tracking-widest">{questions.length} Items</p>
           </div>
           <Button 
             type="button"
             onClick={() => onSave(questions)} 
             className="rounded-[1.5rem] h-12 px-8 font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all uppercase text-xs shadow-none border-2 border-primary"
           >
-            Save All
+            Save Survey
           </Button>
         </div>
 
@@ -96,31 +96,36 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
                       </div>
                     </div>
                     
-                    <div className="flex gap-3">
-                      <Input 
-                        value={q.question} 
-                        onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
-                        placeholder="Type your question here..."
-                        className="text-xl font-bold h-16 border-2 bg-muted rounded-[1.5rem] px-6 focus-visible:ring-1 shadow-none"
-                      />
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => removeQuestion(q.id)} 
-                        disabled={questions.length <= 1}
-                        className="h-16 w-16 rounded-[1.5rem] hover:text-destructive border-2 border-transparent"
-                      >
-                        <Trash2 className="h-6 w-6" />
-                      </Button>
+                    <div className="space-y-4">
+                      <div className="flex gap-3 items-center">
+                        <div className="relative flex-grow">
+                          <Input 
+                            value={q.question} 
+                            onChange={(e) => updateQuestion(q.id, { question: e.target.value.toUpperCase() })}
+                            placeholder="Type your question here..."
+                            className="text-xl font-bold h-16 border-2 bg-muted rounded-[1.5rem] pl-6 pr-14 focus-visible:ring-1 shadow-none"
+                          />
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                            <AIQuestionRefiner 
+                              currentQuestion={q.question} 
+                              onSelect={(refined) => updateQuestion(q.id, { question: refined })}
+                            />
+                          </div>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => removeQuestion(q.id)} 
+                          disabled={questions.length <= 1}
+                          className="h-16 w-16 rounded-[1.5rem] hover:text-destructive border-2 border-transparent"
+                        >
+                          <Trash2 className="h-6 w-6" />
+                        </Button>
+                      </div>
                     </div>
 
-                    <AIQuestionRefiner 
-                      currentQuestion={q.question} 
-                      onSelect={(refined) => updateQuestion(q.id, { question: refined })}
-                    />
-
                     {q.type === 'multiple-choice' && q.options && (
-                      <div className="grid gap-4 pt-4">
+                      <div className="grid gap-4 pt-2">
                         {q.options.map((opt, oIdx) => (
                           <div key={oIdx} className="flex gap-3 items-center">
                             <Input 
@@ -159,7 +164,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
         </div>
       </section>
 
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-foreground text-background p-3 rounded-[1.5rem] flex items-center gap-2 z-50 shadow-none border-2 border-foreground">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-background dark:bg-card border-2 border-foreground/10 p-3 rounded-[1.5rem] flex items-center gap-2 z-50 shadow-none">
         {[
           { type: 'multiple-choice', icon: ListChecks, label: 'Poll' },
           { type: 'word-cloud', icon: Cloud, label: 'Cloud' },
@@ -170,7 +175,7 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
           <Button 
             key={tool.type}
             onClick={() => addQuestion(tool.type as PollType)} 
-            className="h-12 px-6 gap-3 bg-transparent hover:bg-background hover:text-foreground text-background border-2 border-transparent font-bold uppercase text-[10px] tracking-widest transition-all shadow-none"
+            className="h-12 px-6 gap-3 bg-transparent hover:bg-primary hover:text-primary-foreground text-foreground border-2 border-transparent font-bold uppercase text-[10px] tracking-widest transition-all shadow-none"
           >
             <tool.icon className="h-5 w-5" /> <span className="hidden sm:inline">{tool.label}</span>
           </Button>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, use } from "react";
@@ -21,14 +22,14 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   
   const pollRef = useMemoFirebase(() => {
     if (!user) return null;
-    return doc(db, `users/${user.uid}/polls/${resolvedParams.pollId}`);
+    return doc(db, `users/${user.uid}/surveys/${resolvedParams.pollId}`);
   }, [user, db, resolvedParams.pollId]);
 
   const { data: poll, isLoading: pollLoading } = useDoc(pollRef);
 
   const questionsQuery = useMemoFirebase(() => {
     if (!user) return null;
-    return query(collection(db, `users/${user.uid}/polls/${resolvedParams.pollId}/questions`), orderBy("order", "asc"));
+    return query(collection(db, `users/${user.uid}/surveys/${resolvedParams.pollId}/questions`), orderBy("order", "asc"));
   }, [user, db, resolvedParams.pollId]);
 
   const { data: initialQuestions } = useCollection<PollQuestion>(questionsQuery);
@@ -55,7 +56,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     try {
       await setDoc(pollRef!, { title: sessionTitle, updatedAt: serverTimestamp() }, { merge: true });
 
-      const qCol = collection(db, `users/${user.uid}/polls/${resolvedParams.pollId}/questions`);
+      const qCol = collection(db, `users/${user.uid}/surveys/${resolvedParams.pollId}/questions`);
       const batch = writeBatch(db);
       
       for (let i = 0; i < questions.length; i++) {
@@ -78,7 +79,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       }
       
       await batch.commit();
-      toast({ title: "Pulse Updated", description: "Changes persisted." });
+      toast({ title: "Survey Updated", description: "All changes saved." });
       router.push("/presenter");
     } catch (e: any) {
       toast({ variant: "destructive", title: "Update Failed", description: e.message });
@@ -98,16 +99,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   return (
     <div className="min-h-screen bg-background presenter-ui font-body">
       <Header variant="minimal" />
-      <div className="max-w-5xl mx-auto px-6 py-12 pb-40">
+      <div className="max-w-[1400px] mx-auto px-6 py-12 pb-40">
         <div className="flex items-center gap-6 mt-32 mb-12">
           <Button variant="ghost" size="icon" onClick={() => router.push('/presenter')} className="rounded-[1.5rem] h-14 w-14 border-2">
             <ArrowLeft className="h-6 w-6" />
           </Button>
-          <h1 className="text-5xl font-black uppercase tracking-tighter">Edit Pulse</h1>
+          <h1 className="text-5xl font-black uppercase tracking-tighter">Edit Survey</h1>
         </div>
         
         <div className="space-y-4 mb-12">
-          <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Pulse Title</label>
+          <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Survey Title</label>
           <Input 
             value={sessionTitle} 
             onChange={(e) => setSessionTitle(e.target.value)}
