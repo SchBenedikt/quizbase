@@ -1,8 +1,8 @@
+
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
 import { PollQuestion } from "@/app/types/poll";
-import { Card, CardContent } from "@/components/ui/card";
 
 interface ResultChartProps {
   question: PollQuestion;
@@ -14,30 +14,30 @@ export function ResultChart({ question, results }: ResultChartProps) {
 
   if (question.type === 'multiple-choice' && question.options) {
     const data = question.options.map((opt, idx) => ({
-      name: opt,
+      name: opt.toUpperCase(),
       value: results[idx] || 0
     }));
 
     return (
       <div className="h-[400px] w-full animate-in fade-in duration-700">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} layout="vertical" margin={{ left: 20, right: 40, top: 0, bottom: 0 }}>
+          <BarChart data={data} layout="vertical" margin={{ left: 20, right: 60, top: 0, bottom: 0 }}>
             <XAxis type="number" hide />
             <YAxis 
               dataKey="name" 
               type="category" 
-              width={150} 
+              width={160} 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: 'hsl(var(--primary))', fontSize: 16, fontWeight: 900 }}
+              tick={{ fill: 'hsl(var(--foreground))', fontSize: 16, fontWeight: 900 }}
             />
             <Tooltip 
               cursor={{ fill: 'transparent' }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className="bg-white p-4 border-4 border-primary rounded-2xl">
-                      <p className="font-black text-primary">{payload[0].value} VOTES</p>
+                    <div className="bg-foreground p-4 rounded-2xl border-4 border-foreground">
+                      <p className="font-black text-background text-lg">{payload[0].value} VOTES</p>
                     </div>
                   );
                 }
@@ -46,8 +46,8 @@ export function ResultChart({ question, results }: ResultChartProps) {
             />
             <Bar 
               dataKey="value" 
-              radius={[0, 20, 20, 0]} 
-              barSize={60}
+              radius={[0, 24, 24, 0]} 
+              barSize={64}
               animationDuration={1500}
             >
               {data.map((entry, index) => (
@@ -61,25 +61,25 @@ export function ResultChart({ question, results }: ResultChartProps) {
   }
 
   if (question.type === 'word-cloud') {
-    // Mocking a Word Cloud with tags of different sizes
-    const words = Object.entries(results).map(([word, count]) => ({
-      text: word,
-      size: 20 + count * 10,
-      color: colors[Math.floor(Math.random() * colors.length)]
-    }));
+    const entries = Object.entries(results);
+    const sorted = entries.sort((a, b) => b[1] - a[1]);
 
     return (
-      <div className="min-h-[400px] flex flex-wrap items-center justify-center gap-6 p-12">
-        {words.length === 0 ? (
-          <p className="text-3xl font-black uppercase opacity-20">Waiting for vibes...</p>
+      <div className="min-h-[400px] flex flex-wrap items-center justify-center gap-8 p-12">
+        {entries.length === 0 ? (
+          <p className="text-4xl font-black uppercase opacity-10 tracking-widest">Waiting for nodes...</p>
         ) : (
-          words.map((w, i) => (
+          sorted.map(([word, count], i) => (
             <span 
               key={i} 
-              className="font-black uppercase tracking-tighter transition-all hover:scale-110 cursor-default"
-              style={{ fontSize: `${w.size}px`, color: w.color }}
+              className="font-black uppercase tracking-tighter transition-all hover:scale-110 cursor-default animate-in zoom-in duration-500"
+              style={{ 
+                fontSize: `${Math.min(120, 32 + count * 16)}px`, 
+                color: colors[i % colors.length],
+                opacity: 0.5 + (count / Math.max(...entries.map(e => e[1]))) * 0.5
+              }}
             >
-              {w.text}
+              {word}
             </span>
           ))
         )}
@@ -88,49 +88,35 @@ export function ResultChart({ question, results }: ResultChartProps) {
   }
 
   if (question.type === 'slider') {
-    const average = Object.values(results).length > 0 
-      ? Object.values(results).reduce((a, b) => a + b, 0) / Object.values(results).length 
+    const values = Object.values(results);
+    const average = values.length > 0 
+      ? values.reduce((a, b) => Number(a) + Number(b), 0) / values.length 
       : 0;
 
     return (
-      <div className="py-20 text-center space-y-12">
-        <div className="relative h-24 bg-primary/10 rounded-full border-4 border-primary flex items-center px-8">
+      <div className="py-12 w-full max-w-4xl text-center space-y-16">
+        <div className="relative h-28 bg-foreground/5 rounded-full border-8 border-foreground flex items-center px-12 overflow-hidden">
            <div 
-             className="absolute left-0 h-full bg-primary rounded-full transition-all duration-1000"
+             className="absolute left-0 h-full bg-foreground transition-all duration-1000 ease-out"
              style={{ width: `${average}%` }}
            />
-           <div className="relative z-10 w-full flex justify-between px-4 font-black text-xl mix-blend-difference text-white">
+           <div className="relative z-10 w-full flex justify-between font-black text-2xl mix-blend-difference text-white uppercase tracking-widest">
              <span>0</span>
-             <span>AVERAGE: {average.toFixed(1)}</span>
+             <span>Current Pulse: {average.toFixed(1)}</span>
              <span>100</span>
            </div>
         </div>
-        <p className="text-8xl font-black uppercase tracking-tighter">{average.toFixed(0)}</p>
-      </div>
-    );
-  }
-
-  if (question.type === 'rating') {
-    const data = [1, 2, 3, 4, 5].map(v => ({
-      name: `${v}★`,
-      value: results[v] || 0
-    }));
-
-    return (
-      <div className="h-[300px] w-full">
-         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ bottom: 20 }}>
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 20, fontWeight: 900, fill: 'hsl(var(--primary))' }} />
-            <Bar dataKey="value" fill="hsl(var(--primary))" radius={[20, 20, 0, 0]} animationDuration={1000} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="space-y-2">
+          <span className="text-[12rem] font-black tracking-tighter leading-none">{average.toFixed(0)}</span>
+          <p className="text-xl font-black opacity-30 uppercase tracking-[0.5em]">Intensity Level</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-primary/5 p-20 rounded-[4rem] text-center">
-      <p className="text-3xl font-black uppercase opacity-20 tracking-tighter">Gathering data...</p>
+    <div className="bg-foreground/5 p-20 rounded-[4rem] text-center border-4 border-dashed border-foreground/10">
+      <p className="text-4xl font-black uppercase opacity-20 tracking-tighter">Syncing Data Streams...</p>
     </div>
   );
 }
