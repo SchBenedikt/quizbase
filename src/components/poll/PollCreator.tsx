@@ -5,18 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, Palette, MessageSquare, Star, ChevronDown, ChevronUp } from "lucide-react";
+import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronUp } from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
-import { PollQuestion, PollType, AppTheme } from "@/app/types/poll";
+import { PollQuestion, PollType } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 
 interface PollCreatorProps {
-  onSave: (questions: PollQuestion[], theme: AppTheme) => void;
+  onSave: (questions: PollQuestion[]) => void;
   initialQuestions?: PollQuestion[];
-  initialTheme?: AppTheme;
 }
 
-export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'orange' }: PollCreatorProps) {
+export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps) {
   const [questions, setQuestions] = useState<PollQuestion[]>(initialQuestions.length > 0 ? initialQuestions : [
     {
       id: Math.random().toString(36).substr(2, 9),
@@ -26,7 +25,6 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
       createdAt: Date.now()
     }
   ]);
-  const [selectedTheme, setSelectedTheme] = useState<AppTheme>(initialTheme);
 
   const addQuestion = (type: PollType) => {
     const newQuestion: PollQuestion = {
@@ -56,47 +54,17 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
     setQuestions(newQuestions);
   };
 
-  const themes: { name: AppTheme; color: string; label: string }[] = [
-    { name: 'orange', color: '#ff9312', label: 'Classic' },
-    { name: 'green', color: '#b5ff12', label: 'Neon' },
-    { name: 'red', color: '#ff4b12', label: 'Vivid' },
-    { name: 'blue', color: '#1293ff', label: 'Hydro' },
-  ];
-
   return (
     <div className="space-y-12 pb-48 presenter-ui">
-      <section className="space-y-6 bg-card p-8 rounded-3xl border border-border">
-        <div className="flex items-center gap-3 px-1">
-          <Palette className="h-5 w-5 text-primary" />
-          <h3 className="text-xl font-bold tracking-tight">Theme</h3>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {themes.map((t) => (
-            <button
-              key={t.name}
-              type="button"
-              onClick={() => setSelectedTheme(t.name)}
-              className={cn(
-                "flex items-center justify-between px-4 py-4 rounded-2xl border-2 transition-all hover:border-primary/40",
-                selectedTheme === t.name ? "border-primary bg-primary/5" : "border-border bg-muted"
-              )}
-            >
-              <span className="font-bold text-sm">{t.label}</span>
-              <div className="w-5 h-5 rounded-md" style={{ backgroundColor: t.color }} />
-            </button>
-          ))}
-        </div>
-      </section>
-
       <section className="space-y-6">
-        <div className="flex items-center justify-between sticky top-24 z-20 bg-background/80 backdrop-blur-md py-4 border-b border-border mb-6">
+        <div className="flex items-center justify-between sticky top-24 z-20 bg-background/80 backdrop-blur-md py-4 border-b mb-6">
           <div className="space-y-0.5">
             <h2 className="text-xl font-bold tracking-tight">Flow</h2>
             <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest">{questions.length} Nodes</p>
           </div>
           <Button 
             type="button"
-            onClick={() => onSave(questions, selectedTheme)} 
+            onClick={() => onSave(questions)} 
             className="rounded-xl h-12 px-8 font-bold bg-primary text-primary-foreground hover:opacity-90 transition-all uppercase text-xs"
           >
             Save Pulse
@@ -105,7 +73,7 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
 
         <div className="grid gap-6">
           {questions.map((q, idx) => (
-            <Card key={q.id} className="border border-border rounded-3xl bg-card overflow-hidden transition-all hover:border-primary/20">
+            <Card key={q.id} className="border rounded-3xl bg-card overflow-hidden transition-all hover:border-primary/20">
               <CardContent className="p-8">
                 <div className="flex gap-6">
                   <div className="flex flex-col gap-2 shrink-0">
@@ -133,7 +101,7 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
                         value={q.question} 
                         onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
                         placeholder="Type your question..."
-                        className="text-lg font-bold h-14 border border-border bg-muted rounded-xl px-6 focus-visible:ring-1 shadow-none"
+                        className="text-lg font-bold h-14 border bg-muted rounded-xl px-6 focus-visible:ring-1 shadow-none"
                       />
                       <Button 
                         variant="ghost" 
@@ -162,7 +130,7 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
                                 newOpts[oIdx] = e.target.value;
                                 updateQuestion(q.id, { options: newOpts });
                               }}
-                              className="h-11 border border-border bg-muted/50 rounded-lg px-4 font-medium text-sm"
+                              className="h-11 border bg-muted/50 rounded-lg px-4 font-medium text-sm"
                             />
                             {q.options!.length > 2 && (
                                <Button variant="ghost" size="icon" onClick={() => {
@@ -191,7 +159,7 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
         </div>
       </section>
 
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-foreground text-background p-2 rounded-2xl flex items-center gap-1 z-50">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground p-2 rounded-2xl flex items-center gap-1 z-50">
         {[
           { type: 'multiple-choice', icon: ListChecks, label: 'Poll' },
           { type: 'word-cloud', icon: Cloud, label: 'Cloud' },
@@ -202,7 +170,7 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
           <Button 
             key={tool.type}
             onClick={() => addQuestion(tool.type as PollType)} 
-            className="h-11 px-4 gap-2 bg-transparent hover:bg-background/10 text-background border-none font-bold uppercase text-[9px] tracking-wider"
+            className="h-11 px-4 gap-2 bg-transparent hover:bg-white/10 text-primary-foreground border-none font-bold uppercase text-[9px] tracking-wider"
           >
             <tool.icon className="h-4 w-4" /> <span className="hidden sm:inline">{tool.label}</span>
           </Button>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
-import { PollQuestion, AppTheme } from "@/app/types/poll";
+import { PollQuestion } from "@/app/types/poll";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
@@ -48,15 +48,13 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
   }, [user, isUserLoading, router]);
 
-  const handleUpdate = async (questions: PollQuestion[], theme: AppTheme) => {
+  const handleUpdate = async (questions: PollQuestion[]) => {
     if (!sessionTitle || !user || !poll) return;
 
     setLoading(true);
     try {
-      // Update poll meta
-      await setDoc(pollRef!, { title: sessionTitle, theme, updatedAt: serverTimestamp() }, { merge: true });
+      await setDoc(pollRef!, { title: sessionTitle, updatedAt: serverTimestamp() }, { merge: true });
 
-      // Update questions
       const qCol = collection(db, `users/${user.uid}/polls/${resolvedParams.pollId}/questions`);
       const batch = writeBatch(db);
       
@@ -73,7 +71,6 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
           createdAt: q.createdAt || Date.now()
         };
 
-        // Explicitly handle options and range to avoid 'undefined' in Firestore
         if (q.options) qData.options = q.options;
         if (q.range) qData.range = q.range;
 
@@ -81,7 +78,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       }
       
       await batch.commit();
-      toast({ title: "Pulse Updated", description: "Changes have been persisted across all sessions." });
+      toast({ title: "Pulse Updated", description: "Changes persisted." });
       router.push("/presenter");
     } catch (e: any) {
       toast({ variant: "destructive", title: "Update Failed", description: e.message });
@@ -92,36 +89,35 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
 
   if (pollLoading || !poll || !initialQuestions) {
     return (
-      <div className="h-screen flex items-center justify-center bg-[#f3f3f1]">
+      <div className="h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f3f1] presenter-ui font-body">
+    <div className="min-h-screen bg-background presenter-ui font-body">
       <Header variant="minimal" />
       <div className="max-w-5xl mx-auto px-6 py-12 pb-40">
         <div className="flex items-center gap-6 mt-32 mb-12">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/presenter')} className="rounded-full h-14 w-14 border-4 border-primary text-primary">
+          <Button variant="ghost" size="icon" onClick={() => router.push('/presenter')} className="rounded-full h-14 w-14 border-2">
             <ArrowLeft className="h-6 w-6" />
           </Button>
-          <h1 className="text-5xl font-black uppercase tracking-tighter text-primary">Edit Pulse</h1>
+          <h1 className="text-5xl font-black uppercase tracking-tighter">Edit Pulse</h1>
         </div>
         
         <div className="space-y-4 mb-12">
-          <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4 text-primary">Pulse Title</label>
+          <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40 ml-4">Pulse Title</label>
           <Input 
             value={sessionTitle} 
             onChange={(e) => setSessionTitle(e.target.value)}
-            className="text-3xl font-black h-20 border-8 border-primary bg-white rounded-[2rem] px-10 focus-visible:ring-0 uppercase text-primary shadow-none"
+            className="text-3xl font-black h-20 border-2 bg-card rounded-[2rem] px-10 focus-visible:ring-0 uppercase shadow-none"
           />
         </div>
 
         <PollCreator 
           onSave={handleUpdate} 
           initialQuestions={initialQuestions} 
-          initialTheme={poll.theme as AppTheme} 
         />
       </div>
     </div>

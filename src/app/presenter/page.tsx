@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
-import { PollQuestion, AppTheme } from "@/app/types/poll";
+import { PollQuestion } from "@/app/types/poll";
 import { Plus, ArrowLeft, Play, BarChart3, Edit2, Trash2, Search, Zap, Loader2 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
@@ -37,7 +37,7 @@ export default function PresenterPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleStartSession = async (questions: PollQuestion[], theme: AppTheme) => {
+  const handleStartSession = async (questions: PollQuestion[]) => {
     if (!sessionTitle) {
       toast({ variant: "destructive", title: "Required", description: "Give your pulse a name." });
       return;
@@ -54,7 +54,6 @@ export default function PresenterPage() {
         id: pollRef.id,
         userId: user.uid,
         title: sessionTitle,
-        theme,
         createdAt: serverTimestamp(),
       });
 
@@ -85,11 +84,10 @@ export default function PresenterPage() {
         code,
         status: "active",
         currentQuestionId: savedQuestionIds[0] || null,
-        theme,
         createdAt: serverTimestamp(),
       });
 
-      router.push(`/presenter/${sessionRef.id}?code=${code}&title=${encodeURIComponent(sessionTitle)}&theme=${theme}`);
+      router.push(`/presenter/${sessionRef.id}?code=${code}&title=${encodeURIComponent(sessionTitle)}`);
     } catch (e: any) {
       toast({ variant: "destructive", title: "Error", description: e.message });
     } finally {
@@ -101,7 +99,7 @@ export default function PresenterPage() {
     if (!user) return;
     const pollRef = doc(db, `users/${user.uid}/polls/${pollId}`);
     deleteDocumentNonBlocking(pollRef);
-    toast({ title: "Pulse Removed", description: "The poll has been deleted from your vault." });
+    toast({ title: "Pulse Removed", description: "The poll has been deleted." });
   };
 
   const handleLaunchExisting = async (poll: any) => {
@@ -121,11 +119,10 @@ export default function PresenterPage() {
         code,
         status: "active",
         currentQuestionId: firstQId,
-        theme: poll.theme,
         createdAt: serverTimestamp(),
       });
 
-      router.push(`/presenter/${sessionRef.id}?code=${code}&title=${encodeURIComponent(poll.title)}&theme=${poll.theme}`);
+      router.push(`/presenter/${sessionRef.id}?code=${code}&title=${encodeURIComponent(poll.title)}`);
     } catch (e: any) {
       toast({ variant: "destructive", title: "Failed", description: e.message });
     }
@@ -137,17 +134,17 @@ export default function PresenterPage() {
 
   if (isCreating) {
     return (
-      <div className="min-h-screen bg-muted presenter-ui font-body">
+      <div className="min-h-screen bg-background presenter-ui font-body">
         <Header variant="minimal" />
         <div className="max-w-4xl mx-auto px-6 py-32">
           <div className="flex items-center gap-6 mb-12">
-            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-12 w-12 border border-foreground/10">
+            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-12 w-12 border">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1 className="text-3xl font-bold tracking-tight">Create Pulse</h1>
           </div>
           
-          <div className="bg-card p-8 rounded-3xl border border-border mb-8">
+          <div className="bg-card p-8 rounded-3xl border mb-8">
             <label className="text-xs font-bold uppercase tracking-widest opacity-40 ml-1">Pulse Title</label>
             <Input 
               value={sessionTitle} 
@@ -164,7 +161,7 @@ export default function PresenterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted presenter-ui flex flex-col font-body">
+    <div className="min-h-screen bg-background presenter-ui flex flex-col font-body">
       <Header variant="minimal" />
       
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-24 space-y-12 mt-8">
@@ -174,7 +171,7 @@ export default function PresenterPage() {
               <Zap className="h-8 w-8 text-primary fill-primary" />
               <h1 className="text-4xl font-bold tracking-tight">Vault</h1>
             </div>
-            <p className="text-[10px] font-bold opacity-50 uppercase tracking-[0.3em]">System Online. Welcome back.</p>
+            <p className="text-[10px] font-bold opacity-50 uppercase tracking-[0.3em]">System Online.</p>
           </div>
           <Button 
             size="lg" 
@@ -193,20 +190,8 @@ export default function PresenterPage() {
                 placeholder="Search your pulse vault..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 pl-14 pr-6 rounded-xl border-2 border-border bg-card focus-visible:ring-1 font-medium text-md shadow-none"
+                className="h-14 pl-14 pr-6 rounded-xl border-2 bg-card focus-visible:ring-1 font-medium text-md shadow-none"
               />
-            </div>
-            
-            <div className="flex gap-10 px-8 py-3 bg-card border border-border rounded-2xl">
-              <div className="text-center">
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">Nodes</p>
-                <p className="text-xl font-bold">{polls?.length || 0}</p>
-              </div>
-              <div className="w-px h-8 bg-border" />
-              <div className="text-center">
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">Vibe Level</p>
-                <p className="text-xl font-bold">Optimal</p>
-              </div>
             </div>
           </div>
 
@@ -214,15 +199,15 @@ export default function PresenterPage() {
             {pollsLoading ? (
               <div className="p-20 text-center"><Loader2 className="h-10 w-10 animate-spin mx-auto opacity-20" /></div>
             ) : !filteredPolls || filteredPolls.length === 0 ? (
-              <div className="p-24 text-center border-4 border-dashed border-border rounded-[3rem] bg-card/50">
-                 <p className="text-sm font-bold uppercase opacity-20 tracking-widest">No pulses found in your archive</p>
+              <div className="p-24 text-center border-4 border-dashed rounded-[3rem] bg-card/50">
+                 <p className="text-sm font-bold uppercase opacity-20 tracking-widest">No pulses found</p>
               </div>
             ) : (
               filteredPolls.map((poll) => (
-                <div key={poll.id} className="bg-card p-6 rounded-[2.5rem] border border-border flex flex-col sm:flex-row items-center justify-between gap-6 group hover:border-primary/40 transition-all">
+                <div key={poll.id} className="bg-card p-6 rounded-[2.5rem] border flex flex-col sm:flex-row items-center justify-between gap-6 group hover:border-primary/40 transition-all">
                   <div className="flex items-center gap-6 w-full sm:w-auto">
-                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border-4 shrink-0 transition-colors", `theme-${poll.theme} border-foreground`)}>
-                       <BarChart3 className="h-6 w-6 text-foreground" />
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center border-2 shrink-0 bg-muted">
+                       <BarChart3 className="h-6 w-6 text-primary" />
                     </div>
                     <div className="space-y-1 truncate">
                       <p className="text-xl font-bold tracking-tight truncate">{poll.title}</p>
@@ -242,7 +227,7 @@ export default function PresenterPage() {
                      <Button 
                        variant="ghost" 
                        onClick={() => router.push(`/presenter/edit/${poll.id}`)}
-                       className="h-12 px-6 rounded-xl font-bold uppercase text-[11px] tracking-widest hover:bg-foreground/5"
+                       className="h-12 px-6 rounded-xl font-bold uppercase text-[11px] tracking-widest"
                      >
                        <Edit2 className="h-5 w-5 mr-3" /> Edit
                      </Button>

@@ -13,8 +13,8 @@ interface ResultChartProps {
 }
 
 export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
-  // Theme-friendly expressive colors
-  const colors = ['#E01CBB', '#4B0EA8', '#FF9F00', '#00C49F', '#FF4444', '#1293ff'];
+  // Neutral expressive palette
+  const colors = ['#000000', '#222222', '#444444', '#666666', '#888888', '#aaaaaa'];
 
   if (question.type === 'multiple-choice' && question.options) {
     const data = question.options.map((opt, idx) => ({
@@ -35,15 +35,15 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               width={240} 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: 'hsl(var(--foreground))', fontSize: 20, fontWeight: 700, fontFamily: 'Bricolage Grotesque' }}
+              tick={{ fill: 'currentColor', fontSize: 20, fontWeight: 700, fontFamily: 'Bricolage Grotesque' }}
             />
             <Tooltip 
               cursor={{ fill: 'transparent' }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className="bg-foreground p-5 rounded-[2rem] border-4 border-foreground shadow-2xl">
-                      <p className="font-bold text-background text-2xl leading-none">{payload[0].value} <span className="text-xs uppercase tracking-widest opacity-60">Votes</span></p>
+                    <div className="bg-primary p-5 rounded-[2rem] border-2 border-primary shadow-2xl">
+                      <p className="font-bold text-primary-foreground text-2xl leading-none">{payload[0].value} <span className="text-xs uppercase tracking-widest opacity-60">Votes</span></p>
                     </div>
                   );
                 }
@@ -73,7 +73,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     return (
       <div className="h-full w-full flex flex-wrap items-center justify-center gap-10 p-12 overflow-hidden">
         {entries.length === 0 ? (
-          <p className="text-4xl font-bold uppercase opacity-10 tracking-[0.4em]">Listening for signals...</p>
+          <p className="text-4xl font-bold uppercase opacity-10 tracking-[0.4em]">Listening...</p>
         ) : (
           sorted.map(([word, count], i) => (
             <span 
@@ -102,7 +102,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
           <ScrollArea className="h-full w-full pr-8">
             <div className="grid gap-6 py-8 px-4">
               {allResponses.map((res, i) => (
-                <div key={i} className="bg-white/80 backdrop-blur-sm p-8 rounded-[3rem] border-4 border-foreground animate-in slide-in-from-bottom-8 duration-700">
+                <div key={i} className="bg-card p-8 rounded-[3rem] border-2 animate-in slide-in-from-bottom-8 duration-700">
                   <p className="text-2xl font-bold uppercase tracking-tight">{res.value}</p>
                 </div>
               ))}
@@ -125,7 +125,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               key={s} 
               className={cn(
                 "h-20 w-20 transition-all duration-700",
-                s <= Math.round(avg) ? "fill-foreground text-foreground" : "text-foreground/10"
+                s <= Math.round(avg) ? "fill-primary text-primary" : "text-muted-foreground/10"
               )} 
             />
           ))}
@@ -144,9 +144,9 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
     return (
       <div className="h-full w-full max-w-5xl flex flex-col items-center justify-center space-y-20">
-        <div className="relative h-24 w-full bg-foreground/10 rounded-full border-4 border-foreground flex items-center px-12 overflow-hidden">
+        <div className="relative h-24 w-full bg-muted rounded-full border-2 flex items-center px-12 overflow-hidden">
            <div 
-             className="absolute left-0 h-full bg-foreground transition-all duration-1000 ease-out"
+             className="absolute left-0 h-full bg-primary transition-all duration-1000 ease-out"
              style={{ width: `${average}%` }}
            />
            <div className="relative z-10 w-full flex justify-between font-bold text-xl mix-blend-difference text-white uppercase tracking-[0.4em]">
@@ -164,8 +164,8 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
   }
 
   return (
-    <div className="bg-foreground/5 p-20 rounded-[4rem] text-center border-4 border-dashed border-foreground/5">
-      <p className="text-4xl font-bold uppercase opacity-10 tracking-[0.4em]">Initializing Data Stream...</p>
+    <div className="bg-muted p-20 rounded-[4rem] text-center border-2 border-dashed">
+      <p className="text-4xl font-bold uppercase opacity-10 tracking-[0.4em]">Initializing...</p>
     </div>
   );
 }

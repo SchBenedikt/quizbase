@@ -15,7 +15,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const resolvedParams = use(params);
   const db = useFirestore();
   
-  // Participant views the session by the 6-digit JOIN CODE (passed as sessionId in URL)
   const sessionQuery = useMemoFirebase(() => {
     return query(
       collection(db, "sessions"), 
@@ -57,8 +56,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     }
   }, [session?.currentQuestionId, session?.userId, session?.pollId, db]);
 
-  const theme = session?.theme || 'orange';
-
   const handleSubmit = async () => {
     if (!currentQuestion || !session) return;
     setLoading(true);
@@ -87,7 +84,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (sessionLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
@@ -95,23 +92,23 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (!session) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-muted">
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
         <h1 className="text-2xl font-bold uppercase tracking-tight opacity-20">Session Not Found</h1>
         <p className="text-sm opacity-50 mt-2 uppercase tracking-widest">Verify your pulse code and try again.</p>
-        <Button onClick={() => window.location.href = '/join'} className="mt-8 bg-primary text-background font-bold rounded-full h-14 px-10 border-4 border-primary hover:bg-transparent hover:text-primary transition-all">Return to Lobby</Button>
+        <Button onClick={() => window.location.href = '/join'} className="mt-8 bg-primary text-primary-foreground font-bold rounded-full h-14 px-10">Return to Lobby</Button>
       </div>
     );
   }
 
   if (voted) {
     return (
-      <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-500 bg-background", `theme-${theme}`)}>
-        <div className="bg-foreground p-12 rounded-[3.5rem] animate-float border-8 border-background">
-          <Heart className="h-24 w-24 text-background fill-background" />
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-500 bg-background">
+        <div className="bg-primary p-12 rounded-[3.5rem] animate-float">
+          <Heart className="h-24 w-24 text-primary-foreground fill-primary-foreground" />
         </div>
         <div className="space-y-4">
-          <h1 className="text-4xl font-extrabold text-foreground uppercase tracking-tight leading-none">Sync Confirmed!</h1>
-          <p className="text-foreground font-semibold text-lg max-w-xs mx-auto uppercase tracking-tight opacity-70">Stand by for the next signal...</p>
+          <h1 className="text-4xl font-extrabold uppercase tracking-tight leading-none">Sync Confirmed!</h1>
+          <p className="font-semibold text-lg max-w-xs mx-auto uppercase tracking-tight opacity-70">Stand by for the next signal...</p>
         </div>
       </div>
     );
@@ -119,27 +116,27 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (!currentQuestion) {
     return (
-      <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background", `theme-${theme}`)}>
-        <p className="text-2xl font-bold uppercase opacity-20 tracking-tight text-foreground">Waiting for Transmission...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
+        <p className="text-2xl font-bold uppercase opacity-20 tracking-tight">Waiting for Transmission...</p>
       </div>
     );
   }
 
   return (
-    <div className={cn("min-h-screen flex flex-col p-8 font-body bg-background transition-colors duration-500", `theme-${theme}`)}>
+    <div className="min-h-screen flex flex-col p-8 font-body bg-background transition-colors duration-500">
       <div className="max-w-lg mx-auto w-full flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-3">
-            <Zap className="h-8 w-8 text-foreground fill-foreground" />
-            <span className="font-bold text-2xl tracking-tight uppercase text-foreground">PopPulse*</span>
+            <Zap className="h-8 w-8 text-primary fill-primary" />
+            <span className="font-bold text-2xl tracking-tight uppercase">PopPulse*</span>
           </div>
-          <div className="px-6 py-2 border-4 border-foreground rounded-full text-[10px] font-bold uppercase tracking-[0.3em] text-foreground">
+          <div className="px-6 py-2 border-2 border-primary rounded-full text-[10px] font-bold uppercase tracking-[0.3em]">
             Live
           </div>
         </div>
 
         <main className="space-y-12 flex-1">
-          <h2 className="text-3xl md:text-4xl font-extrabold leading-tight uppercase tracking-tight text-foreground">
+          <h2 className="text-3xl md:text-4xl font-extrabold leading-tight uppercase tracking-tight">
             {currentQuestion.question}
           </h2>
 
@@ -150,14 +147,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   key={idx}
                   variant={selection === idx ? "default" : "outline"}
                   className={cn(
-                    "h-20 text-lg font-bold rounded-[2rem] border-4 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
-                    selection === idx ? "bg-foreground text-background border-foreground" : "border-foreground/20 bg-white/10 text-foreground"
+                    "h-20 text-lg font-bold rounded-[2rem] border-2 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
+                    selection === idx ? "bg-primary text-primary-foreground border-primary" : "border-muted-foreground/20 text-foreground"
                   )}
                   onClick={() => setSelection(idx)}
                 >
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center mr-6 shrink-0 transition-colors border-4 text-sm font-extrabold",
-                    selection === idx ? "bg-background text-foreground border-background" : "bg-foreground text-background border-foreground"
+                    "w-10 h-10 rounded-xl flex items-center justify-center mr-6 shrink-0 transition-colors border-2 text-sm font-extrabold",
+                    selection === idx ? "bg-background text-foreground border-background" : "bg-primary text-primary-foreground border-primary"
                   )}>
                     {String.fromCharCode(65 + idx)}
                   </div>
@@ -180,7 +177,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   <Star 
                     className={cn(
                       "h-12 w-12 transition-all",
-                      s <= ratingValue ? "fill-foreground text-foreground" : "text-foreground/20"
+                      s <= ratingValue ? "fill-primary text-primary" : "text-muted-foreground/20"
                     )} 
                   />
                 </Button>
@@ -196,14 +193,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   maxLength={20}
-                  className="h-20 text-2xl font-bold px-8 rounded-[2rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none text-foreground"
+                  className="h-20 text-2xl font-bold px-8 rounded-[2rem] border-2 border-primary bg-muted focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none"
                 />
               ) : (
                 <Textarea 
                   placeholder="Your thoughts..."
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
-                  className="min-h-[200px] text-xl font-bold p-8 rounded-[2.5rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight text-foreground"
+                  className="min-h-[200px] text-xl font-bold p-8 rounded-[2.5rem] border-2 border-primary bg-muted focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight"
                 />
               )}
             </div>
@@ -212,7 +209,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           {currentQuestion.type === 'slider' && (
             <div className="space-y-12 py-8">
               <div className="text-center">
-                <span className="text-8xl font-extrabold tracking-tight leading-none text-foreground">{sliderValue}</span>
+                <span className="text-8xl font-extrabold tracking-tight leading-none">{sliderValue}</span>
               </div>
               <Slider 
                 value={[sliderValue]}
@@ -221,7 +218,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 step={1}
                 className="py-6"
               />
-              <div className="flex justify-between font-bold text-[10px] uppercase tracking-widest opacity-40 text-foreground px-4">
+              <div className="flex justify-between font-bold text-[10px] uppercase tracking-widest opacity-40 px-4">
                 <span>Low</span>
                 <span>High</span>
               </div>
@@ -231,14 +228,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           <Button 
             disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
             onClick={handleSubmit}
-            className="w-full h-20 text-2xl font-extrabold rounded-[2rem] bg-foreground text-background border-4 border-foreground hover:bg-transparent hover:text-foreground transition-all mt-8 uppercase tracking-tight shadow-none"
+            className="w-full h-20 text-2xl font-extrabold rounded-[2rem] bg-primary text-primary-foreground hover:opacity-90 transition-all mt-8 uppercase tracking-tight shadow-none"
           >
             {loading ? <Loader2 className="animate-spin h-8 w-8" /> : "Transmit"}
           </Button>
         </main>
 
-        <footer className="mt-20 pt-12 text-center opacity-30 border-t-8 border-foreground/5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-foreground">Zero Retention. Instant Sync.</p>
+        <footer className="mt-20 pt-12 text-center opacity-30 border-t-2 border-muted">
+          <p className="text-[10px] font-bold uppercase tracking-[0.4em]">Zero Retention. Instant Sync.</p>
         </footer>
       </div>
     </div>

@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "User": {
@@ -21,10 +20,9 @@
         "id": { "type": "string" },
         "userId": { "type": "string" },
         "title": { "type": "string" },
-        "theme": { "type": "string", "enum": ["orange", "green", "red", "blue"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "userId", "title", "theme", "createdAt"]
+      "required": ["id", "userId", "title", "createdAt"]
     },
     "Question": {
       "title": "Question",
@@ -50,11 +48,10 @@
         "userId": { "type": "string" },
         "code": { "type": "string" },
         "status": { "type": "string", "enum": ["active", "ended"] },
-        "theme": { "type": "string", "enum": ["orange", "green", "red", "blue"] },
         "currentQuestionId": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "pollId", "userId", "code", "status", "theme", "createdAt"]
+      "required": ["id", "pollId", "userId", "code", "status", "createdAt"]
     },
     "Response": {
       "title": "Response",

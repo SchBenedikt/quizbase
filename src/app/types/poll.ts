@@ -1,5 +1,4 @@
 export type PollType = 'multiple-choice' | 'open-text' | 'rating' | 'slider' | 'word-cloud';
-export type AppTheme = 'orange' | 'green' | 'red' | 'blue';
 
 export interface PollQuestion {
   id: string;
@@ -14,18 +13,18 @@ export interface PollSession {
   id: string;
   code: string;
   title: string;
-  questions: PollQuestion[];
-  currentQuestionIndex: number;
-  status: 'draft' | 'active' | 'paused' | 'ended';
-  theme: AppTheme;
-  createdAt: number;
+  userId: string;
+  pollId: string;
+  currentQuestionId: string | null;
+  status: 'active' | 'ended';
+  createdAt: any;
 }
 
 export interface PollResponse {
   id: string;
   sessionId: string;
   questionId: string;
-  participantId: string;
-  value: string | number; // Choice index, open text, or slider value
-  timestamp: number;
+  value: string | number;
+  userId: string;
+  createdAt: any;
 }
