@@ -1,11 +1,10 @@
-
 "use client";
 
 import { useState, useEffect, use } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2, Palette } from "lucide-react";
+import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2, Palette, Settings } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, AppTheme } from "@/app/types/poll";
 import { useSearchParams } from "next/navigation";
@@ -21,10 +20,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
   const { data: session, isLoading: sessionLoading } = useDoc(sessionRef);
 
-  // Derive theme from session document primarily
-  const theme = (session?.theme as AppTheme) || (searchParams.get('theme') as AppTheme) || 'orange';
-  const title = session?.title || searchParams.get('title') || "Live Presentation";
-  const code = session?.code || searchParams.get('code') || "---";
+  const theme = (session?.theme as AppTheme) || 'orange';
+  const title = session?.title || "Live Pulse";
+  const code = session?.code || "---";
 
   const questionsQuery = useMemoFirebase(() => {
     if (!session) return null;
@@ -83,7 +81,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   if (sessionLoading || !questions) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-muted transition-colors duration-500">
+      <div className="h-screen w-screen flex items-center justify-center bg-muted">
         <Loader2 className="h-10 w-10 animate-spin opacity-20" />
       </div>
     );
@@ -103,89 +101,87 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   return (
     <div className={cn("no-scroll h-screen w-screen flex flex-col font-body bg-background transition-colors duration-500", `theme-${theme}`)}>
-      <header className="h-[12vh] px-12 flex items-center justify-between border-b border-foreground/10 shrink-0 z-10 bg-background/50 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
-          <Zap className="h-8 w-8 text-foreground fill-foreground" />
-          <h1 className="text-xl font-bold tracking-tight text-foreground truncate max-w-lg">{title}</h1>
+      <header className="h-[12vh] px-12 flex items-center justify-between border-b border-foreground/10 shrink-0 z-10 bg-background/50 backdrop-blur-md">
+        <div className="flex items-center gap-6">
+          <Zap className="h-10 w-10 text-foreground fill-foreground" />
+          <h1 className="text-2xl font-extrabold tracking-tighter text-foreground truncate max-w-xl uppercase">{title}</h1>
         </div>
         
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-12">
           <div className="flex flex-col items-end">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] opacity-50 text-foreground">Pulse Code</p>
-            <p className="text-4xl font-black tracking-tighter text-foreground leading-none mt-1">{code}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 text-foreground">Join Pulse</p>
+            <p className="text-5xl font-black tracking-tighter text-foreground leading-none mt-1">{code}</p>
           </div>
-          <div className="flex items-center gap-3 bg-foreground/10 px-5 py-2 rounded-2xl border border-foreground/20 text-foreground">
-            <Users className="h-5 w-5" />
-            <span className="text-xl font-black">{currentResponses.length}</span>
+          <div className="flex items-center gap-4 bg-foreground/10 px-6 py-3 rounded-2xl border-2 border-foreground/20 text-foreground">
+            <Users className="h-6 w-6" />
+            <span className="text-3xl font-black">{currentResponses.length}</span>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center overflow-hidden">
-        <div className="w-full max-w-6xl h-full flex flex-col gap-6">
-          <div className="text-center shrink-0">
-             <div className="inline-block px-5 py-1 bg-foreground text-background rounded-full text-xs font-bold uppercase tracking-[0.3em] mb-3">
-               Node {currentIdx + 1} of {questions.length}
+      <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center">
+        <div className="w-full max-w-7xl h-full flex flex-col gap-10">
+          <div className="text-center shrink-0 space-y-4">
+             <div className="inline-block px-6 py-1.5 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-[0.4em]">
+               Node {currentIdx + 1} / {questions.length}
              </div>
-             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-foreground max-w-4xl mx-auto uppercase">
+             <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-foreground max-w-5xl mx-auto uppercase">
                {q.question}
              </h2>
           </div>
 
-          <div className="flex-1 min-h-0 w-full">
-            <Card className="h-full border-4 border-foreground/10 rounded-[3rem] bg-white/10 backdrop-blur-lg p-10 flex items-center justify-center overflow-hidden shadow-none">
+          <div className="flex-1 min-h-0 w-full relative">
+            <Card className="h-full border-8 border-foreground/10 rounded-[4rem] bg-white/5 backdrop-blur-xl p-16 flex items-center justify-center overflow-hidden">
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
           </div>
         </div>
       </main>
 
-      <footer className="h-[10vh] flex items-center justify-between gap-8 border-t border-foreground/10 shrink-0 px-12 bg-background/50 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
+      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-12 border-t border-foreground/10 bg-background/50 backdrop-blur-md">
+        <div className="flex items-center gap-6">
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="h-12 w-12 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
+            className="h-14 w-14 rounded-full border-4 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-8 w-8" />
           </Button>
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handleNext}
             disabled={currentIdx === questions.length - 1}
-            className="h-12 w-12 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
+            className="h-14 w-14 rounded-full border-4 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-8 w-8" />
           </Button>
         </div>
         
-        <div className="flex items-center gap-6 bg-foreground/5 px-6 py-2 rounded-2xl border border-foreground/10 text-foreground">
-           <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[10px] h-9 px-3 hover:bg-foreground/10">
-             <LayoutGrid className="h-4 w-4 mr-2" /> Grid
+        <div className="flex items-center gap-4 bg-foreground/10 p-2 rounded-full border-2 border-foreground/20">
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full hover:bg-foreground/10 text-foreground">
+             <LayoutGrid className="h-5 w-5 mr-3" /> Grid
            </Button>
-           <div className="w-px h-5 bg-foreground/10" />
-           <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[10px] h-9 px-3 hover:bg-foreground/10">
-             <Timer className="h-4 w-4 mr-2" /> Timer
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full hover:bg-foreground/10 text-foreground">
+             <Timer className="h-5 w-5 mr-3" /> Timer
            </Button>
-           <div className="w-px h-5 bg-foreground/10" />
            <Popover>
              <PopoverTrigger asChild>
-               <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[10px] h-9 px-3 hover:bg-foreground/10">
-                 <Palette className="h-4 w-4 mr-2" /> Vibe
+               <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full hover:bg-foreground/10 text-foreground">
+                 <Palette className="h-5 w-5 mr-3" /> Vibe
                </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-48 p-3 rounded-2xl border-4 border-foreground bg-background">
-               <div className="grid grid-cols-2 gap-2">
+             <PopoverContent className="w-56 p-4 rounded-[2.5rem] border-4 border-foreground bg-background shadow-2xl">
+               <div className="grid grid-cols-2 gap-3">
                  {themeOptions.map((opt) => (
                    <button
                      key={opt.name}
                      onClick={() => changeTheme(opt.name)}
                      className={cn(
-                       "h-10 rounded-xl border-2 transition-all",
-                       theme === opt.name ? "border-foreground" : "border-transparent opacity-50 hover:opacity-100"
+                       "h-14 rounded-2xl border-4 transition-all hover:scale-105",
+                       theme === opt.name ? "border-foreground" : "border-transparent opacity-40 hover:opacity-100"
                      )}
                      style={{ backgroundColor: opt.color }}
                    />
@@ -193,10 +189,14 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                </div>
              </PopoverContent>
            </Popover>
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full hover:bg-foreground/10 text-foreground">
+             <Settings className="h-5 w-5 mr-3" /> Controls
+           </Button>
         </div>
 
-        <div className="w-24 flex justify-end">
-           <Zap className="h-6 w-6 text-foreground/20" />
+        <div className="flex items-center gap-2 opacity-20 text-foreground">
+           <Zap className="h-6 w-6 fill-foreground" />
+           <span className="font-black text-xs uppercase tracking-[0.3em]">PopPulse* OS</span>
         </div>
       </footer>
     </div>
