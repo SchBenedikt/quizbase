@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, use } from "react";
@@ -93,11 +92,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
 
   return (
-    <div className="no-scroll h-screen w-screen flex flex-col font-body bg-background transition-colors duration-500" data-theme={currentTheme}>
-      <header className="h-[12vh] px-12 flex items-center justify-between border-b shrink-0 z-10 bg-background/50 backdrop-blur-md">
+    <div className="no-scroll h-screen w-screen flex flex-col font-body bg-background transition-colors duration-700" data-theme={currentTheme}>
+      <header className="h-[12vh] px-12 flex items-center justify-between border-b border-foreground/10 shrink-0 z-10 bg-background/20 backdrop-blur-2xl">
         <div className="flex items-center gap-6">
-          <Zap className="h-10 w-10 text-primary fill-primary" />
-          <h1 className="text-2xl font-extrabold tracking-tighter truncate max-w-xl uppercase">{title}</h1>
+          <Zap className="h-10 w-10 text-foreground fill-foreground" />
+          <h1 className="text-2xl font-black tracking-tighter truncate max-w-xl uppercase">{title}</h1>
         </div>
         
         <div className="flex items-center gap-12">
@@ -105,7 +104,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Join Pulse</p>
             <p className="text-5xl font-black tracking-tighter leading-none mt-1">{code}</p>
           </div>
-          <div className="flex items-center gap-4 bg-muted px-6 py-3 rounded-2xl border-2">
+          <div className="flex items-center gap-4 bg-foreground/10 px-6 py-3 rounded-2xl border-2 border-foreground/20 backdrop-blur-md">
             <Users className="h-6 w-6" />
             <span className="text-3xl font-black">{currentResponses.length}</span>
           </div>
@@ -115,30 +114,30 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center">
         <div className="w-full max-w-7xl h-full flex flex-col gap-10">
           <div className="text-center shrink-0 space-y-4">
-             <div className="inline-block px-6 py-1.5 bg-primary text-primary-foreground rounded-full text-[10px] font-black uppercase tracking-[0.4em]">
+             <div className="inline-block px-6 py-1.5 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-[0.4em]">
                Node {currentIdx + 1} / {questions.length}
              </div>
-             <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight max-w-5xl mx-auto uppercase">
+             <h2 className="text-4xl md:text-5xl lg:text-7xl font-black leading-[0.9] tracking-tighter max-w-5xl mx-auto uppercase">
                {q.question}
              </h2>
           </div>
 
           <div className="flex-1 min-h-0 w-full relative">
-            <Card className="h-full border-4 rounded-[3rem] bg-muted/30 backdrop-blur-xl p-16 flex items-center justify-center overflow-hidden">
+            <Card className="h-full border-4 rounded-[4rem] bg-foreground/5 backdrop-blur-3xl border-foreground/20 p-16 flex items-center justify-center overflow-hidden">
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
           </div>
         </div>
       </main>
 
-      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-12 border-t bg-background/50 backdrop-blur-md">
+      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-12 border-t border-foreground/10 bg-background/20 backdrop-blur-2xl">
         <div className="flex items-center gap-6">
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="h-14 w-14 rounded-full border-2 hover:bg-primary hover:text-primary-foreground transition-all"
+            className="h-14 w-14 rounded-full border-2 border-foreground/20 bg-background/40 hover:bg-foreground hover:text-background transition-all"
           >
             <ChevronLeft className="h-8 w-8" />
           </Button>
@@ -147,30 +146,30 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             size="icon" 
             onClick={handleNext}
             disabled={currentIdx === questions.length - 1}
-            className="h-14 w-14 rounded-full border-2 hover:bg-primary hover:text-primary-foreground transition-all"
+            className="h-14 w-14 rounded-full border-2 border-foreground/20 bg-background/40 hover:bg-foreground hover:text-background transition-all"
           >
             <ChevronRight className="h-8 w-8" />
           </Button>
         </div>
         
-        <div className="flex items-center gap-4 bg-muted p-2 rounded-full border-2">
+        <div className="flex items-center gap-4 bg-foreground/10 p-2 rounded-full border-2 border-foreground/20 backdrop-blur-md">
            <Popover>
              <PopoverTrigger asChild>
-                <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full">
+                <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full hover:bg-foreground/10 transition-colors">
                   <Palette className="h-5 w-5 mr-3" /> Vibe
                 </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-48 p-4 rounded-[2rem] border-4 flex flex-col gap-2">
-                <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] hover:bg-[#ff9312]/90 text-white rounded-full font-black uppercase text-[10px]">Orange</Button>
-                <Button onClick={() => setTheme('red')} className="bg-[#f24822] hover:bg-[#f24822]/90 text-white rounded-full font-black uppercase text-[10px]">Red</Button>
-                <Button onClick={() => setTheme('green')} className="bg-[#14ae5c] hover:bg-[#14ae5c]/90 text-white rounded-full font-black uppercase text-[10px]">Green</Button>
-                <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] hover:bg-[#0d99ff]/90 text-white rounded-full font-black uppercase text-[10px]">Blue</Button>
+             <PopoverContent className="w-56 p-4 rounded-[2.5rem] border-4 border-foreground/20 bg-background/90 backdrop-blur-2xl flex flex-col gap-2">
+                <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] hover:opacity-90 text-white rounded-full font-black uppercase text-[10px] h-12">Vibrant Orange</Button>
+                <Button onClick={() => setTheme('red')} className="bg-[#f24822] hover:opacity-90 text-white rounded-full font-black uppercase text-[10px] h-12">Electric Red</Button>
+                <Button onClick={() => setTheme('green')} className="bg-[#14ae5c] hover:opacity-90 text-white rounded-full font-black uppercase text-[10px] h-12">Neon Green</Button>
+                <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] hover:opacity-90 text-white rounded-full font-black uppercase text-[10px] h-12">Deep Blue</Button>
              </PopoverContent>
            </Popover>
-           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full">
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full hover:bg-foreground/10 transition-colors">
              <Timer className="h-5 w-5 mr-3" /> Timer
            </Button>
-           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full">
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-full hover:bg-foreground/10 transition-colors">
              <Settings className="h-5 w-5 mr-3" /> Controls
            </Button>
         </div>
