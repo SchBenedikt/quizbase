@@ -28,45 +28,42 @@
 
   /* Presenter Dashboard UI - Clean & Focused */
   .presenter-ui {
-    --background: 60 5% 96%; /* Light Gray */
-    --foreground: 35 88% 16%;
+    --background: 60 5% 96%; /* Light Grayish White */
+    --foreground: 35 20% 12%; /* Softer Dark */
     --card: 0 0% 100%;
-    --card-foreground: 35 88% 16%;
-    --primary: 33 100% 54%; /* Orange as primary accent */
+    --card-foreground: 35 20% 12%;
+    --primary: 33 100% 54%; /* Orange as accent only */
     --primary-foreground: 0 0% 100%;
-    --border: 35 88% 16% / 0.1;
-    --muted: 35 88% 16% / 0.05;
-    --muted-foreground: 35 88% 16% / 0.5;
+    --border: 0 0% 89%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --radius: 1.5rem;
   }
 
-  /* Theme Overrides - High Specificity */
+  /* Theme Overrides */
   .theme-orange {
     --background: 33 100% 54% !important;
     --foreground: 35 88% 16% !important;
     --primary: 35 88% 16% !important;
     --primary-foreground: 33 100% 54% !important;
-    --accent: 35 88% 16% !important;
   }
   .theme-green {
     --background: 82 100% 54% !important;
     --foreground: 120 88% 10% !important;
     --primary: 120 88% 10% !important;
     --primary-foreground: 82 100% 54% !important;
-    --accent: 120 88% 10% !important;
   }
   .theme-red {
     --background: 15 100% 54% !important;
     --foreground: 0 88% 10% !important;
     --primary: 0 88% 10% !important;
     --primary-foreground: 15 100% 54% !important;
-    --accent: 0 88% 10% !important;
   }
   .theme-blue {
     --background: 207 100% 54% !important;
     --foreground: 215 88% 10% !important;
     --primary: 215 88% 10% !important;
     --primary-foreground: 207 100% 54% !important;
-    --accent: 215 88% 10% !important;
   }
 }
 
