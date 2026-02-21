@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, use } from "react";
@@ -27,7 +26,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   const questionsQuery = useMemoFirebase(() => {
     if (!session) return null;
-    return query(collection(db, `users/${session.userId}/polls/${session.pollId}/questions`), orderBy("order", "asc"));
+    return query(collection(db, `users/${session.userId}/surveys/${session.pollId}/questions`), orderBy("order", "asc"));
   }, [db, session]);
   const { data: questions } = useCollection<PollQuestion>(questionsQuery);
 

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, use, useEffect } from "react";
@@ -39,7 +38,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     if (session?.currentQuestionId && session.userId && session.pollId) {
       const fetchQ = async () => {
         try {
-          const qRef = doc(db, `users/${session.userId}/polls/${session.pollId}/questions/${session.currentQuestionId}`);
+          const qRef = doc(db, `users/${session.userId}/surveys/${session.pollId}/questions/${session.currentQuestionId}`);
           const snap = await getDoc(qRef);
           if (snap.exists()) {
             setCurrentQuestion({ ...snap.data(), id: snap.id } as PollQuestion);

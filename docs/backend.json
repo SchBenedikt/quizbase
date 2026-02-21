@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "User": {
@@ -13,8 +12,8 @@
       },
       "required": ["id", "email", "createdAt"]
     },
-    "Poll": {
-      "title": "Poll",
+    "Survey": {
+      "title": "Survey",
       "description": "A collection of questions created by a user.",
       "type": "object",
       "properties": {
@@ -27,7 +26,7 @@
     },
     "Question": {
       "title": "Question",
-      "description": "A single interactive question within a poll.",
+      "description": "A single interactive question within a survey.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -41,7 +40,7 @@
     },
     "Session": {
       "title": "Session",
-      "description": "A live interactive instance of a poll.",
+      "description": "A live interactive instance of a survey.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },
@@ -77,13 +76,13 @@
       "schema": "#/entities/User",
       "description": "User profile data."
     },
-    "/users/{userId}/polls/{pollId}": {
-      "schema": "#/entities/Poll",
-      "description": "Polls created by a user."
+    "/users/{userId}/surveys/{surveyId}": {
+      "schema": "#/entities/Survey",
+      "description": "Surveys created by a user."
     },
-    "/users/{userId}/polls/{pollId}/questions/{questionId}": {
+    "/users/{userId}/surveys/{surveyId}/questions/{questionId}": {
       "schema": "#/entities/Question",
-      "description": "Questions within a specific poll."
+      "description": "Questions within a specific survey."
     },
     "/sessions/{sessionId}": {
       "schema": "#/entities/Session",
