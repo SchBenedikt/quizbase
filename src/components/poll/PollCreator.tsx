@@ -111,9 +111,9 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
           <Button 
             type="button"
             onClick={() => onSave(questions, selectedTheme)} 
-            className="w-full sm:w-auto rounded-[2rem] h-20 px-16 text-2xl font-black bg-primary text-white border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tighter"
+            className="w-full sm:w-auto rounded-[2rem] h-20 px-16 text-2xl font-black bg-primary text-white border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tighter shadow-none"
           >
-            Deploy Pulse
+            Save Changes
           </Button>
         </div>
 
@@ -200,12 +200,17 @@ export function PollCreator({ onSave, initialQuestions = [], initialTheme = 'ora
                       </div>
                     )}
 
+                    {q.type === 'slider' && (
+                      <div className="flex gap-4 items-center pl-10 mt-6 bg-primary/5 p-6 rounded-[2rem] border-4 border-primary/5">
+                        <SlidersHorizontal className="h-6 w-6 text-primary" />
+                        <span className="text-sm font-black uppercase tracking-widest text-primary">Range Selector (0-100) Active</span>
+                      </div>
+                    )}
+
                     {q.type === 'rating' && (
-                      <div className="flex gap-4 items-center pl-10 mt-6">
-                        <Label className="text-sm font-black uppercase tracking-[0.4em] opacity-40">Stars Scale (1-5)</Label>
-                        <div className="flex gap-2">
-                           {[1,2,3,4,5].map(s => <Star key={s} className="h-6 w-6 text-primary fill-primary" />)}
-                        </div>
+                      <div className="flex gap-4 items-center pl-10 mt-6 bg-primary/5 p-6 rounded-[2rem] border-4 border-primary/5">
+                         <Star className="h-6 w-6 text-primary fill-primary" />
+                         <span className="text-sm font-black uppercase tracking-widest text-primary">5-Star Feedback Protocol Active</span>
                       </div>
                     )}
                   </div>

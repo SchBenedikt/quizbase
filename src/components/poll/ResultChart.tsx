@@ -3,7 +3,8 @@
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
 import { PollQuestion } from "@/app/types/poll";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Star } from "lucide-react";
+import { Star, SlidersHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ResultChartProps {
   question: PollQuestion;
@@ -79,7 +80,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               key={i} 
               className="font-black uppercase tracking-tighter transition-all hover:scale-125 cursor-default animate-in zoom-in duration-700"
               style={{ 
-                fontSize: `${Math.min(120, 32 + count * 16)}px`, 
+                fontSize: `${Math.min(100, 32 + count * 16)}px`, 
                 color: colors[i % colors.length],
                 opacity: 0.7 + (count / Math.max(...entries.map(e => e[1]))) * 0.3
               }}
@@ -130,7 +131,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
           ))}
         </div>
         <div className="text-center space-y-4">
-          <span className="text-[16rem] font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
+          <span className="text-[14rem] font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
           <p className="text-3xl font-black opacity-30 uppercase tracking-[0.8em]">Avg Star Rating</p>
         </div>
       </div>
@@ -155,7 +156,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
            </div>
         </div>
         <div className="text-center">
-          <span className="text-[18rem] font-black tracking-tighter leading-none">{average.toFixed(0)}</span>
+          <span className="text-[16rem] font-black tracking-tighter leading-none">{average.toFixed(0)}</span>
           <p className="text-4xl font-black opacity-30 uppercase tracking-[0.8em] mt-6">Current Synergy</p>
         </div>
       </div>

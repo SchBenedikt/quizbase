@@ -32,6 +32,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setSelection(null);
             setTextValue("");
             setRatingValue(0);
+            setSliderValue(50);
           }
         } catch (error) {
           console.error("Failed to fetch current question:", error);
@@ -201,14 +202,19 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         {currentQuestion.type === 'slider' && (
           <div className="space-y-16 py-12">
             <div className="text-center">
-              <span className="text-[12rem] font-black tracking-tighter leading-none text-foreground">{sliderValue}</span>
+              <span className="text-[10rem] font-black tracking-tighter leading-none text-foreground">{sliderValue}</span>
             </div>
             <Slider 
               value={[sliderValue]}
               onValueChange={(v) => setSliderValue(v[0])}
               max={100}
+              step={1}
               className="py-8"
             />
+            <div className="flex justify-between font-black text-xs uppercase tracking-widest opacity-40 text-foreground px-4">
+              <span>Low</span>
+              <span>High</span>
+            </div>
           </div>
         )}
 
