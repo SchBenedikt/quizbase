@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2, Settings, Palette } from "lucide-react";
+import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2, Settings, Palette, Sparkles } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession } from "@/app/types/poll";
 import { useSearchParams } from "next/navigation";
@@ -11,10 +11,13 @@ import { cn } from "@/lib/utils";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, collection, updateDoc, query, orderBy } from "firebase/firestore";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { aiOpenTextSummarizer } from "@/ai/flows/ai-open-text-summarizer";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
   const db = useFirestore();
+  const { toast } = useToast();
   
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
   const { data: session, isLoading: sessionLoading } = useDoc<PollSession>(sessionRef);
@@ -36,6 +39,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const { data: allResponses } = useCollection(responsesQuery);
 
   const [results, setResults] = useState<Record<string, number>>({});
+  const [isSummarizing, setIsSummarizing] = useState(false);
 
   useEffect(() => {
     if (allResponses && session?.currentQuestionId) {
@@ -76,6 +80,26 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const setTheme = (theme: string) => {
     if (!sessionRef) return;
     updateDoc(sessionRef, { theme });
+  };
+
+  const handleSummarize = async () => {
+    if (!allResponses || !session?.currentQuestionId) return;
+    const currentResponses = allResponses.filter(r => r.questionId === session.currentQuestionId).map(r => r.value.toString());
+    if (currentResponses.length < 3) {
+      toast({ title: "Need more signal", description: "Collect at least 3 responses first." });
+      return;
+    }
+
+    setIsSummarizing(true);
+    try {
+      const { summary } = await aiOpenTextSummarizer({ responses: currentResponses });
+      toast({ title: "AI Vibe Check", description: summary });
+    } catch (e) {
+      console.error(e);
+      toast({ variant: "destructive", title: "AI Error", description: "Couldn't reach the neural network." });
+    } finally {
+      setIsSummarizing(false);
+    }
   };
 
   if (sessionLoading || !questions) {
@@ -126,6 +150,17 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             <Card className="h-full border-4 rounded-[4rem] bg-foreground/5 backdrop-blur-3xl border-foreground/20 p-16 flex items-center justify-center overflow-hidden">
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
+            
+            {q.type === 'open-text' && currentResponses.length > 0 && (
+              <Button 
+                onClick={handleSummarize}
+                disabled={isSummarizing}
+                className="absolute top-8 right-8 h-14 px-8 rounded-2xl bg-foreground text-background font-black uppercase text-xs border-4 border-foreground hover:bg-transparent hover:text-foreground transition-all gap-2"
+              >
+                {isSummarizing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+                Summarize
+              </Button>
+            )}
           </div>
         </div>
       </main>
