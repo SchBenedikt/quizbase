@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -177,7 +178,7 @@ export default function PresenterPage() {
               </div>
               <h1 className="text-5xl font-black tracking-tighter uppercase">Dashboard</h1>
             </div>
-            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Manage your interactions</p>
+            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Manage your surveys</p>
           </div>
           <Button 
             size="lg" 
@@ -199,56 +200,58 @@ export default function PresenterPage() {
             />
           </div>
 
-          <div className="grid gap-6">
-            {pollsLoading ? (
-              <div className="p-32 text-center"><Loader2 className="h-12 w-12 animate-spin mx-auto opacity-20" /></div>
-            ) : !filteredPolls || filteredPolls.length === 0 ? (
-              <div className="p-40 text-center border-2 border-dashed rounded-[1.5rem] bg-muted/30 space-y-4">
-                 <Sparkles className="h-12 w-12 mx-auto opacity-10" />
-                 <p className="text-sm font-black uppercase opacity-30 tracking-widest">No surveys found</p>
-              </div>
-            ) : (
-              filteredPolls.map((poll) => (
-                <div key={poll.id} className="bg-white dark:bg-card p-8 rounded-[1.5rem] border-2 flex flex-col sm:flex-row items-center justify-between gap-8 group hover:border-primary transition-all shadow-none">
-                  <div className="flex items-center gap-8 w-full sm:w-auto">
-                    <div className="w-16 h-16 rounded-[1rem] flex items-center justify-center border-2 shrink-0 bg-muted group-hover:bg-primary/5 transition-colors">
-                       <BarChart3 className="h-7 w-7 text-primary" />
+          {pollsLoading ? (
+            <div className="p-32 text-center"><Loader2 className="h-12 w-12 animate-spin mx-auto opacity-20" /></div>
+          ) : !filteredPolls || filteredPolls.length === 0 ? (
+            <div className="p-40 text-center border-2 border-dashed rounded-[1.5rem] bg-muted/30 space-y-4">
+               <Sparkles className="h-12 w-12 mx-auto opacity-10" />
+               <p className="text-sm font-black uppercase opacity-30 tracking-widest">No surveys found</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredPolls.map((poll) => (
+                <div key={poll.id} className="bg-white dark:bg-card p-8 rounded-[1.5rem] border-2 flex flex-col gap-6 group hover:border-primary transition-all shadow-none h-full">
+                  <div className="flex items-start justify-between">
+                    <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center border-2 shrink-0 bg-muted group-hover:bg-primary/5 transition-colors">
+                       <BarChart3 className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="space-y-1 truncate">
-                      <p className="text-2xl font-black tracking-tighter truncate uppercase leading-tight">{poll.title}</p>
-                      <p className="text-xs font-black opacity-40 uppercase tracking-widest">
-                        Created on: {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString('en-US') : 'N/A'}
-                      </p>
-                    </div>
+                    <Button 
+                       variant="ghost" 
+                       size="icon"
+                       onClick={() => handleDeletePoll(poll.id)}
+                       className="h-10 w-10 rounded-[1rem] hover:text-destructive hover:bg-destructive/10 shadow-none -mt-2 -mr-2"
+                     >
+                       <Trash2 className="h-4 w-4" />
+                     </Button>
                   </div>
-                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  
+                  <div className="space-y-1 flex-1 min-h-[4rem]">
+                    <p className="text-2xl font-black tracking-tighter uppercase leading-tight line-clamp-2">{poll.title}</p>
+                    <p className="text-xs font-black opacity-40 uppercase tracking-widest">
+                      Created on: {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString('en-US') : 'N/A'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-4 border-t-2 border-foreground/5">
                      <Button 
                        variant="ghost" 
                        onClick={() => handleLaunchExisting(poll)}
-                       className="h-12 px-6 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-primary hover:text-primary-foreground transition-all shadow-none"
+                       className="flex-1 h-12 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-primary hover:text-primary-foreground transition-all shadow-none"
                      >
                        <Play className="h-4 w-4 mr-2 fill-current" /> Launch
                      </Button>
                      <Button 
                        variant="ghost" 
                        onClick={() => router.push(`/presenter/edit/${poll.id}`)}
-                       className="h-12 px-6 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-muted shadow-none"
+                       className="h-12 w-12 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-muted shadow-none p-0"
                      >
-                       <Edit2 className="h-4 w-4 mr-2" /> Edit
-                     </Button>
-                     <Button 
-                       variant="ghost" 
-                       size="icon"
-                       onClick={() => handleDeletePoll(poll.id)}
-                       className="h-12 w-12 rounded-[1rem] hover:text-destructive hover:bg-destructive/10 shadow-none"
-                     >
-                       <Trash2 className="h-5 w-5" />
+                       <Edit2 className="h-4 w-4" />
                      </Button>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>
