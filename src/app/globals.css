@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    /* DEFAULT ORANGE THEME */
+    /* DEFAULT VIBRANT ORANGE THEME */
     --background: 37 40% 95%;
     --foreground: 37 92% 16%;
     --card: 0 0% 100%;
@@ -29,36 +29,36 @@
   }
 
   [data-theme='red'] {
-    --background: 11 40% 95%;
-    --foreground: 11 84% 15%;
-    --primary: 11 89% 54%;
-    --primary-foreground: 11 84% 15%;
-    --secondary: 11 100% 96%;
-    --accent: 11 100% 90%;
-    --ring: 11 89% 54%;
-    --border: 11 84% 15% / 0.1;
+    --background: 0 100% 98%;
+    --foreground: 0 100% 10%;
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 100% 96%;
+    --accent: 0 100% 90%;
+    --ring: 0 100% 50%;
+    --border: 0 100% 10% / 0.1;
   }
 
   [data-theme='green'] {
-    --background: 148 40% 95%;
-    --foreground: 148 79% 10%;
-    --primary: 148 79% 38%;
-    --primary-foreground: 148 40% 95%;
-    --secondary: 148 79% 96%;
-    --accent: 148 79% 90%;
-    --ring: 148 79% 38%;
-    --border: 148 79% 10% / 0.1;
+    --background: 142 76% 98%;
+    --foreground: 142 76% 10%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 142 76% 96%;
+    --accent: 142 76% 90%;
+    --ring: 142 76% 36%;
+    --border: 142 76% 10% / 0.1;
   }
 
   [data-theme='blue'] {
-    --background: 205 40% 95%;
-    --foreground: 205 92% 15%;
-    --primary: 205 100% 53%;
-    --primary-foreground: 205 92% 15%;
-    --secondary: 205 100% 96%;
-    --accent: 205 100% 90%;
-    --ring: 205 100% 53%;
-    --border: 205 92% 15% / 0.1;
+    --background: 221 83% 98%;
+    --foreground: 221 83% 10%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 221 83% 96%;
+    --accent: 221 83% 90%;
+    --ring: 221 83% 53%;
+    --border: 221 83% 10% / 0.1;
   }
 
   .presenter-ui {

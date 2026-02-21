@@ -1,9 +1,10 @@
+
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
 import { PollQuestion } from "@/app/types/poll";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Star, SlidersHorizontal } from "lucide-react";
+import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ResultChartProps {
@@ -13,16 +14,21 @@ interface ResultChartProps {
 }
 
 export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
-  // Neutral expressive palette
-  const colors = ['#000000', '#222222', '#444444', '#666666', '#888888', '#aaaaaa'];
+  // Themed palette using primary color and transparency steps
+  const colors = [
+    'hsl(var(--primary))',
+    'hsl(var(--primary) / 0.8)',
+    'hsl(var(--primary) / 0.6)',
+    'hsl(var(--primary) / 0.4)',
+    'hsl(var(--primary) / 0.3)',
+    'hsl(var(--primary) / 0.2)',
+  ];
 
   if (question.type === 'multiple-choice' && question.options) {
     const data = question.options.map((opt, idx) => ({
       name: opt.toUpperCase(),
       value: results[idx] || 0
     }));
-
-    const maxVal = Math.max(...data.map(d => d.value), 1);
 
     return (
       <div className="h-full w-full max-w-5xl animate-in fade-in duration-700 flex items-center px-8">
@@ -80,7 +86,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               key={i} 
               className="font-bold uppercase tracking-tighter transition-all hover:scale-125 cursor-default animate-in zoom-in duration-700"
               style={{ 
-                fontSize: `${Math.min(80, 24 + count * 12)}px`, 
+                fontSize: `${Math.min(100, 28 + count * 15)}px`, 
                 color: colors[i % colors.length],
                 opacity: 0.7 + (count / Math.max(...entries.map(e => e[1]))) * 0.3
               }}
@@ -102,7 +108,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
           <ScrollArea className="h-full w-full pr-8">
             <div className="grid gap-6 py-8 px-4">
               {allResponses.map((res, i) => (
-                <div key={i} className="bg-card p-8 rounded-[3rem] border-2 animate-in slide-in-from-bottom-8 duration-700">
+                <div key={i} className="bg-card p-8 rounded-[3rem] border-2 border-primary/20 animate-in slide-in-from-bottom-8 duration-700">
                   <p className="text-2xl font-bold uppercase tracking-tight">{res.value}</p>
                 </div>
               ))}
@@ -124,7 +130,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
             <Star 
               key={s} 
               className={cn(
-                "h-20 w-20 transition-all duration-700",
+                "h-24 w-24 transition-all duration-700",
                 s <= Math.round(avg) ? "fill-primary text-primary" : "text-muted-foreground/10"
               )} 
             />
@@ -132,7 +138,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
         </div>
         <div className="text-center space-y-2">
           <span className="text-[12rem] font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
-          <p className="text-2xl font-bold opacity-30 uppercase tracking-[0.8em]">Avg Star Rating</p>
+          <p className="text-2xl font-bold opacity-30 uppercase tracking-[0.8em]">Avg Rating</p>
         </div>
       </div>
     );
@@ -144,7 +150,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
     return (
       <div className="h-full w-full max-w-5xl flex flex-col items-center justify-center space-y-20">
-        <div className="relative h-24 w-full bg-muted rounded-full border-2 flex items-center px-12 overflow-hidden">
+        <div className="relative h-24 w-full bg-muted rounded-full border-2 border-primary/20 flex items-center px-12 overflow-hidden">
            <div 
              className="absolute left-0 h-full bg-primary transition-all duration-1000 ease-out"
              style={{ width: `${average}%` }}
