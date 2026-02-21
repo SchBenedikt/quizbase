@@ -26,15 +26,17 @@
     --radius: 2.5rem;
   }
 
-  /* Presenter Dashboard UI - Minimalist & Light */
+  /* Presenter Dashboard UI - Clean & Focused */
   .presenter-ui {
-    --background: 60 5% 95%; /* #f3f3f1 - Light off-white */
+    --background: 60 5% 96%; /* Light Gray */
     --foreground: 35 88% 16%;
     --card: 0 0% 100%;
     --card-foreground: 35 88% 16%;
     --primary: 33 100% 54%; /* Orange as primary accent */
-    --primary-foreground: 35 88% 16%;
+    --primary-foreground: 0 0% 100%;
     --border: 35 88% 16% / 0.1;
+    --muted: 35 88% 16% / 0.05;
+    --muted-foreground: 35 88% 16% / 0.5;
   }
 
   /* Theme Overrides - High Specificity */
@@ -43,24 +45,28 @@
     --foreground: 35 88% 16% !important;
     --primary: 35 88% 16% !important;
     --primary-foreground: 33 100% 54% !important;
+    --accent: 35 88% 16% !important;
   }
   .theme-green {
     --background: 82 100% 54% !important;
     --foreground: 120 88% 10% !important;
     --primary: 120 88% 10% !important;
     --primary-foreground: 82 100% 54% !important;
+    --accent: 120 88% 10% !important;
   }
   .theme-red {
     --background: 15 100% 54% !important;
     --foreground: 0 88% 10% !important;
     --primary: 0 88% 10% !important;
     --primary-foreground: 15 100% 54% !important;
+    --accent: 0 88% 10% !important;
   }
   .theme-blue {
     --background: 207 100% 54% !important;
     --foreground: 215 88% 10% !important;
     --primary: 215 88% 10% !important;
     --primary-foreground: 207 100% 54% !important;
+    --accent: 215 88% 10% !important;
   }
 }
 
@@ -91,7 +97,7 @@
   100% { transform: translateY(0px); }
 }
 
-/* Force shadow removal globally for the brand style */
+/* Shadow removal for consistent brand style */
 .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, .shadow-none {
   box-shadow: none !important;
 }
