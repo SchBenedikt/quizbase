@@ -19,7 +19,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
   const { data: session, isLoading: sessionLoading } = useDoc(sessionRef);
 
-  // Derive theme from session document primarily, fallback to searchParams or orange
+  // Derive theme from session document primarily
   const theme = (session?.theme as AppTheme) || (searchParams.get('theme') as AppTheme) || 'orange';
   const title = session?.title || searchParams.get('title') || "Live Presentation";
   const code = session?.code || searchParams.get('code') || "---";
@@ -92,34 +92,34 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <header className="h-[12vh] px-12 flex items-center justify-between border-b border-foreground/10 shrink-0 z-10 bg-background/50 backdrop-blur-sm">
         <div className="flex items-center gap-4">
           <Zap className="h-8 w-8 text-foreground fill-foreground" />
-          <h1 className="text-2xl font-bold tracking-tight text-foreground truncate max-w-lg">{title}</h1>
+          <h1 className="text-xl font-bold tracking-tight text-foreground truncate max-w-lg">{title}</h1>
         </div>
         
         <div className="flex items-center gap-10">
           <div className="flex flex-col items-end">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] opacity-40 text-foreground">Pulse Code</p>
-            <p className="text-4xl font-black tracking-tighter text-foreground leading-none mt-1">{code}</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 text-foreground">Pulse Code</p>
+            <p className="text-3xl font-black tracking-tighter text-foreground leading-none mt-1">{code}</p>
           </div>
-          <div className="flex items-center gap-3 bg-foreground/10 px-6 py-2.5 rounded-2xl border border-foreground/20 text-foreground">
-            <Users className="h-6 w-6" />
-            <span className="text-2xl font-black">{currentResponses.length}</span>
+          <div className="flex items-center gap-3 bg-foreground/10 px-5 py-2 rounded-2xl border border-foreground/20 text-foreground">
+            <Users className="h-5 w-5" />
+            <span className="text-xl font-black">{currentResponses.length}</span>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center overflow-hidden">
-        <div className="w-full max-w-6xl h-full flex flex-col gap-8">
+      <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center overflow-hidden">
+        <div className="w-full max-w-6xl h-full flex flex-col gap-6">
           <div className="text-center shrink-0">
-             <div className="inline-block px-6 py-1.5 bg-foreground text-background rounded-full text-[12px] font-bold uppercase tracking-[0.4em] mb-4">
+             <div className="inline-block px-5 py-1 bg-foreground text-background rounded-full text-[10px] font-bold uppercase tracking-[0.4em] mb-3">
                Node {currentIdx + 1} of {questions.length}
              </div>
-             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-foreground max-w-4xl mx-auto">
+             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-foreground max-w-4xl mx-auto uppercase">
                {q.question}
              </h2>
           </div>
 
           <div className="flex-1 min-h-0 w-full">
-            <Card className="h-full border-4 border-foreground/10 rounded-[3rem] bg-white/10 backdrop-blur-lg p-12 flex items-center justify-center overflow-hidden shadow-none">
+            <Card className="h-full border-4 border-foreground/10 rounded-[3rem] bg-white/10 backdrop-blur-lg p-10 flex items-center justify-center overflow-hidden shadow-none">
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
           </div>
@@ -132,18 +132,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           size="icon" 
           onClick={handlePrev}
           disabled={currentIdx === 0}
-          className="h-12 w-12 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
+          className="h-10 w-10 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-5 w-5" />
         </Button>
         
-        <div className="flex items-center gap-6 bg-foreground/5 px-8 py-3 rounded-2xl border border-foreground/10 text-foreground">
-           <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[11px] h-10 px-4 hover:bg-foreground/10">
-             <LayoutGrid className="h-4 w-4 mr-3" /> Grid View
+        <div className="flex items-center gap-6 bg-foreground/5 px-6 py-2 rounded-2xl border border-foreground/10 text-foreground">
+           <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[10px] h-9 px-3 hover:bg-foreground/10">
+             <LayoutGrid className="h-4 w-4 mr-2" /> Grid
            </Button>
-           <div className="w-px h-6 bg-foreground/10" />
-           <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[11px] h-10 px-4 hover:bg-foreground/10">
-             <Timer className="h-4 w-4 mr-3" /> Stop Watch
+           <div className="w-px h-5 bg-foreground/10" />
+           <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[10px] h-9 px-3 hover:bg-foreground/10">
+             <Timer className="h-4 w-4 mr-2" /> Timer
            </Button>
         </div>
 
@@ -152,9 +152,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           size="icon" 
           onClick={handleNext}
           disabled={currentIdx === questions.length - 1}
-          className="h-12 w-12 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
+          className="h-10 w-10 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-5 w-5" />
         </Button>
       </footer>
     </div>

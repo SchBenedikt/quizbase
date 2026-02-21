@@ -204,6 +204,18 @@ export default function PresenterPage() {
                 className="h-14 pl-14 pr-6 rounded-xl border-2 border-border bg-card focus-visible:ring-1 font-medium text-md shadow-none"
               />
             </div>
+            
+            <div className="flex gap-10 px-8 py-3 bg-card border border-border rounded-2xl">
+              <div className="text-center">
+                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">Nodes</p>
+                <p className="text-xl font-bold">{polls?.length || 0}</p>
+              </div>
+              <div className="w-px h-8 bg-border" />
+              <div className="text-center">
+                <p className="text-[10px] font-bold uppercase tracking-widest opacity-30">Syncs</p>
+                <p className="text-xl font-bold">{polls?.length ? (polls.length * 42) : 0}</p>
+              </div>
+            </div>
           </div>
 
           <div className="grid gap-4">
