@@ -6,10 +6,10 @@ import { Card } from "@/components/ui/card";
 import { Zap, ChevronLeft, ChevronRight, Users, LayoutGrid, Timer, Loader2, Sparkles } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, AppTheme } from "@/app/types/poll";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
-import { doc, collection, updateDoc, query, orderBy, getDocs } from "firebase/firestore";
+import { doc, collection, updateDoc, query, orderBy } from "firebase/firestore";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
@@ -51,7 +51,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   }, [allResponses, session?.currentQuestionId]);
 
-  // Handle auto-pick first question if none set
   useEffect(() => {
     if (session && !session.currentQuestionId && questions && questions.length > 0) {
       updateDoc(sessionRef, { currentQuestionId: questions[0].id });
@@ -79,7 +78,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   if (sessionLoading || !questions) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-[#f3f3f1]">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
@@ -92,39 +91,39 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   return (
     <div className={cn("no-scroll h-screen w-screen overflow-hidden flex flex-col font-body bg-background transition-colors duration-500", `theme-${theme}`)}>
       <header className="h-[12vh] px-12 flex items-center justify-between bg-white border-b-8 border-foreground shrink-0 z-10">
-        <div className="flex items-center gap-6 overflow-hidden">
-          <div className="bg-foreground p-3 rounded-[1rem] shrink-0">
-            <Zap className="text-background h-6 w-6" />
+        <div className="flex items-center gap-4 overflow-hidden">
+          <div className="bg-foreground p-2 rounded-lg shrink-0">
+            <Zap className="text-background h-5 w-5" />
           </div>
-          <h1 className="text-2xl font-black uppercase tracking-tighter truncate max-w-lg text-foreground">{title}</h1>
+          <h1 className="text-xl font-bold uppercase tracking-tight truncate max-w-lg text-foreground">{title}</h1>
         </div>
         
         <div className="flex items-center gap-8">
           <div className="flex flex-col items-end">
-            <p className="text-sm font-black uppercase tracking-[0.4em] opacity-40 mb-1 text-foreground">Join Code</p>
-            <p className="text-5xl font-black tracking-tighter leading-none text-foreground">{code}</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 mb-0.5 text-foreground">Join Code</p>
+            <p className="text-4xl font-extrabold tracking-tight leading-none text-foreground">{code}</p>
           </div>
-          <div className="h-12 w-1.5 bg-foreground/10 rounded-full" />
-          <div className="flex items-center gap-3 bg-foreground/5 px-6 py-3 rounded-[1.5rem] border-4 border-foreground text-foreground">
-            <Users className="h-6 w-6" />
-            <span className="text-3xl font-black leading-none">{currentResponses.length}</span>
+          <div className="h-10 w-1 bg-foreground/10 rounded-full" />
+          <div className="flex items-center gap-3 bg-foreground/5 px-5 py-2 rounded-2xl border-4 border-foreground text-foreground">
+            <Users className="h-5 w-5" />
+            <span className="text-2xl font-bold leading-none">{currentResponses.length}</span>
           </div>
         </div>
       </header>
 
       <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center overflow-hidden">
-        <div className="w-full max-w-7xl h-full flex flex-col gap-6">
-          <div className="space-y-2 text-center shrink-0">
-             <div className="inline-block px-6 py-1 bg-foreground text-background rounded-full text-sm font-black uppercase tracking-[0.4em]">
+        <div className="w-full max-w-6xl h-full flex flex-col gap-6">
+          <div className="space-y-1 text-center shrink-0">
+             <div className="inline-block px-5 py-0.5 bg-foreground text-background rounded-full text-xs font-bold uppercase tracking-[0.3em]">
                Node {currentIdx + 1} of {questions.length}
              </div>
-             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] uppercase tracking-tighter text-foreground max-w-5xl mx-auto">
+             <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight uppercase tracking-tight text-foreground max-w-4xl mx-auto">
                {q.question}
              </h2>
           </div>
 
           <div className="flex-1 min-h-0 w-full">
-            <Card className="h-full border-8 border-foreground rounded-[4rem] bg-white/40 backdrop-blur-md p-10 flex items-center justify-center overflow-hidden shadow-none">
+            <Card className="h-full border-8 border-foreground rounded-[3rem] bg-white/40 backdrop-blur-md p-10 flex items-center justify-center overflow-hidden shadow-none">
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
           </div>
@@ -137,24 +136,24 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           size="icon" 
           onClick={handlePrev}
           disabled={currentIdx === 0}
-          className="h-14 w-14 rounded-full border-4 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all shadow-none"
+          className="h-12 w-12 rounded-full border-4 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all shadow-none"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-5 w-5" />
         </Button>
         
-        <div className="bg-foreground text-background px-10 py-3 rounded-[3rem] flex items-center gap-8 border-4 border-foreground">
-           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1rem] font-black uppercase tracking-widest text-[10px] px-6 py-2 h-auto">
-             <LayoutGrid className="h-4 w-4 mr-3" /> Grid
+        <div className="bg-foreground text-background px-8 py-2 rounded-[2rem] flex items-center gap-6 border-4 border-foreground">
+           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-lg font-bold uppercase tracking-widest text-[9px] px-4 py-1.5 h-auto">
+             <LayoutGrid className="h-3.5 w-3.5 mr-2" /> Grid
            </Button>
-           <div className="w-1 h-6 bg-background/20 rounded-full" />
-           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1rem] font-black uppercase tracking-widest text-[10px] px-6 py-2 h-auto">
-             <Timer className="h-4 w-4 mr-3" /> Lock
+           <div className="w-0.5 h-4 bg-background/20 rounded-full" />
+           <Button variant="ghost" className="text-background hover:bg-white/10 rounded-lg font-bold uppercase tracking-widest text-[9px] px-4 py-1.5 h-auto">
+             <Timer className="h-3.5 w-3.5 mr-2" /> Lock
            </Button>
            {q.type === 'open-text' && (
              <>
-               <div className="w-1 h-6 bg-background/20 rounded-full" />
-               <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1rem] font-black uppercase tracking-widest text-[10px] px-6 py-2 h-auto">
-                 <Sparkles className="h-4 w-4 mr-3" /> Analyze
+               <div className="w-0.5 h-4 bg-background/20 rounded-full" />
+               <Button variant="ghost" className="text-background hover:bg-white/10 rounded-lg font-bold uppercase tracking-widest text-[9px] px-4 py-1.5 h-auto">
+                 <Sparkles className="h-3.5 w-3.5 mr-2" /> Analyze
                </Button>
              </>
            )}
@@ -165,9 +164,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           size="icon" 
           onClick={handleNext}
           disabled={currentIdx === questions.length - 1}
-          className="h-14 w-14 rounded-full border-4 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all shadow-none"
+          className="h-12 w-12 rounded-full border-4 border-foreground text-foreground hover:bg-foreground hover:text-background transition-all shadow-none"
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-5 w-5" />
         </Button>
       </footer>
     </div>

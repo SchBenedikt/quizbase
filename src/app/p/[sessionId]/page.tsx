@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { Zap, Send, Heart, Loader2, Star } from "lucide-react";
-import { PollQuestion, AppTheme } from "@/app/types/poll";
+import { Zap, Heart, Loader2, Star } from "lucide-react";
+import { PollQuestion } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 import { useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { doc, collection, addDoc, serverTimestamp, getDoc } from "firebase/firestore";
@@ -80,7 +80,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (sessionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f3f3f1]">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
@@ -88,21 +88,21 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (!session) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-[#f3f3f1]">
-        <h1 className="text-4xl font-black uppercase tracking-tighter opacity-20">Session Inactive</h1>
-        <Button onClick={() => window.location.href = '/join'} className="mt-8 bg-primary text-white font-black rounded-full h-16 px-10 border-4 border-primary">Return to Lobby</Button>
+        <h1 className="text-3xl font-bold uppercase tracking-tight opacity-20">Session Inactive</h1>
+        <Button onClick={() => window.location.href = '/join'} className="mt-8 bg-primary text-white font-bold rounded-full h-14 px-10 border-4 border-primary">Return to Lobby</Button>
       </div>
     );
   }
 
   if (voted) {
     return (
-      <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-12 animate-in fade-in duration-500 bg-background", `theme-${theme}`)}>
-        <div className="bg-foreground p-16 rounded-[5rem] animate-float border-8 border-background">
-          <Heart className="h-32 w-32 text-background fill-background" />
+      <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-500 bg-background", `theme-${theme}`)}>
+        <div className="bg-foreground p-12 rounded-[3.5rem] animate-float border-8 border-background">
+          <Heart className="h-24 w-24 text-background fill-background" />
         </div>
-        <div className="space-y-6">
-          <h1 className="text-7xl font-black text-foreground uppercase tracking-tighter leading-none">Sync Confirmed!</h1>
-          <p className="text-foreground font-black text-2xl max-w-xs mx-auto uppercase tracking-tight opacity-70">Stand by for the next pulse signal...</p>
+        <div className="space-y-4">
+          <h1 className="text-5xl font-extrabold text-foreground uppercase tracking-tight leading-none">Sync Confirmed!</h1>
+          <p className="text-foreground font-semibold text-lg max-w-xs mx-auto uppercase tracking-tight opacity-70">Stand by for the next pulse signal...</p>
         </div>
       </div>
     );
@@ -111,42 +111,42 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (!currentQuestion) {
     return (
       <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background", `theme-${theme}`)}>
-        <p className="text-4xl font-black uppercase opacity-20 tracking-tighter text-foreground">Waiting for Transmission...</p>
+        <p className="text-3xl font-bold uppercase opacity-20 tracking-tight text-foreground">Waiting for Transmission...</p>
       </div>
     );
   }
 
   return (
     <div className={cn("min-h-screen flex flex-col p-8 font-body max-w-lg mx-auto bg-background transition-colors duration-500", `theme-${theme}`)}>
-      <div className="flex items-center justify-between mb-20">
-        <div className="flex items-center gap-4">
-          <Zap className="h-10 w-10 text-foreground fill-foreground" />
-          <span className="font-black text-4xl tracking-tighter uppercase text-foreground">PopPulse*</span>
+      <div className="flex items-center justify-between mb-16">
+        <div className="flex items-center gap-3">
+          <Zap className="h-8 w-8 text-foreground fill-foreground" />
+          <span className="font-bold text-2xl tracking-tight uppercase text-foreground">PopPulse*</span>
         </div>
-        <div className="px-8 py-3 border-4 border-foreground rounded-full text-xs font-black uppercase tracking-[0.4em] text-foreground">
-          LIVE
+        <div className="px-6 py-2 border-4 border-foreground rounded-full text-[10px] font-bold uppercase tracking-[0.3em] text-foreground">
+          Live
         </div>
       </div>
 
-      <main className="space-y-16 flex-1">
-        <h2 className="text-5xl md:text-7xl font-black leading-[1] uppercase tracking-tighter text-foreground">
+      <main className="space-y-12 flex-1">
+        <h2 className="text-4xl md:text-5xl font-extrabold leading-tight uppercase tracking-tight text-foreground">
           {currentQuestion.question}
         </h2>
 
         {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
-          <div className="grid gap-6">
+          <div className="grid gap-4">
             {currentQuestion.options.map((opt, idx) => (
               <Button
                 key={idx}
                 variant={selection === idx ? "default" : "outline"}
                 className={cn(
-                  "h-28 text-2xl font-black rounded-[3rem] border-4 transition-all active:scale-95 text-left justify-start px-10 shadow-none",
+                  "h-20 text-lg font-bold rounded-[2rem] border-4 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
                   selection === idx ? "bg-foreground text-background border-foreground" : "border-foreground/20 bg-white/10 text-foreground"
                 )}
                 onClick={() => setSelection(idx)}
               >
                 <div className={cn(
-                  "w-14 h-14 rounded-2xl flex items-center justify-center mr-8 shrink-0 transition-colors border-4",
+                  "w-10 h-10 rounded-xl flex items-center justify-center mr-6 shrink-0 transition-colors border-4 text-sm font-extrabold",
                   selection === idx ? "bg-background text-foreground border-background" : "bg-foreground text-background border-foreground"
                 )}>
                   {String.fromCharCode(65 + idx)}
@@ -158,18 +158,18 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         )}
 
         {currentQuestion.type === 'rating' && (
-          <div className="flex justify-center gap-4 py-10">
+          <div className="flex justify-center gap-4 py-8">
             {[1, 2, 3, 4, 5].map((s) => (
               <Button
                 key={s}
                 variant="ghost"
                 size="icon"
                 onClick={() => setRatingValue(s)}
-                className="h-20 w-20 rounded-full"
+                className="h-16 w-16 rounded-full"
               >
                 <Star 
                   className={cn(
-                    "h-16 w-16 transition-all",
+                    "h-12 w-12 transition-all",
                     s <= ratingValue ? "fill-foreground text-foreground" : "text-foreground/20"
                   )} 
                 />
@@ -179,39 +179,39 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         )}
 
         {(currentQuestion.type === 'word-cloud' || currentQuestion.type === 'open-text') && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {currentQuestion.type === 'word-cloud' ? (
               <Input 
                 placeholder="Type one word..."
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
                 maxLength={20}
-                className="h-28 text-4xl font-black px-12 rounded-[3.5rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none text-foreground"
+                className="h-20 text-2xl font-bold px-8 rounded-[2rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none text-foreground"
               />
             ) : (
               <Textarea 
                 placeholder="Broadcast your thoughts..."
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
-                className="min-h-[250px] text-2xl font-black p-12 rounded-[3.5rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight text-foreground"
+                className="min-h-[200px] text-xl font-bold p-8 rounded-[2.5rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight text-foreground"
               />
             )}
           </div>
         )}
 
         {currentQuestion.type === 'slider' && (
-          <div className="space-y-16 py-12">
+          <div className="space-y-12 py-8">
             <div className="text-center">
-              <span className="text-[10rem] font-black tracking-tighter leading-none text-foreground">{sliderValue}</span>
+              <span className="text-8xl font-extrabold tracking-tight leading-none text-foreground">{sliderValue}</span>
             </div>
             <Slider 
               value={[sliderValue]}
               onValueChange={(v) => setSliderValue(v[0])}
               max={100}
               step={1}
-              className="py-8"
+              className="py-6"
             />
-            <div className="flex justify-between font-black text-xs uppercase tracking-widest opacity-40 text-foreground px-4">
+            <div className="flex justify-between font-bold text-[10px] uppercase tracking-widest opacity-40 text-foreground px-4">
               <span>Low</span>
               <span>High</span>
             </div>
@@ -221,14 +221,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         <Button 
           disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
           onClick={handleSubmit}
-          className="w-full h-28 text-3xl font-black rounded-[3.5rem] bg-foreground text-background border-4 border-foreground hover:bg-transparent hover:text-foreground transition-all mt-12 uppercase tracking-tighter shadow-none"
+          className="w-full h-20 text-2xl font-extrabold rounded-[2rem] bg-foreground text-background border-4 border-foreground hover:bg-transparent hover:text-foreground transition-all mt-8 uppercase tracking-tight shadow-none"
         >
-          {loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit Pulse"}
+          {loading ? <Loader2 className="animate-spin h-8 w-8" /> : "Transmit Pulse"}
         </Button>
       </main>
 
-      <footer className="mt-24 pt-16 text-center opacity-30 border-t-8 border-foreground/5">
-        <p className="text-xs font-black uppercase tracking-[0.5em] text-foreground">Zero Retention. Instant Connection. PopPulse*</p>
+      <footer className="mt-20 pt-12 text-center opacity-30 border-t-8 border-foreground/5">
+        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-foreground">Zero Retention. Instant Connection.</p>
       </footer>
     </div>
   );
