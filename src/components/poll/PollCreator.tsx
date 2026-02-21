@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,11 +11,12 @@ import { PollQuestion, PollType } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 
 interface PollCreatorProps {
-  onSave: (questions: PollQuestion[]) => void;
+  onSave?: (questions: PollQuestion[]) => void;
+  onChange?: (questions: PollQuestion[]) => void;
   initialQuestions?: PollQuestion[];
 }
 
-export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps) {
+export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCreatorProps) {
   const [questions, setQuestions] = useState<PollQuestion[]>(initialQuestions.length > 0 ? initialQuestions : [
     {
       id: Math.random().toString(36).substr(2, 9),
@@ -27,6 +28,12 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
   ]);
 
   const questionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    if (onChange) {
+      onChange(questions);
+    }
+  }, [questions, onChange]);
 
   const scrollToQuestion = (id: string) => {
     questionRefs.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -84,13 +91,15 @@ export function PollCreator({ onSave, initialQuestions = [] }: PollCreatorProps)
               </div>
             </div>
           </div>
-          <Button 
-            type="button"
-            onClick={() => onSave(questions)} 
-            className="rounded-[1.25rem] h-14 px-10 font-black bg-primary text-primary-foreground hover:bg-primary/90 transition-all uppercase text-sm shadow-none border-2 border-primary shrink-0"
-          >
-            Save Presentation
-          </Button>
+          {onSave && (
+            <Button 
+              type="button"
+              onClick={() => onSave(questions)} 
+              className="rounded-[1.25rem] h-14 px-10 font-black bg-primary text-primary-foreground hover:bg-primary/90 transition-all uppercase text-sm shadow-none border-2 border-primary shrink-0"
+            >
+              Update All
+            </Button>
+          )}
         </div>
 
         <div className="grid gap-8">

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion } from "@/app/types/poll";
-import { Plus, ArrowLeft, Play, BarChart3, Edit2, Trash2, Search, Zap, Loader2, Sparkles } from "lucide-react";
+import { Plus, ArrowLeft, Play, BarChart3, Edit2, Trash2, Search, Zap, Loader2, Sparkles, Rocket } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, setDoc, serverTimestamp, query, orderBy, getDocs } from "firebase/firestore";
@@ -20,6 +20,7 @@ export default function PresenterPage() {
   const { toast } = useToast();
   const [isCreating, setIsCreating] = useState(false);
   const [sessionTitle, setSessionTitle] = useState("");
+  const [currentQuestions, setCurrentQuestions] = useState<PollQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -36,7 +37,7 @@ export default function PresenterPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleStartSession = async (questions: PollQuestion[]) => {
+  const handleLaunchSession = async () => {
     if (!sessionTitle) {
       toast({ variant: "destructive", title: "Title missing", description: "Please give your presentation a name." });
       return;
@@ -57,8 +58,8 @@ export default function PresenterPage() {
       });
 
       const savedQuestionIds: string[] = [];
-      for (let i = 0; i < questions.length; i++) {
-        const q = questions[i];
+      for (let i = 0; i < currentQuestions.length; i++) {
+        const q = currentQuestions[i];
         const qRef = doc(collection(db, `users/${user.uid}/surveys/${pollRef.id}/questions`));
         
         const qData: any = {
@@ -148,17 +149,26 @@ export default function PresenterPage() {
             <h1 className="text-4xl font-black uppercase tracking-tighter">New Presentation</h1>
           </div>
           
-          <div className="bg-white dark:bg-card p-12 rounded-[1.5rem] border-2 mb-12 shadow-none">
-            <label className="text-xs font-black uppercase tracking-widest opacity-40 ml-2 mb-4 block">Survey Title</label>
-            <Input 
-              value={sessionTitle} 
-              onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="E.G., QUARTERLY STRATEGY REVIEW"
-              className="text-5xl font-black h-24 border-none bg-transparent focus-visible:ring-0 placeholder:opacity-10 shadow-none p-0 uppercase tracking-tighter"
-            />
+          <div className="flex flex-col md:flex-row items-end gap-6 mb-12">
+            <div className="flex-1 space-y-4 w-full">
+              <label className="text-xs font-black uppercase tracking-widest opacity-40 ml-4">Survey Title</label>
+              <Input 
+                value={sessionTitle} 
+                onChange={(e) => setSessionTitle(e.target.value)}
+                placeholder="E.G., QUARTERLY STRATEGY REVIEW"
+                className="text-4xl font-black h-24 border-2 bg-card rounded-[1.5rem] px-10 focus-visible:ring-0 placeholder:opacity-10 shadow-none uppercase tracking-tighter"
+              />
+            </div>
+            <Button 
+              onClick={handleLaunchSession}
+              disabled={loading || !sessionTitle}
+              className="h-24 px-12 rounded-[1.5rem] bg-foreground text-background font-black uppercase tracking-tighter text-2xl border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shrink-0 shadow-none"
+            >
+              {loading ? <Loader2 className="animate-spin h-8 w-8" /> : <><Rocket className="mr-3 h-8 w-8" /> Launch Live</>}
+            </Button>
           </div>
 
-          <PollCreator onSave={handleStartSession} />
+          <PollCreator onChange={setCurrentQuestions} />
         </div>
       </div>
     );
@@ -228,6 +238,9 @@ export default function PresenterPage() {
                   
                   <div className="flex-1 min-h-[5rem]">
                     <p className="text-3xl font-black tracking-tighter uppercase leading-[0.9] line-clamp-3 group-hover:text-primary transition-colors">{poll.title}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-30 mt-3">
+                      {new Date(poll.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
                   </div>
 
                   <div className="flex items-center gap-3 pt-6 border-t-2 border-foreground/5">
