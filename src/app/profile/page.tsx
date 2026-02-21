@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Bell, Eye } from "lucide-react";
+import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Bell, Eye, Palette } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { useUser, useAuth } from "@/firebase";
+import { useUser, useAuth, useFirestore } from "@/firebase";
 import { updateProfile } from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -16,6 +17,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const db = useFirestore();
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,13 +33,26 @@ export default function ProfilePage() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!auth.currentUser) return;
+    if (!auth.currentUser || !user) return;
     setLoading(true);
     try {
+      // Update Auth Profile
       await updateProfile(auth.currentUser, { displayName: name });
-      toast({ title: "Identity Synced", description: "Your profile has been updated across all pulses." });
+      
+      // Sync to Firestore User Doc
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, { name });
+
+      toast({ 
+        title: "Identity Synced", 
+        description: "Your profile has been updated across all pulses." 
+      });
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Update Failed", description: e.message });
+      toast({ 
+        variant: "destructive", 
+        title: "Update Failed", 
+        description: e.message 
+      });
     } finally {
       setLoading(false);
     }
@@ -46,58 +61,63 @@ export default function ProfilePage() {
   if (isUserLoading || !user) return null;
 
   return (
-    <div className="min-h-screen bg-[#f3f3f1] presenter-ui font-body flex flex-col">
+    <div className="min-h-screen bg-background presenter-ui font-body flex flex-col">
       <Header variant="minimal" />
       
-      <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-12 mt-32 space-y-12 pb-40">
+      <main className="flex-1 max-w-4xl mx-auto w-full px-6 py-32 space-y-12 pb-40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full h-14 w-14 border-4 border-primary text-primary">
-              <ArrowLeft className="h-6 w-6" />
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => router.back()} 
+              className="rounded-full h-12 w-12 border-2 text-foreground hover:bg-muted"
+            >
+              <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-6xl font-black uppercase tracking-tighter text-primary">Settings.</h1>
+            <h1 className="text-5xl font-black uppercase tracking-tighter">Settings</h1>
           </div>
         </div>
 
         <Tabs defaultValue="identity" className="w-full">
-          <TabsList className="bg-white/50 border-4 border-primary/10 p-2 h-auto rounded-[2rem] mb-12 flex w-full">
-            <TabsTrigger value="identity" className="flex-1 py-4 rounded-[1.5rem] font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-background">
+          <TabsList className="bg-muted border-2 p-1 h-auto rounded-2xl mb-12 flex w-full">
+            <TabsTrigger value="identity" className="flex-1 py-4 rounded-xl font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <User className="w-4 h-4 mr-2" /> Identity
             </TabsTrigger>
-            <TabsTrigger value="security" className="flex-1 py-4 rounded-[1.5rem] font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-background">
+            <TabsTrigger value="security" className="flex-1 py-4 rounded-xl font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Shield className="w-4 h-4 mr-2" /> Security
             </TabsTrigger>
-            <TabsTrigger value="preferences" className="flex-1 py-4 rounded-[1.5rem] font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-background">
+            <TabsTrigger value="preferences" className="flex-1 py-4 rounded-xl font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Eye className="w-4 h-4 mr-2" /> Interface
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="identity">
-            <Card className="border-8 border-primary rounded-[4rem] bg-white overflow-hidden">
-              <CardContent className="p-12 space-y-12">
+          <TabsContent value="identity" className="mt-0">
+            <Card className="border-2 rounded-[2rem] bg-card overflow-hidden shadow-none">
+              <CardContent className="p-10 space-y-10">
                 <form onSubmit={handleUpdate} className="space-y-10">
-                  <div className="space-y-8">
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-6 text-primary">Display Name</label>
+                  <div className="grid gap-8">
+                    <div className="space-y-3">
+                      <label className="text-sm font-black uppercase tracking-widest opacity-40 ml-2">Display Name</label>
                       <div className="relative">
-                        <User className="absolute left-8 top-1/2 -translate-y-1/2 h-6 w-6 text-primary opacity-20" />
+                        <User className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 opacity-20" />
                         <Input 
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="Your Professional Handle"
-                          className="h-20 pl-20 pr-10 rounded-[2.5rem] border-4 border-primary/10 focus-visible:ring-0 font-black text-2xl uppercase"
+                          placeholder="Studio Master"
+                          className="h-16 pl-16 pr-8 rounded-2xl border-2 bg-muted focus-visible:ring-1 font-bold text-xl uppercase shadow-none"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-6 text-primary">Email Protocol</label>
+                    <div className="space-y-3">
+                      <label className="text-sm font-black uppercase tracking-widest opacity-40 ml-2">Protocol Address</label>
                       <div className="relative">
-                        <Mail className="absolute left-8 top-1/2 -translate-y-1/2 h-6 w-6 text-primary opacity-20" />
+                        <Mail className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 opacity-20" />
                         <Input 
                           value={user.email || ""}
                           readOnly
-                          className="h-20 pl-20 pr-10 rounded-[2.5rem] border-4 border-primary/5 bg-primary/5 text-primary/40 focus-visible:ring-0 font-black text-2xl"
+                          className="h-16 pl-16 pr-8 rounded-2xl border-2 bg-muted/50 text-foreground/40 focus-visible:ring-0 font-bold text-xl cursor-not-allowed shadow-none"
                         />
                       </div>
                     </div>
@@ -106,53 +126,53 @@ export default function ProfilePage() {
                   <Button 
                     type="submit" 
                     disabled={loading}
-                    className="w-full h-24 text-2xl font-black rounded-[3rem] bg-primary text-background border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tighter"
+                    className="w-full h-20 text-xl font-black rounded-2xl bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tight shadow-none"
                   >
-                    {loading ? "Syncing..." : "Commit Changes"} <Save className="ml-3 h-8 w-8" />
+                    {loading ? "Syncing..." : "Commit Changes"} <Save className="ml-3 h-6 w-6" />
                   </Button>
                 </form>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="security">
-            <div className="grid md:grid-cols-2 gap-8">
+          <TabsContent value="security" className="mt-0">
+            <div className="grid md:grid-cols-2 gap-6">
               {[
                 { icon: Shield, title: "Auth Check", desc: "Two-step verification for presenter vault." },
-                { icon: Smartphone, title: "Device Sync", desc: "Manage active presenter terminals." },
+                { icon: Smartphone, title: "Terminal Sync", desc: "Manage active presenter devices." },
               ].map((item, i) => (
-                <Card key={i} className="border-4 border-primary/10 rounded-[3rem] p-8 space-y-4 hover:border-primary transition-all bg-white">
-                  <item.icon className="h-10 w-10 text-primary" />
-                  <h3 className="text-2xl font-black uppercase tracking-tight text-primary">{item.title}</h3>
-                  <p className="text-sm font-bold opacity-40 uppercase leading-tight">{item.desc}</p>
-                  <Button variant="outline" className="w-full rounded-2xl h-12 border-2 border-primary/10 font-black uppercase text-[10px] tracking-widest">Manage</Button>
+                <Card key={i} className="border-2 rounded-2xl p-8 space-y-4 bg-card shadow-none">
+                  <item.icon className="h-8 w-8 text-primary" />
+                  <h3 className="text-xl font-black uppercase tracking-tight">{item.title}</h3>
+                  <p className="text-sm font-bold opacity-60 uppercase leading-tight">{item.desc}</p>
+                  <Button variant="outline" className="w-full rounded-xl h-12 border-2 font-black uppercase text-xs tracking-widest shadow-none">Configure</Button>
                 </Card>
               ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="preferences">
-             <Card className="border-4 border-primary/10 rounded-[3rem] p-12 bg-white space-y-8">
+          <TabsContent value="preferences" className="mt-0">
+             <Card className="border-2 rounded-[2rem] p-10 bg-card space-y-8 shadow-none">
                 <div className="flex items-center justify-between">
                    <div className="space-y-1">
-                      <h4 className="text-xl font-black uppercase text-primary tracking-tight">Vibe Pre-selection</h4>
-                      <p className="text-xs font-bold opacity-40 uppercase">Default theme for new pulses.</p>
+                      <h4 className="text-xl font-black uppercase tracking-tight">Vibe Pre-selection</h4>
+                      <p className="text-sm font-bold opacity-40 uppercase">Default theme for your next pulse.</p>
                    </div>
-                   <div className="flex gap-2">
-                      <div className="w-10 h-10 rounded-full bg-[#ff9312] border-4 border-primary" />
-                      <div className="w-10 h-10 rounded-full bg-[#14ae5c] opacity-20" />
-                      <div className="w-10 h-10 rounded-full bg-[#f24822] opacity-20" />
-                      <div className="w-10 h-10 rounded-full bg-[#0d99ff] opacity-20" />
+                   <div className="flex gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#ff9312] border-2 border-foreground" />
+                      <div className="w-8 h-8 rounded-full bg-[#14ae5c] opacity-20 border-2 border-transparent" />
+                      <div className="w-8 h-8 rounded-full bg-[#f24822] opacity-20 border-2 border-transparent" />
+                      <div className="w-8 h-8 rounded-full bg-[#0d99ff] opacity-20 border-2 border-transparent" />
                    </div>
                 </div>
-                <div className="h-px bg-primary/5 w-full" />
+                <div className="h-px bg-foreground/10 w-full" />
                 <div className="flex items-center justify-between">
                    <div className="space-y-1">
-                      <h4 className="text-xl font-black uppercase text-primary tracking-tight">Audio Feedback</h4>
-                      <p className="text-xs font-bold opacity-40 uppercase">Sound on every new participant pulse.</p>
+                      <h4 className="text-xl font-black uppercase tracking-tight">Audio Feedback</h4>
+                      <p className="text-sm font-bold opacity-40 uppercase">Play sound on every incoming pulse.</p>
                    </div>
-                   <div className="w-16 h-8 bg-primary/10 rounded-full relative">
-                      <div className="absolute right-1 top-1 w-6 h-6 bg-primary rounded-full" />
+                   <div className="w-14 h-7 bg-primary/10 rounded-full relative cursor-pointer border-2 border-primary/20">
+                      <div className="absolute right-1 top-1 w-4 h-4 bg-primary rounded-full" />
                    </div>
                 </div>
              </Card>

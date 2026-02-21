@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { LogOut, User as UserIcon, Zap } from "lucide-react";
+import { LogOut, User as UserIcon, Zap, Settings } from "lucide-react";
 
 interface HeaderProps {
   className?: string;
@@ -29,10 +29,10 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
       variant === 'brand' ? "bg-transparent" : "bg-transparent"
     )}>
       <nav className={cn(
-        "max-w-7xl mx-auto border-4 rounded-full px-8 py-4 flex items-center justify-between backdrop-blur-md transition-all",
+        "max-w-7xl mx-auto border-2 rounded-full px-8 py-4 flex items-center justify-between backdrop-blur-md transition-all shadow-none",
         variant === 'brand' 
           ? "bg-white/10 border-primary/20" 
-          : "bg-white/80 border-foreground/10"
+          : "bg-white/90 border-foreground/10"
       )}>
         <Link href="/" className="flex items-center gap-3 group">
           <Zap className={cn("h-7 w-7 fill-current transition-transform group-hover:scale-110", variant === 'brand' ? "text-primary" : "text-primary")} />
@@ -42,21 +42,26 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
         <div className="flex items-center gap-4">
           {!user ? (
             <>
-              <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-[10px] tracking-widest hover:bg-primary/10">
+              <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs tracking-widest hover:bg-primary/10 shadow-none">
                 <Link href="/login">Login</Link>
               </Button>
-              <Button asChild className="rounded-full px-8 font-black uppercase text-[10px] tracking-widest bg-primary text-primary-foreground border-4 border-primary hover:bg-transparent hover:text-primary transition-all">
+              <Button asChild className="rounded-full px-8 font-black uppercase text-xs tracking-widest bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all shadow-none">
                 <Link href="/login?signup=true">Sign Up</Link>
               </Button>
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-[10px] tracking-widest">
+              <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs tracking-widest shadow-none">
                 <Link href="/presenter" className="flex items-center gap-2">
-                  <UserIcon className="h-4 w-4" /> {user.displayName || "Studio"}
+                   Vault
                 </Link>
               </Button>
-              <Button onClick={handleSignOut} size="sm" variant="outline" className="rounded-full px-6 border-2 font-black uppercase text-[9px] tracking-widest">
+              <Button variant="ghost" asChild className="rounded-full px-6 font-black uppercase text-xs tracking-widest shadow-none">
+                <Link href="/profile" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" /> Settings
+                </Link>
+              </Button>
+              <Button onClick={handleSignOut} size="sm" variant="outline" className="rounded-full px-6 border-2 font-black uppercase text-[10px] tracking-widest shadow-none">
                 <LogOut className="h-3.5 w-3.5 mr-2" /> Out
               </Button>
             </>
