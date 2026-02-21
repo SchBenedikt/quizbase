@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -27,6 +28,28 @@
     --radius: 1.5rem;
   }
 
+  .dark {
+    --background: 33 100% 5%;
+    --foreground: 33 100% 95%;
+    --card: 33 100% 7%;
+    --card-foreground: 33 100% 95%;
+    --popover: 33 100% 5%;
+    --popover-foreground: 33 100% 95%;
+    --primary: 33 100% 50%;
+    --primary-foreground: 33 100% 5%;
+    --secondary: 33 100% 15%;
+    --secondary-foreground: 33 100% 95%;
+    --muted: 33 100% 10%;
+    --muted-foreground: 33 100% 60%;
+    --accent: 33 100% 20%;
+    --accent-foreground: 33 100% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 33 100% 95%;
+    --border: 33 100% 20%;
+    --input: 33 100% 20%;
+    --ring: 33 100% 50%;
+  }
+
   [data-theme='red'] {
     --background: 0 85% 50%;
     --foreground: 0 0% 100%;
@@ -35,7 +58,7 @@
     --secondary: 0 85% 45%;
     --accent: 0 0% 100% / 0.2;
     --ring: 0 0% 100%;
-    --border: 0 0% 100% / 0.1;
+    --border: 0 0% 100% / 0.2;
   }
 
   [data-theme='green'] {
@@ -46,7 +69,7 @@
     --secondary: 142 76% 35%;
     --accent: 0 0% 100% / 0.2;
     --ring: 0 0% 100%;
-    --border: 0 0% 100% / 0.1;
+    --border: 0 0% 100% / 0.2;
   }
 
   [data-theme='blue'] {
@@ -57,21 +80,32 @@
     --secondary: 221 83% 45%;
     --accent: 0 0% 100% / 0.2;
     --ring: 0 0% 100%;
-    --border: 0 0% 100% / 0.1;
+    --border: 0 0% 100% / 0.2;
   }
 
-  /* NEUTRAL STUDIO UI FOR PRESENTERS */
+  /* NEUTRAL STUDIO UI FOR PRESENTERS - THEME AWARE */
   .presenter-ui {
-    --background: 0 0% 100% !important;
-    --foreground: 0 0% 10% !important;
-    --card: 0 0% 100% !important;
-    --card-foreground: 0 0% 10% !important;
-    --primary: 33 100% 50% !important; 
-    --primary-foreground: 0 0% 100% !important;
-    --muted: 0 0% 97% !important;
-    --muted-foreground: 0 0% 40% !important;
-    --border: 0 0% 0% / 0.1 !important;
-    --radius: 1.5rem;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --primary: 33 100% 50%; 
+    --primary-foreground: 0 0% 100%;
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 40%;
+    --border: 0 0% 0% / 0.1;
+  }
+
+  .dark .presenter-ui {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 95%;
+    --primary: 33 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --border: 0 0% 100% / 0.1;
   }
 }
 
@@ -80,7 +114,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased transition-colors duration-700 shadow-none;
+    @apply bg-background text-foreground font-body antialiased transition-colors duration-500 shadow-none;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline font-bold tracking-tight uppercase;

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,13 +6,14 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Bell, Eye, Palette } from "lucide-react";
+import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Bell, Eye, Palette, Moon, Sun, Monitor } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useAuth, useFirestore } from "@/firebase";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "next-themes";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -21,8 +23,11 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (!isUserLoading && !user) {
       router.push("/login");
     }
@@ -36,10 +41,7 @@ export default function ProfilePage() {
     if (!auth.currentUser || !user) return;
     setLoading(true);
     try {
-      // Update Auth Profile
       await updateProfile(auth.currentUser, { displayName: name });
-      
-      // Sync to Firestore User Doc
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, { name });
 
@@ -152,7 +154,36 @@ export default function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="preferences" className="mt-0">
-             <Card className="border-2 rounded-[1.5rem] p-10 bg-card space-y-8 shadow-none">
+             <Card className="border-2 rounded-[1.5rem] p-10 bg-card space-y-12 shadow-none">
+                <div className="space-y-6">
+                   <h3 className="text-xl font-black uppercase tracking-tight">Theme Protocol</h3>
+                   <div className="grid grid-cols-3 gap-4">
+                      <Button 
+                        variant={mounted && theme === 'light' ? 'default' : 'outline'}
+                        onClick={() => setTheme('light')}
+                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2"
+                      >
+                        <Sun className="h-4 w-4" /> Light
+                      </Button>
+                      <Button 
+                        variant={mounted && theme === 'dark' ? 'default' : 'outline'}
+                        onClick={() => setTheme('dark')}
+                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2"
+                      >
+                        <Moon className="h-4 w-4" /> Dark
+                      </Button>
+                      <Button 
+                        variant={mounted && theme === 'system' ? 'default' : 'outline'}
+                        onClick={() => setTheme('system')}
+                        className="h-16 rounded-[1rem] border-2 font-black uppercase text-xs gap-2"
+                      >
+                        <Monitor className="h-4 w-4" /> System
+                      </Button>
+                   </div>
+                </div>
+
+                <div className="h-px bg-foreground/10 w-full" />
+
                 <div className="flex items-center justify-between">
                    <div className="space-y-1">
                       <h4 className="text-xl font-black uppercase tracking-tight">Vibe Pre-selection</h4>
@@ -165,7 +196,9 @@ export default function ProfilePage() {
                       <div className="w-8 h-8 rounded-full bg-[#0d99ff] opacity-20 border-2 border-transparent" />
                    </div>
                 </div>
+
                 <div className="h-px bg-foreground/10 w-full" />
+
                 <div className="flex items-center justify-between">
                    <div className="space-y-1">
                       <h4 className="text-xl font-black uppercase tracking-tight">Audio Feedback</h4>
