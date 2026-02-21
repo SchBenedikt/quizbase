@@ -1,4 +1,3 @@
-
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
@@ -12,6 +11,7 @@ interface ResultChartProps {
 }
 
 export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
+  // Theme-friendly expressive colors
   const colors = ['#E01CBB', '#4B0EA8', '#FF9F00', '#00C49F', '#FF4444'];
 
   if (question.type === 'multiple-choice' && question.options) {
@@ -39,7 +39,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
                 if (active && payload && payload.length) {
                   return (
                     <div className="bg-foreground p-4 rounded-2xl border-4 border-foreground">
-                      <p className="font-black text-background text-lg">{payload[0].value} VOTES</p>
+                      <p className="font-black text-background text-lg">{payload[0].value} Votes</p>
                     </div>
                   );
                 }
@@ -131,7 +131,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
         </div>
         <div className="text-center">
           <span className="text-[14rem] font-black tracking-tighter leading-none">{average.toFixed(0)}</span>
-          <p className="text-2xl font-black opacity-30 uppercase tracking-[0.6em] mt-4">PULSE STRENGTH</p>
+          <p className="text-2xl font-black opacity-30 uppercase tracking-[0.6em] mt-4">Pulse Strength</p>
         </div>
       </div>
     );

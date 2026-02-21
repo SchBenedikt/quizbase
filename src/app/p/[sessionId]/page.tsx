@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, use, useEffect } from "react";
@@ -16,21 +15,21 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const resolvedParams = use(params);
   const db = useFirestore();
   
-  // Real-time session monitoring
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
   const { data: session, isLoading: sessionLoading } = useDoc(sessionRef);
 
-  // Fetch current question
   const [currentQuestion, setCurrentQuestion] = useState<PollQuestion | null>(null);
   
   useEffect(() => {
     if (session?.currentQuestionId && session.userId && session.pollId) {
-      const qRef = doc(db, `users/${session.userId}/polls/${session.pollId}/questions/${session.currentQuestionId}`);
       const fetchQ = async () => {
+        const qRef = doc(db, `users/${session.userId}/polls/${session.pollId}/questions/${session.currentQuestionId}`);
         const snap = await getDocs(query(collection(db, `users/${session.userId}/polls/${session.pollId}/questions`), where("id", "==", session.currentQuestionId)));
         if (!snap.empty) {
           setCurrentQuestion(snap.docs[0].data() as PollQuestion);
           setVoted(false);
+          setSelection(null);
+          setTextValue("");
         }
       };
       fetchQ();
@@ -59,6 +58,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         sessionId: resolvedParams.sessionId,
         questionId: currentQuestion.id,
         value,
+        userId: session.userId, // Storing owner ID in response helps with security rules
         createdAt: serverTimestamp(),
       });
       setVoted(true);
@@ -80,11 +80,11 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (voted) {
     return (
       <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-12 animate-in fade-in duration-500", `theme-${theme}`)}>
-        <div className="bg-foreground p-12 rounded-[5rem] animate-float">
+        <div className="bg-foreground p-12 rounded-[5rem] animate-float border-8 border-background">
           <Heart className="h-24 w-24 text-background fill-background" />
         </div>
         <div className="space-y-6">
-          <h1 className="text-6xl font-black text-foreground uppercase tracking-tighter leading-none">PULSE SENT!</h1>
+          <h1 className="text-6xl font-black text-foreground uppercase tracking-tighter leading-none">Pulse Sent!</h1>
           <p className="text-foreground font-black text-xl max-w-xs mx-auto uppercase tracking-tight opacity-70">Waiting for the next signal...</p>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           <div className="space-y-6">
             {currentQuestion.type === 'word-cloud' ? (
               <Input 
-                placeholder="one word..."
+                placeholder="One word..."
                 value={textValue}
                 onChange={(e) => setTextValue(e.target.value)}
                 maxLength={20}

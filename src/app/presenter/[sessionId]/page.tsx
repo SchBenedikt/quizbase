@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, use } from "react";
@@ -15,25 +14,23 @@ import { doc, collection, updateDoc, query, orderBy } from "firebase/firestore";
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
   const searchParams = useSearchParams();
-  const router = useRouter();
   const db = useFirestore();
   
-  const theme = (searchParams.get('theme') as AppTheme) || 'orange';
-  const title = searchParams.get('title') || "SESSION DISPLAY";
-  const code = searchParams.get('code') || "---";
-
-  // Fetch real session data
+  // Real session data
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
   const { data: session, isLoading: sessionLoading } = useDoc(sessionRef);
 
-  // Fetch real poll questions
+  // Use session theme first, fallback to search params, then default orange
+  const theme = (session?.theme as AppTheme) || (searchParams.get('theme') as AppTheme) || 'orange';
+  const title = session?.title || searchParams.get('title') || "Session Display";
+  const code = session?.code || searchParams.get('code') || "---";
+
   const questionsQuery = useMemoFirebase(() => {
     if (!session) return null;
     return query(collection(db, `users/${session.userId}/polls/${session.pollId}/questions`), orderBy("order", "asc"));
   }, [db, session]);
   const { data: questions } = useCollection<PollQuestion>(questionsQuery);
 
-  // Fetch real responses for the session
   const responsesQuery = useMemoFirebase(() => {
     if (!resolvedParams.sessionId) return null;
     return collection(db, `sessions/${resolvedParams.sessionId}/responses`);
@@ -88,7 +85,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   return (
     <div className={cn("no-scroll h-screen w-screen overflow-hidden flex flex-col font-body", `theme-${theme}`)}>
-      {/* Header - Optimized for visibility without clutter */}
       <header className="h-[12vh] px-12 flex items-center justify-between bg-white border-b-8 border-foreground shrink-0 z-10">
         <div className="flex items-center gap-6 overflow-hidden">
           <div className="bg-foreground p-3 rounded-[1rem] shrink-0">
@@ -99,7 +95,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         
         <div className="flex items-center gap-8">
           <div className="flex flex-col items-end">
-            <p className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 mb-1">JOIN PULSE</p>
+            <p className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 mb-1">Join Pulse</p>
             <p className="text-5xl font-black tracking-tighter leading-none">{code}</p>
           </div>
           <div className="h-12 w-1.5 bg-foreground/10 rounded-full" />
@@ -110,12 +106,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
       </header>
 
-      {/* Main Content - No Scroll enforced */}
       <main className="flex-1 min-h-0 p-8 bg-background flex flex-col items-center justify-center overflow-hidden">
         <div className="w-full max-w-7xl h-full flex flex-col gap-6">
           <div className="space-y-2 text-center shrink-0">
              <div className="inline-block px-6 py-1 bg-foreground text-background rounded-full text-[10px] font-black uppercase tracking-[0.4em]">
-               STAGE {currentIdx + 1} OF {questions.length}
+               Stage {currentIdx + 1} of {questions.length}
              </div>
              <h2 className="text-4xl md:text-6xl font-black leading-[1.1] uppercase tracking-tighter text-foreground max-w-4xl mx-auto">
                {q.question}
@@ -130,7 +125,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
       </main>
 
-      {/* Footer Controls */}
       <footer className="h-[10vh] flex items-center justify-center gap-6 bg-white border-t-8 border-foreground shrink-0 px-12">
         <Button 
           variant="outline" 
@@ -144,17 +138,17 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         
         <div className="bg-foreground text-background px-10 py-3 rounded-[3rem] flex items-center gap-8 border-4 border-foreground">
            <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1rem] font-black uppercase tracking-widest text-[10px] px-6 py-2 h-auto">
-             <LayoutGrid className="h-4 w-4 mr-3" /> GRID
+             <LayoutGrid className="h-4 w-4 mr-3" /> Grid
            </Button>
            <div className="w-1 h-6 bg-background/20 rounded-full" />
            <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1rem] font-black uppercase tracking-widest text-[10px] px-6 py-2 h-auto">
-             <Timer className="h-4 w-4 mr-3" /> LOCK
+             <Timer className="h-4 w-4 mr-3" /> Lock
            </Button>
            {q.type === 'open-text' && (
              <>
                <div className="w-1 h-6 bg-background/20 rounded-full" />
                <Button variant="ghost" className="text-background hover:bg-white/10 rounded-[1rem] font-black uppercase tracking-widest text-[10px] px-6 py-2 h-auto">
-                 <Sparkles className="h-4 w-4 mr-3" /> ANALYZE
+                 <Sparkles className="h-4 w-4 mr-3" /> Analyze
                </Button>
              </>
            )}
