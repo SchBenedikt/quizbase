@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -24,7 +23,6 @@ export default function PresenterPage() {
   const [sessionTitle, setSessionTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const pollsQuery = useMemoFirebase(() => {
     if (!user) return null;
@@ -75,7 +73,6 @@ export default function PresenterPage() {
         };
         
         if (q.options) qData.options = q.options;
-        if (q.range) qData.range = q.range;
 
         await setDoc(qRef, qData);
         savedQuestionIds.push(qRef.id);

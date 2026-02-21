@@ -23,10 +23,35 @@
     --border: 35 88% 16% / 0.2;
     --input: 35 88% 16% / 0.2;
     --ring: 35 88% 16%;
-    --radius: 2rem;
+    --radius: 1.5rem;
   }
 
-  /* Presenter Dashboard UI - Clean & Focused */
+  /* Theme Overrides - High Specificity applied to wrapping divs */
+  .theme-orange {
+    --background: 33 100% 54% !important;
+    --foreground: 35 88% 16% !important;
+    --primary: 35 88% 16% !important;
+    --primary-foreground: 33 100% 54% !important;
+  }
+  .theme-green {
+    --background: 142 76% 36% !important;
+    --foreground: 120 88% 95% !important;
+    --primary: 120 88% 95% !important;
+    --primary-foreground: 142 76% 36% !important;
+  }
+  .theme-red {
+    --background: 0 84% 60% !important;
+    --foreground: 0 0% 100% !important;
+    --primary: 0 0% 100% !important;
+    --primary-foreground: 0 84% 60% !important;
+  }
+  .theme-blue {
+    --background: 221 83% 53% !important;
+    --foreground: 210 40% 98% !important;
+    --primary: 210 40% 98% !important;
+    --primary-foreground: 221 83% 53% !important;
+  }
+
   .presenter-ui {
     --background: 60 5% 96% !important;
     --foreground: 35 20% 12% !important;
@@ -35,43 +60,7 @@
     --primary: 33 100% 54% !important;
     --primary-foreground: 0 0% 100% !important;
     --border: 0 0% 89% !important;
-    --muted: 0 0% 96% !important;
-    --muted-foreground: 0 0% 45% !important;
     --radius: 1.5rem;
-  }
-
-  /* Theme Overrides - High Specificity */
-  .theme-orange {
-    --background: 33 100% 54% !important;
-    --foreground: 35 88% 16% !important;
-    --primary: 35 88% 16% !important;
-    --primary-foreground: 33 100% 54% !important;
-    --accent: 35 88% 16% !important;
-    --accent-foreground: 33 100% 54% !important;
-  }
-  .theme-green {
-    --background: 142 76% 36% !important;
-    --foreground: 120 88% 95% !important;
-    --primary: 120 88% 95% !important;
-    --primary-foreground: 142 76% 36% !important;
-    --accent: 120 88% 95% !important;
-    --accent-foreground: 142 76% 36% !important;
-  }
-  .theme-red {
-    --background: 0 84% 60% !important;
-    --foreground: 0 0% 100% !important;
-    --primary: 0 0% 100% !important;
-    --primary-foreground: 0 84% 60% !important;
-    --accent: 0 0% 100% !important;
-    --accent-foreground: 0 84% 60% !important;
-  }
-  .theme-blue {
-    --background: 221 83% 53% !important;
-    --foreground: 210 40% 98% !important;
-    --primary: 210 40% 98% !important;
-    --primary-foreground: 221 83% 53% !important;
-    --accent: 210 40% 98% !important;
-    --accent-foreground: 221 83% 53% !important;
   }
 }
 
@@ -107,7 +96,6 @@
   100% { transform: translateY(0px); }
 }
 
-/* Shadow removal for consistent brand style */
-.shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, .shadow-none {
+.shadow-none {
   box-shadow: none !important;
 }
