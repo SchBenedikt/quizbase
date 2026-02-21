@@ -143,14 +143,14 @@ export default function PresenterPage() {
         <Header variant="minimal" />
         <div className="max-w-4xl mx-auto px-6 py-40">
           <div className="flex items-center gap-6 mb-16">
-            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-14 w-14 border-2">
+            <Button variant="ghost" size="icon" onClick={() => setIsCreating(false)} className="rounded-full h-14 w-14 border-2 shadow-none">
               <ArrowLeft className="h-6 w-6" />
             </Button>
             <h1 className="text-4xl font-black uppercase tracking-tighter">Create Pulse</h1>
           </div>
           
-          <div className="bg-white p-12 rounded-[3rem] border-4 mb-12 shadow-sm">
-            <label className="text-[10px] font-black uppercase tracking-[0.5em] opacity-30 ml-2 mb-4 block">Identity Signature</label>
+          <div className="bg-white p-12 rounded-[2.5rem] border-2 mb-12 shadow-none">
+            <label className="text-xs font-black uppercase tracking-widest opacity-40 ml-2 mb-4 block">Identity Signature</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
@@ -173,17 +173,17 @@ export default function PresenterPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-[2rem] bg-primary flex items-center justify-center border-4 border-primary">
+              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center border-2 border-primary">
                 <Zap className="h-8 w-8 text-primary-foreground fill-current" />
               </div>
               <h1 className="text-5xl font-black tracking-tighter uppercase">Vault</h1>
             </div>
-            <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.5em] ml-2">Secure Pulse Repository</p>
+            <p className="text-xs font-black opacity-40 uppercase tracking-widest ml-2">Secure Pulse Repository</p>
           </div>
           <Button 
             size="lg" 
             onClick={() => setIsCreating(true)}
-            className="h-20 px-12 rounded-[2rem] text-lg font-black bg-primary text-primary-foreground border-4 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tight shadow-xl"
+            className="h-20 px-12 rounded-2xl text-lg font-black bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-tight shadow-none"
           >
             <Plus className="mr-3 h-6 w-6" /> NEW PULSE
           </Button>
@@ -191,57 +191,57 @@ export default function PresenterPage() {
 
         <div className="space-y-8">
           <div className="relative w-full max-w-lg">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 opacity-20" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-6 w-6 opacity-30" />
             <Input 
               placeholder="Search pulse archive..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-16 pl-16 pr-8 rounded-2xl border-4 bg-white focus-visible:ring-0 font-bold text-lg shadow-sm"
+              className="h-16 pl-16 pr-8 rounded-xl border-2 bg-white focus-visible:ring-0 font-bold text-lg shadow-none"
             />
           </div>
 
           <div className="grid gap-6">
             {pollsLoading ? (
-              <div className="p-32 text-center"><Loader2 className="h-12 w-12 animate-spin mx-auto opacity-10" /></div>
+              <div className="p-32 text-center"><Loader2 className="h-12 w-12 animate-spin mx-auto opacity-20" /></div>
             ) : !filteredPolls || filteredPolls.length === 0 ? (
-              <div className="p-40 text-center border-4 border-dashed rounded-[4rem] bg-white/50 space-y-4">
+              <div className="p-40 text-center border-2 border-dashed rounded-[3rem] bg-muted/30 space-y-4">
                  <Sparkles className="h-12 w-12 mx-auto opacity-10" />
-                 <p className="text-[10px] font-black uppercase opacity-20 tracking-[0.6em]">No pulses archived</p>
+                 <p className="text-sm font-black uppercase opacity-30 tracking-widest">No pulses archived</p>
               </div>
             ) : (
               filteredPolls.map((poll) => (
-                <div key={poll.id} className="bg-white p-8 rounded-[3rem] border-4 flex flex-col sm:flex-row items-center justify-between gap-8 group hover:border-primary/40 transition-all shadow-sm">
+                <div key={poll.id} className="bg-white p-8 rounded-[2rem] border-2 flex flex-col sm:flex-row items-center justify-between gap-8 group hover:border-primary transition-all shadow-none">
                   <div className="flex items-center gap-8 w-full sm:w-auto">
-                    <div className="w-20 h-20 rounded-[2.5rem] flex items-center justify-center border-4 shrink-0 bg-muted group-hover:bg-primary/5 transition-colors">
-                       <BarChart3 className="h-8 w-8 text-primary" />
+                    <div className="w-16 h-16 rounded-xl flex items-center justify-center border-2 shrink-0 bg-muted group-hover:bg-primary/5 transition-colors">
+                       <BarChart3 className="h-7 w-7 text-primary" />
                     </div>
                     <div className="space-y-1 truncate">
-                      <p className="text-2xl font-black tracking-tighter truncate uppercase">{poll.title}</p>
-                      <p className="text-[9px] font-black opacity-30 uppercase tracking-[0.2em]">
-                        Sync Date: {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString() : 'N/A'}
+                      <p className="text-2xl font-black tracking-tighter truncate uppercase leading-tight">{poll.title}</p>
+                      <p className="text-xs font-black opacity-40 uppercase tracking-widest">
+                        Sync: {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                      <Button 
                        variant="ghost" 
                        onClick={() => handleLaunchExisting(poll)}
-                       className="h-14 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-primary hover:text-primary-foreground transition-all"
+                       className="h-12 px-6 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-primary hover:text-primary-foreground transition-all shadow-none"
                      >
-                       <Play className="h-5 w-5 mr-3 fill-current" /> Launch
+                       <Play className="h-4 w-4 mr-2 fill-current" /> Launch
                      </Button>
                      <Button 
                        variant="ghost" 
                        onClick={() => router.push(`/presenter/edit/${poll.id}`)}
-                       className="h-14 px-8 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-muted"
+                       className="h-12 px-6 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-muted shadow-none"
                      >
-                       <Edit2 className="h-5 w-5 mr-3" /> Edit
+                       <Edit2 className="h-4 w-4 mr-2" /> Edit
                      </Button>
                      <Button 
                        variant="ghost" 
                        size="icon"
                        onClick={() => handleDeletePoll(poll.id)}
-                       className="h-14 w-14 rounded-2xl hover:text-destructive hover:bg-destructive/10"
+                       className="h-12 w-12 rounded-xl hover:text-destructive hover:bg-destructive/10 shadow-none"
                      >
                        <Trash2 className="h-5 w-5" />
                      </Button>
