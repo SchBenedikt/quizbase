@@ -56,16 +56,28 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       // Update poll meta
       await setDoc(pollRef!, { title: sessionTitle, theme, updatedAt: serverTimestamp() }, { merge: true });
 
-      // Update questions (simplified: overwrite for MVP)
+      // Update questions
       const qCol = collection(db, `users/${user.uid}/polls/${resolvedParams.pollId}/questions`);
       const batch = writeBatch(db);
       
-      // We'd ideally delete old questions or track IDs, but for this interaction 
-      // we'll just upsert and rely on the UI list.
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         const qRef = doc(qCol, q.id);
-        batch.set(qRef, { ...q, pollId: resolvedParams.pollId, order: i }, { merge: true });
+        
+        const qData: any = {
+          id: q.id,
+          pollId: resolvedParams.pollId,
+          type: q.type,
+          question: q.question,
+          order: i,
+          createdAt: q.createdAt || Date.now()
+        };
+
+        // Explicitly handle options and range to avoid 'undefined' in Firestore
+        if (q.options) qData.options = q.options;
+        if (q.range) qData.range = q.range;
+
+        batch.set(qRef, qData, { merge: true });
       }
       
       await batch.commit();

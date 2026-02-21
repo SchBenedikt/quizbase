@@ -50,6 +50,7 @@ export default function PresenterPage() {
       const sessionRef = doc(collection(db, "sessions"));
       const pollRef = doc(collection(db, `users/${user.uid}/polls`));
 
+      // Save Poll Meta
       await setDoc(pollRef, {
         id: pollRef.id,
         userId: user.uid,
@@ -58,19 +59,37 @@ export default function PresenterPage() {
         createdAt: serverTimestamp(),
       });
 
+      // Save Questions - Cleanly handle undefined fields for Firestore
+      const savedQuestionIds: string[] = [];
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
         const qRef = doc(collection(db, `users/${user.uid}/polls/${pollRef.id}/questions`));
-        await setDoc(qRef, { ...q, id: qRef.id, pollId: pollRef.id, order: i });
+        
+        const qData: any = {
+          id: qRef.id,
+          pollId: pollRef.id,
+          type: q.type,
+          question: q.question,
+          order: i,
+          createdAt: q.createdAt || Date.now()
+        };
+        
+        // Only include optional fields if they exist
+        if (q.options) qData.options = q.options;
+        if (q.range) qData.range = q.range;
+
+        await setDoc(qRef, qData);
+        savedQuestionIds.push(qRef.id);
       }
 
+      // Create Active Session
       await setDoc(sessionRef, {
         id: sessionRef.id,
         pollId: pollRef.id,
         userId: user.uid,
         code,
         status: "active",
-        currentQuestionId: questions[0]?.id || null,
+        currentQuestionId: savedQuestionIds[0] || null,
         theme,
         createdAt: serverTimestamp(),
       });
@@ -87,7 +106,6 @@ export default function PresenterPage() {
     if (!user) return;
     setDeletingId(pollId);
     try {
-      // Delete the poll document. In a full app, we'd also cleanup subcollections.
       const pollRef = doc(db, `users/${user.uid}/polls/${pollId}`);
       await deleteDoc(pollRef);
       toast({ title: "Poll Removed", description: "The poll has been deleted from your vault." });
