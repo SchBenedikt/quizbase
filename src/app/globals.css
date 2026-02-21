@@ -60,12 +60,13 @@
     --border: 0 0% 100% / 0.2;
   }
 
+  /* NEUTRAL STUDIO UI FOR PRESENTERS */
   .presenter-ui {
     --background: 0 0% 98% !important;
     --foreground: 0 0% 10% !important;
     --card: 0 0% 100% !important;
     --card-foreground: 0 0% 10% !important;
-    --primary: 0 0% 0% !important;
+    --primary: 33 100% 50% !important; /* Brand Orange accent */
     --primary-foreground: 0 0% 100% !important;
     --muted: 0 0% 95% !important;
     --muted-foreground: 0 0% 40% !important;
@@ -104,10 +105,6 @@
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
-}
-
-.shadow-none {
-  box-shadow: none !important;
 }
 
 .glass-card {

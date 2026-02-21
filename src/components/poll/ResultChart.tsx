@@ -13,14 +13,14 @@ interface ResultChartProps {
 }
 
 export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
-  // Higher contrast colors for vibrant backgrounds
+  // Use current theme foreground for text and chart elements
   const colors = [
     'hsl(var(--foreground))',
-    'hsl(var(--foreground) / 0.8)',
-    'hsl(var(--foreground) / 0.6)',
+    'hsl(var(--foreground) / 0.85)',
+    'hsl(var(--foreground) / 0.7)',
+    'hsl(var(--foreground) / 0.55)',
     'hsl(var(--foreground) / 0.4)',
-    'hsl(var(--foreground) / 0.3)',
-    'hsl(var(--foreground) / 0.2)',
+    'hsl(var(--foreground) / 0.25)',
   ];
 
   if (question.type === 'multiple-choice' && question.options) {
@@ -30,25 +30,28 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     }));
 
     return (
-      <div className="h-full w-full max-w-5xl animate-in fade-in duration-700 flex items-center px-8">
+      <div className="h-full w-full max-w-6xl animate-in fade-in duration-1000 flex items-center px-12">
         <ResponsiveContainer width="100%" height="90%">
-          <BarChart data={data} layout="vertical" margin={{ left: 40, right: 60, top: 0, bottom: 0 }}>
+          <BarChart data={data} layout="vertical" margin={{ left: 60, right: 100, top: 0, bottom: 0 }}>
             <XAxis type="number" hide />
             <YAxis 
               dataKey="name" 
               type="category" 
-              width={240} 
+              width={280} 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: 'currentColor', fontSize: 20, fontWeight: 700, fontFamily: 'Bricolage Grotesque' }}
+              tick={{ fill: 'currentColor', fontSize: 24, fontWeight: 900, fontFamily: 'Bricolage Grotesque' }}
             />
             <Tooltip 
-              cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+              cursor={{ fill: 'rgba(255,255,255,0.1)' }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className="bg-foreground p-5 rounded-[2rem] border-2 border-foreground shadow-2xl">
-                      <p className="font-bold text-background text-2xl leading-none">{payload[0].value} <span className="text-[10px] uppercase tracking-widest opacity-60">Syncs</span></p>
+                    <div className="bg-foreground p-8 rounded-[2.5rem] border-8 border-background/20 shadow-2xl">
+                      <p className="font-black text-background text-5xl leading-none">
+                        {payload[0].value}
+                        <span className="text-[12px] uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">TOTAL PULSES</span>
+                      </p>
                     </div>
                   );
                 }
@@ -57,8 +60,8 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
             />
             <Bar 
               dataKey="value" 
-              radius={[0, 40, 40, 0]} 
-              barSize={80}
+              radius={[0, 60, 60, 0]} 
+              barSize={120}
               animationDuration={1500}
             >
               {data.map((entry, index) => (
@@ -76,16 +79,16 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const sorted = entries.sort((a, b) => b[1] - a[1]);
 
     return (
-      <div className="h-full w-full flex flex-wrap items-center justify-center gap-10 p-12 overflow-hidden">
+      <div className="h-full w-full flex flex-wrap items-center justify-center gap-16 p-20 overflow-hidden">
         {entries.length === 0 ? (
-          <p className="text-4xl font-bold uppercase opacity-20 tracking-[0.4em]">Listening...</p>
+          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] animate-pulse">Awaiting Signals...</p>
         ) : (
           sorted.map(([word, count], i) => (
             <span 
               key={i} 
-              className="font-bold uppercase tracking-tighter transition-all hover:scale-125 cursor-default animate-in zoom-in duration-700"
+              className="font-black uppercase tracking-tighter transition-all hover:scale-125 cursor-default animate-in zoom-in duration-1000"
               style={{ 
-                fontSize: `${Math.min(120, 32 + count * 18)}px`, 
+                fontSize: `${Math.min(180, 48 + count * 24)}px`, 
                 color: colors[i % colors.length],
                 opacity: 0.8 + (count / Math.max(...entries.map(e => e[1]))) * 0.2
               }}
@@ -100,15 +103,15 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
   if (question.type === 'open-text') {
     return (
-      <div className="h-full w-full max-w-5xl flex flex-col items-center">
+      <div className="h-full w-full max-w-6xl flex flex-col items-center">
         {allResponses.length === 0 ? (
-          <p className="text-4xl font-bold uppercase opacity-20 tracking-[0.4em] my-auto">Awaiting transmissions...</p>
+          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] my-auto animate-pulse">Silence is Golden...</p>
         ) : (
-          <ScrollArea className="h-full w-full pr-8">
-            <div className="grid gap-6 py-8 px-4">
+          <ScrollArea className="h-full w-full pr-12">
+            <div className="grid gap-12 py-12 px-8">
               {allResponses.map((res, i) => (
-                <div key={i} className="bg-foreground text-background p-10 rounded-[3rem] border-4 border-foreground animate-in slide-in-from-bottom-8 duration-700">
-                  <p className="text-3xl font-black uppercase tracking-tight leading-tight">{res.value}</p>
+                <div key={i} className="bg-foreground text-background p-16 rounded-[4rem] border-8 border-foreground shadow-xl animate-in slide-in-from-bottom-20 duration-1000">
+                  <p className="text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9]">{res.value}</p>
                 </div>
               ))}
             </div>
@@ -123,21 +126,21 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const avg = total > 0 ? allResponses.reduce((acc, r) => acc + Number(r.value), 0) / total : 0;
 
     return (
-      <div className="h-full w-full max-w-4xl flex flex-col items-center justify-center space-y-16">
-        <div className="flex gap-4">
+      <div className="h-full w-full max-w-5xl flex flex-col items-center justify-center space-y-24">
+        <div className="flex gap-8">
           {[1, 2, 3, 4, 5].map((s) => (
             <Star 
               key={s} 
               className={cn(
-                "h-28 w-28 transition-all duration-700",
+                "h-40 w-40 transition-all duration-1000",
                 s <= Math.round(avg) ? "fill-foreground text-foreground" : "text-foreground/10"
               )} 
             />
           ))}
         </div>
-        <div className="text-center space-y-2">
-          <span className="text-[14rem] font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
-          <p className="text-3xl font-bold opacity-30 uppercase tracking-[0.8em]">Avg Pulse</p>
+        <div className="text-center space-y-4">
+          <span className="text-[24rem] font-black tracking-tighter leading-[0.7]">{avg.toFixed(1)}</span>
+          <p className="text-5xl font-black opacity-20 uppercase tracking-[1em] mt-8">AVG PULSE</p>
         </div>
       </div>
     );
@@ -148,29 +151,29 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const average = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
 
     return (
-      <div className="h-full w-full max-w-5xl flex flex-col items-center justify-center space-y-20">
-        <div className="relative h-28 w-full bg-foreground/10 rounded-full border-4 border-foreground flex items-center px-12 overflow-hidden">
+      <div className="h-full w-full max-w-6xl flex flex-col items-center justify-center space-y-32">
+        <div className="relative h-40 w-full bg-foreground/10 rounded-full border-8 border-foreground flex items-center px-16 overflow-hidden">
            <div 
-             className="absolute left-0 h-full bg-foreground transition-all duration-1000 ease-out"
+             className="absolute left-0 h-full bg-foreground transition-all duration-1500 ease-out"
              style={{ width: `${average}%` }}
            />
-           <div className="relative z-10 w-full flex justify-between font-black text-2xl mix-blend-difference text-white uppercase tracking-[0.4em]">
+           <div className="relative z-10 w-full flex justify-between font-black text-4xl mix-blend-difference text-white uppercase tracking-[0.5em]">
              <span>0</span>
              <span>PULSE INTENSITY</span>
              <span>100</span>
            </div>
         </div>
         <div className="text-center">
-          <span className="text-[16rem] font-black tracking-tighter leading-none">{average.toFixed(0)}</span>
-          <p className="text-4xl font-bold opacity-30 uppercase tracking-[0.8em] mt-4">Synergy</p>
+          <span className="text-[28rem] font-black tracking-tighter leading-[0.7]">{average.toFixed(0)}</span>
+          <p className="text-6xl font-black opacity-20 uppercase tracking-[1.2em] mt-8">SYNERGY</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-transparent p-20 rounded-[4rem] text-center border-4 border-dashed border-foreground/20">
-      <p className="text-4xl font-bold uppercase opacity-20 tracking-[0.4em]">Initializing...</p>
+    <div className="bg-transparent p-40 rounded-[5rem] text-center border-8 border-dashed border-foreground/10">
+      <p className="text-5xl font-black uppercase opacity-10 tracking-[1em] animate-pulse">CONNECTING...</p>
     </div>
   );
 }
