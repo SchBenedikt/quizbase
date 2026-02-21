@@ -39,7 +39,7 @@ export default function PresenterPage() {
 
   const handleStartSession = async (questions: PollQuestion[], theme: AppTheme) => {
     if (!sessionTitle) {
-      toast({ variant: "destructive", title: "Missing Title", description: "Please enter a title for your pulse." });
+      toast({ variant: "destructive", title: "Required", description: "Give your pulse a name." });
       return;
     }
     if (!user) return;
@@ -50,7 +50,6 @@ export default function PresenterPage() {
       const sessionRef = doc(collection(db, "sessions"));
       const pollRef = doc(collection(db, `users/${user.uid}/polls`));
 
-      // Save Poll Meta
       await setDoc(pollRef, {
         id: pollRef.id,
         userId: user.uid,
@@ -59,7 +58,6 @@ export default function PresenterPage() {
         createdAt: serverTimestamp(),
       });
 
-      // Save Questions - Cleanly handle undefined fields for Firestore
       const savedQuestionIds: string[] = [];
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i];
@@ -74,7 +72,6 @@ export default function PresenterPage() {
           createdAt: q.createdAt || Date.now()
         };
         
-        // Only include optional fields if they exist
         if (q.options) qData.options = q.options;
         if (q.range) qData.range = q.range;
 
@@ -82,7 +79,6 @@ export default function PresenterPage() {
         savedQuestionIds.push(qRef.id);
       }
 
-      // Create Active Session
       await setDoc(sessionRef, {
         id: sessionRef.id,
         pollId: pollRef.id,
@@ -96,7 +92,7 @@ export default function PresenterPage() {
 
       router.push(`/presenter/${sessionRef.id}?code=${code}&title=${encodeURIComponent(sessionTitle)}&theme=${theme}`);
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Launch Error", description: e.message });
+      toast({ variant: "destructive", title: "Error", description: e.message });
     } finally {
       setLoading(false);
     }
@@ -108,9 +104,9 @@ export default function PresenterPage() {
     try {
       const pollRef = doc(db, `users/${user.uid}/polls/${pollId}`);
       await deleteDoc(pollRef);
-      toast({ title: "Poll Removed", description: "The poll has been deleted from your vault." });
+      toast({ title: "Removed", description: "The pulse was deleted from your vault." });
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Delete Failed", description: e.message });
+      toast({ variant: "destructive", title: "Failed", description: e.message });
     } finally {
       setDeletingId(null);
     }
@@ -139,7 +135,7 @@ export default function PresenterPage() {
 
       router.push(`/presenter/${sessionRef.id}?code=${code}&title=${encodeURIComponent(poll.title)}&theme=${poll.theme}`);
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Launch Failed", description: e.message });
+      toast({ variant: "destructive", title: "Failed", description: e.message });
     }
   };
 
@@ -160,11 +156,11 @@ export default function PresenterPage() {
           </div>
           
           <div className="bg-card p-8 rounded-3xl border border-border mb-8">
-            <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-1">Pulse Title</label>
+            <label className="text-sm font-bold uppercase tracking-widest opacity-40 ml-1">Pulse Title</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              placeholder="e.g. Product Feedback"
+              placeholder="e.g. Workshop Vibe"
               className="text-2xl font-bold h-16 border-none bg-transparent focus-visible:ring-0 placeholder:opacity-10 shadow-none p-0 mt-2"
             />
           </div>
@@ -181,79 +177,79 @@ export default function PresenterPage() {
       
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-24 space-y-12 mt-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-1">
-              <Zap className="h-6 w-6 text-primary fill-primary" />
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 mb-1">
+              <Zap className="h-8 w-8 text-primary fill-primary" />
               <h1 className="text-4xl font-bold tracking-tight">Vault</h1>
             </div>
-            <p className="text-sm font-medium opacity-40 uppercase tracking-widest">System Online, {user.displayName?.split(' ')[0] || 'Presenter'}</p>
+            <p className="text-xs font-bold opacity-40 uppercase tracking-[0.3em]">System Online. Welcome, {user.displayName?.split(' ')[0] || 'Presenter'}.</p>
           </div>
           <Button 
             size="lg" 
             onClick={() => setIsCreating(true)}
-            className="h-14 px-8 rounded-2xl text-md font-bold bg-primary text-primary-foreground border-none hover:opacity-90 transition-all uppercase tracking-tight"
+            className="h-16 px-10 rounded-2xl text-md font-bold bg-primary text-primary-foreground border-none hover:opacity-90 transition-all uppercase tracking-tight"
           >
-            <Plus className="mr-2 h-5 w-5" /> New Pulse
+            <Plus className="mr-3 h-5 w-5" /> New Pulse
           </Button>
         </div>
 
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="relative w-full max-w-sm">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 opacity-30" />
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 opacity-30" />
               <Input 
-                placeholder="Search pulses..."
+                placeholder="Search your pulse vault..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-11 pl-11 pr-4 rounded-xl border border-border bg-card focus-visible:ring-1 font-medium text-sm shadow-none"
+                className="h-14 pl-14 pr-6 rounded-xl border-2 border-border bg-card focus-visible:ring-1 font-medium text-md shadow-none"
               />
             </div>
           </div>
 
-          <div className="grid gap-3">
+          <div className="grid gap-4">
             {pollsLoading ? (
-              <div className="p-20 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto opacity-20" /></div>
+              <div className="p-20 text-center"><Loader2 className="h-10 w-10 animate-spin mx-auto opacity-20" /></div>
             ) : !filteredPolls || filteredPolls.length === 0 ? (
-              <div className="p-20 text-center border-2 border-dashed border-border rounded-3xl bg-card/50">
-                 <p className="text-sm font-bold uppercase opacity-20 tracking-widest">No pulses found</p>
+              <div className="p-24 text-center border-4 border-dashed border-border rounded-[3rem] bg-card/50">
+                 <p className="text-sm font-bold uppercase opacity-20 tracking-widest">No pulses found in your archive</p>
               </div>
             ) : (
               filteredPolls.map((poll) => (
-                <div key={poll.id} className="bg-card p-5 rounded-2xl border border-border flex flex-col sm:flex-row items-center justify-between gap-4 group hover:border-primary/30 transition-all">
-                  <div className="flex items-center gap-5 w-full sm:w-auto">
-                    <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center border-2 shrink-0", `theme-${poll.theme} border-foreground`)}>
-                       <BarChart3 className="h-5 w-5 text-foreground" />
+                <div key={poll.id} className="bg-card p-6 rounded-[2.5rem] border border-border flex flex-col sm:flex-row items-center justify-between gap-6 group hover:border-primary/40 transition-all">
+                  <div className="flex items-center gap-6 w-full sm:w-auto">
+                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center border-4 shrink-0 transition-colors", `theme-${poll.theme} border-foreground`)}>
+                       <BarChart3 className="h-6 w-6 text-foreground" />
                     </div>
-                    <div className="space-y-0.5 truncate">
-                      <p className="text-lg font-bold tracking-tight truncate">{poll.title}</p>
-                      <p className="text-[10px] font-bold opacity-30 uppercase tracking-wider">
-                        {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString() : 'Just now'}
+                    <div className="space-y-1 truncate">
+                      <p className="text-xl font-bold tracking-tight truncate">{poll.title}</p>
+                      <p className="text-xs font-bold opacity-30 uppercase tracking-[0.1em]">
+                        Created {poll.createdAt?.toDate ? poll.createdAt.toDate().toLocaleDateString() : 'Today'}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                      <Button 
                        variant="ghost" 
                        onClick={() => handleLaunchExisting(poll)}
-                       className="h-10 px-4 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-primary/10"
+                       className="h-12 px-6 rounded-xl font-bold uppercase text-[11px] tracking-widest hover:bg-primary/10 text-primary"
                      >
-                       <Play className="h-4 w-4 mr-2" /> Launch
+                       <Play className="h-5 w-5 mr-3" /> Launch
                      </Button>
                      <Button 
                        variant="ghost" 
                        onClick={() => router.push(`/presenter/edit/${poll.id}`)}
-                       className="h-10 px-4 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-foreground/5"
+                       className="h-12 px-6 rounded-xl font-bold uppercase text-[11px] tracking-widest hover:bg-foreground/5"
                      >
-                       <Edit2 className="h-4 w-4 mr-2" /> Edit
+                       <Edit2 className="h-5 w-5 mr-3" /> Edit
                      </Button>
                      <Button 
                        variant="ghost" 
                        size="icon"
                        disabled={deletingId === poll.id}
                        onClick={() => handleDeletePoll(poll.id)}
-                       className="h-10 w-10 rounded-xl hover:text-destructive hover:bg-destructive/5"
+                       className="h-12 w-12 rounded-xl hover:text-destructive hover:bg-destructive/10"
                      >
-                       {deletingId === poll.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                       {deletingId === poll.id ? <Loader2 className="h-5 w-5 animate-spin" /> : <Trash2 className="h-5 w-5" />}
                      </Button>
                   </div>
                 </div>

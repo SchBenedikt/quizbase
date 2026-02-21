@@ -8,18 +8,33 @@ import { Textarea } from "@/components/ui/textarea";
 import { Zap, Heart, Loader2, Star } from "lucide-react";
 import { PollQuestion } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
-import { useFirestore, useDoc, useMemoFirebase } from "@/firebase";
-import { doc, collection, addDoc, serverTimestamp, getDoc } from "firebase/firestore";
+import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { doc, collection, addDoc, serverTimestamp, getDoc, query, where, limit } from "firebase/firestore";
 
 export default function ParticipantView({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
   const db = useFirestore();
   
-  const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
-  const { data: session, isLoading: sessionLoading } = useDoc(sessionRef);
+  // Participant views the session by the 6-digit JOIN CODE (passed as sessionId in URL)
+  const sessionQuery = useMemoFirebase(() => {
+    return query(
+      collection(db, "sessions"), 
+      where("code", "==", resolvedParams.sessionId.toUpperCase()), 
+      limit(1)
+    );
+  }, [db, resolvedParams.sessionId]);
+
+  const { data: sessionDocs, isLoading: sessionLoading } = useCollection(sessionQuery);
+  const session = sessionDocs?.[0] || null;
 
   const [currentQuestion, setCurrentQuestion] = useState<PollQuestion | null>(null);
-  
+  const [voted, setVoted] = useState(false);
+  const [selection, setSelection] = useState<number | null>(null);
+  const [textValue, setTextValue] = useState("");
+  const [sliderValue, setSliderValue] = useState(50);
+  const [ratingValue, setRatingValue] = useState(0);
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (session?.currentQuestionId && session.userId && session.pollId) {
       const fetchQ = async () => {
@@ -42,13 +57,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     }
   }, [session?.currentQuestionId, session?.userId, session?.pollId, db]);
 
-  const [voted, setVoted] = useState(false);
-  const [selection, setSelection] = useState<number | null>(null);
-  const [textValue, setTextValue] = useState("");
-  const [sliderValue, setSliderValue] = useState(50);
-  const [ratingValue, setRatingValue] = useState(0);
-  const [loading, setLoading] = useState(false);
-
   const theme = session?.theme || 'orange';
 
   const handleSubmit = async () => {
@@ -62,8 +70,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       if (currentQuestion.type === 'slider') value = sliderValue;
       if (currentQuestion.type === 'rating') value = ratingValue;
 
-      await addDoc(collection(db, `sessions/${resolvedParams.sessionId}/responses`), {
-        sessionId: resolvedParams.sessionId,
+      await addDoc(collection(db, `sessions/${session.id}/responses`), {
+        sessionId: session.id,
         questionId: currentQuestion.id,
         value,
         userId: session.userId, 
@@ -79,7 +87,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (sessionLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f3f3f1]">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
@@ -87,9 +95,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (!session) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-[#f3f3f1]">
-        <h1 className="text-3xl font-bold uppercase tracking-tight opacity-20">Session Inactive</h1>
-        <Button onClick={() => window.location.href = '/join'} className="mt-8 bg-primary text-white font-bold rounded-full h-14 px-10 border-4 border-primary">Return to Lobby</Button>
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-muted">
+        <h1 className="text-2xl font-bold uppercase tracking-tight opacity-20">Session Not Found</h1>
+        <p className="text-sm opacity-50 mt-2 uppercase tracking-widest">Verify your pulse code and try again.</p>
+        <Button onClick={() => window.location.href = '/join'} className="mt-8 bg-primary text-background font-bold rounded-full h-14 px-10 border-4 border-primary hover:bg-transparent hover:text-primary transition-all">Return to Lobby</Button>
       </div>
     );
   }
@@ -101,8 +110,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           <Heart className="h-24 w-24 text-background fill-background" />
         </div>
         <div className="space-y-4">
-          <h1 className="text-5xl font-extrabold text-foreground uppercase tracking-tight leading-none">Sync Confirmed!</h1>
-          <p className="text-foreground font-semibold text-lg max-w-xs mx-auto uppercase tracking-tight opacity-70">Stand by for the next pulse signal...</p>
+          <h1 className="text-4xl font-extrabold text-foreground uppercase tracking-tight leading-none">Sync Confirmed!</h1>
+          <p className="text-foreground font-semibold text-lg max-w-xs mx-auto uppercase tracking-tight opacity-70">Stand by for the next signal...</p>
         </div>
       </div>
     );
@@ -111,125 +120,127 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (!currentQuestion) {
     return (
       <div className={cn("min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background", `theme-${theme}`)}>
-        <p className="text-3xl font-bold uppercase opacity-20 tracking-tight text-foreground">Waiting for Transmission...</p>
+        <p className="text-2xl font-bold uppercase opacity-20 tracking-tight text-foreground">Waiting for Transmission...</p>
       </div>
     );
   }
 
   return (
-    <div className={cn("min-h-screen flex flex-col p-8 font-body max-w-lg mx-auto bg-background transition-colors duration-500", `theme-${theme}`)}>
-      <div className="flex items-center justify-between mb-16">
-        <div className="flex items-center gap-3">
-          <Zap className="h-8 w-8 text-foreground fill-foreground" />
-          <span className="font-bold text-2xl tracking-tight uppercase text-foreground">PopPulse*</span>
-        </div>
-        <div className="px-6 py-2 border-4 border-foreground rounded-full text-[10px] font-bold uppercase tracking-[0.3em] text-foreground">
-          Live
-        </div>
-      </div>
-
-      <main className="space-y-12 flex-1">
-        <h2 className="text-4xl md:text-5xl font-extrabold leading-tight uppercase tracking-tight text-foreground">
-          {currentQuestion.question}
-        </h2>
-
-        {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
-          <div className="grid gap-4">
-            {currentQuestion.options.map((opt, idx) => (
-              <Button
-                key={idx}
-                variant={selection === idx ? "default" : "outline"}
-                className={cn(
-                  "h-20 text-lg font-bold rounded-[2rem] border-4 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
-                  selection === idx ? "bg-foreground text-background border-foreground" : "border-foreground/20 bg-white/10 text-foreground"
-                )}
-                onClick={() => setSelection(idx)}
-              >
-                <div className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center mr-6 shrink-0 transition-colors border-4 text-sm font-extrabold",
-                  selection === idx ? "bg-background text-foreground border-background" : "bg-foreground text-background border-foreground"
-                )}>
-                  {String.fromCharCode(65 + idx)}
-                </div>
-                <span className="truncate uppercase">{opt}</span>
-              </Button>
-            ))}
+    <div className={cn("min-h-screen flex flex-col p-8 font-body bg-background transition-colors duration-500", `theme-${theme}`)}>
+      <div className="max-w-lg mx-auto w-full flex-1 flex flex-col">
+        <div className="flex items-center justify-between mb-16">
+          <div className="flex items-center gap-3">
+            <Zap className="h-8 w-8 text-foreground fill-foreground" />
+            <span className="font-bold text-2xl tracking-tight uppercase text-foreground">PopPulse*</span>
           </div>
-        )}
+          <div className="px-6 py-2 border-4 border-foreground rounded-full text-[10px] font-bold uppercase tracking-[0.3em] text-foreground">
+            Live
+          </div>
+        </div>
 
-        {currentQuestion.type === 'rating' && (
-          <div className="flex justify-center gap-4 py-8">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Button
-                key={s}
-                variant="ghost"
-                size="icon"
-                onClick={() => setRatingValue(s)}
-                className="h-16 w-16 rounded-full"
-              >
-                <Star 
+        <main className="space-y-12 flex-1">
+          <h2 className="text-3xl md:text-4xl font-extrabold leading-tight uppercase tracking-tight text-foreground">
+            {currentQuestion.question}
+          </h2>
+
+          {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
+            <div className="grid gap-4">
+              {currentQuestion.options.map((opt, idx) => (
+                <Button
+                  key={idx}
+                  variant={selection === idx ? "default" : "outline"}
                   className={cn(
-                    "h-12 w-12 transition-all",
-                    s <= ratingValue ? "fill-foreground text-foreground" : "text-foreground/20"
-                  )} 
+                    "h-20 text-lg font-bold rounded-[2rem] border-4 transition-all active:scale-95 text-left justify-start px-8 shadow-none",
+                    selection === idx ? "bg-foreground text-background border-foreground" : "border-foreground/20 bg-white/10 text-foreground"
+                  )}
+                  onClick={() => setSelection(idx)}
+                >
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center mr-6 shrink-0 transition-colors border-4 text-sm font-extrabold",
+                    selection === idx ? "bg-background text-foreground border-background" : "bg-foreground text-background border-foreground"
+                  )}>
+                    {String.fromCharCode(65 + idx)}
+                  </div>
+                  <span className="truncate uppercase">{opt}</span>
+                </Button>
+              ))}
+            </div>
+          )}
+
+          {currentQuestion.type === 'rating' && (
+            <div className="flex justify-center gap-4 py-8">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Button
+                  key={s}
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setRatingValue(s)}
+                  className="h-16 w-16 rounded-full"
+                >
+                  <Star 
+                    className={cn(
+                      "h-12 w-12 transition-all",
+                      s <= ratingValue ? "fill-foreground text-foreground" : "text-foreground/20"
+                    )} 
+                  />
+                </Button>
+              ))}
+            </div>
+          )}
+
+          {(currentQuestion.type === 'word-cloud' || currentQuestion.type === 'open-text') && (
+            <div className="space-y-6">
+              {currentQuestion.type === 'word-cloud' ? (
+                <Input 
+                  placeholder="One word..."
+                  value={textValue}
+                  onChange={(e) => setTextValue(e.target.value)}
+                  maxLength={20}
+                  className="h-20 text-2xl font-bold px-8 rounded-[2rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none text-foreground"
                 />
-              </Button>
-            ))}
-          </div>
-        )}
-
-        {(currentQuestion.type === 'word-cloud' || currentQuestion.type === 'open-text') && (
-          <div className="space-y-6">
-            {currentQuestion.type === 'word-cloud' ? (
-              <Input 
-                placeholder="Type one word..."
-                value={textValue}
-                onChange={(e) => setTextValue(e.target.value)}
-                maxLength={20}
-                className="h-20 text-2xl font-bold px-8 rounded-[2rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none text-foreground"
-              />
-            ) : (
-              <Textarea 
-                placeholder="Broadcast your thoughts..."
-                value={textValue}
-                onChange={(e) => setTextValue(e.target.value)}
-                className="min-h-[200px] text-xl font-bold p-8 rounded-[2.5rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight text-foreground"
-              />
-            )}
-          </div>
-        )}
-
-        {currentQuestion.type === 'slider' && (
-          <div className="space-y-12 py-8">
-            <div className="text-center">
-              <span className="text-8xl font-extrabold tracking-tight leading-none text-foreground">{sliderValue}</span>
+              ) : (
+                <Textarea 
+                  placeholder="Your thoughts..."
+                  value={textValue}
+                  onChange={(e) => setTextValue(e.target.value)}
+                  className="min-h-[200px] text-xl font-bold p-8 rounded-[2.5rem] border-4 border-foreground bg-white/10 focus-visible:ring-0 uppercase placeholder:opacity-20 shadow-none leading-tight text-foreground"
+                />
+              )}
             </div>
-            <Slider 
-              value={[sliderValue]}
-              onValueChange={(v) => setSliderValue(v[0])}
-              max={100}
-              step={1}
-              className="py-6"
-            />
-            <div className="flex justify-between font-bold text-[10px] uppercase tracking-widest opacity-40 text-foreground px-4">
-              <span>Low</span>
-              <span>High</span>
+          )}
+
+          {currentQuestion.type === 'slider' && (
+            <div className="space-y-12 py-8">
+              <div className="text-center">
+                <span className="text-8xl font-extrabold tracking-tight leading-none text-foreground">{sliderValue}</span>
+              </div>
+              <Slider 
+                value={[sliderValue]}
+                onValueChange={(v) => setSliderValue(v[0])}
+                max={100}
+                step={1}
+                className="py-6"
+              />
+              <div className="flex justify-between font-bold text-[10px] uppercase tracking-widest opacity-40 text-foreground px-4">
+                <span>Low</span>
+                <span>High</span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <Button 
-          disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
-          onClick={handleSubmit}
-          className="w-full h-20 text-2xl font-extrabold rounded-[2rem] bg-foreground text-background border-4 border-foreground hover:bg-transparent hover:text-foreground transition-all mt-8 uppercase tracking-tight shadow-none"
-        >
-          {loading ? <Loader2 className="animate-spin h-8 w-8" /> : "Transmit Pulse"}
-        </Button>
-      </main>
+          <Button 
+            disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
+            onClick={handleSubmit}
+            className="w-full h-20 text-2xl font-extrabold rounded-[2rem] bg-foreground text-background border-4 border-foreground hover:bg-transparent hover:text-foreground transition-all mt-8 uppercase tracking-tight shadow-none"
+          >
+            {loading ? <Loader2 className="animate-spin h-8 w-8" /> : "Transmit"}
+          </Button>
+        </main>
 
-      <footer className="mt-20 pt-12 text-center opacity-30 border-t-8 border-foreground/5">
-        <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-foreground">Zero Retention. Instant Connection.</p>
-      </footer>
+        <footer className="mt-20 pt-12 text-center opacity-30 border-t-8 border-foreground/5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-foreground">Zero Retention. Instant Sync.</p>
+        </footer>
+      </div>
     </div>
   );
 }

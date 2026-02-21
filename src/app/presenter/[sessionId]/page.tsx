@@ -19,8 +19,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
   const { data: session, isLoading: sessionLoading } = useDoc(sessionRef);
 
+  // Derive theme from session document primarily, fallback to searchParams or orange
   const theme = (session?.theme as AppTheme) || (searchParams.get('theme') as AppTheme) || 'orange';
-  const title = session?.title || searchParams.get('title') || "Display";
+  const title = session?.title || searchParams.get('title') || "Live Presentation";
   const code = session?.code || searchParams.get('code') || "---";
 
   const questionsQuery = useMemoFirebase(() => {
@@ -75,8 +76,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   if (sessionLoading || !questions) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-muted">
-        <Loader2 className="h-8 w-8 animate-spin opacity-20" />
+      <div className="h-screen w-screen flex items-center justify-center bg-muted transition-colors duration-500">
+        <Loader2 className="h-10 w-10 animate-spin opacity-20" />
       </div>
     );
   }
@@ -87,62 +88,62 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
 
   return (
-    <div className={cn("no-scroll h-screen w-screen overflow-hidden flex flex-col font-body bg-background transition-colors duration-500", `theme-${theme}`)}>
-      <header className="h-[10vh] px-10 flex items-center justify-between border-b border-foreground/10 shrink-0 z-10 bg-background/50 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <Zap className="h-6 w-6 text-foreground fill-foreground" />
-          <h1 className="text-xl font-bold tracking-tight text-foreground truncate max-w-sm">{title}</h1>
+    <div className={cn("no-scroll h-screen w-screen flex flex-col font-body bg-background transition-colors duration-500", `theme-${theme}`)}>
+      <header className="h-[12vh] px-12 flex items-center justify-between border-b border-foreground/10 shrink-0 z-10 bg-background/50 backdrop-blur-sm">
+        <div className="flex items-center gap-4">
+          <Zap className="h-8 w-8 text-foreground fill-foreground" />
+          <h1 className="text-2xl font-bold tracking-tight text-foreground truncate max-w-lg">{title}</h1>
         </div>
         
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-10">
           <div className="flex flex-col items-end">
-            <p className="text-[9px] font-bold uppercase tracking-widest opacity-40 text-foreground">Join Code</p>
-            <p className="text-3xl font-black tracking-tighter text-foreground">{code}</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] opacity-40 text-foreground">Pulse Code</p>
+            <p className="text-4xl font-black tracking-tighter text-foreground leading-none mt-1">{code}</p>
           </div>
-          <div className="flex items-center gap-2 bg-foreground/10 px-4 py-1.5 rounded-xl border border-foreground/20 text-foreground">
-            <Users className="h-4 w-4" />
-            <span className="text-xl font-bold">{currentResponses.length}</span>
+          <div className="flex items-center gap-3 bg-foreground/10 px-6 py-2.5 rounded-2xl border border-foreground/20 text-foreground">
+            <Users className="h-6 w-6" />
+            <span className="text-2xl font-black">{currentResponses.length}</span>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center overflow-hidden">
-        <div className="w-full max-w-5xl h-full flex flex-col gap-6">
+      <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center overflow-hidden">
+        <div className="w-full max-w-6xl h-full flex flex-col gap-8">
           <div className="text-center shrink-0">
-             <div className="inline-block px-4 py-1 bg-foreground text-background rounded-full text-[10px] font-bold uppercase tracking-widest mb-3">
+             <div className="inline-block px-6 py-1.5 bg-foreground text-background rounded-full text-[12px] font-bold uppercase tracking-[0.4em] mb-4">
                Node {currentIdx + 1} of {questions.length}
              </div>
-             <h2 className="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-foreground max-w-3xl mx-auto">
+             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-foreground max-w-4xl mx-auto">
                {q.question}
              </h2>
           </div>
 
           <div className="flex-1 min-h-0 w-full">
-            <Card className="h-full border-2 border-foreground/10 rounded-[2.5rem] bg-white/20 backdrop-blur-md p-8 flex items-center justify-center overflow-hidden shadow-none">
+            <Card className="h-full border-4 border-foreground/10 rounded-[3rem] bg-white/10 backdrop-blur-lg p-12 flex items-center justify-center overflow-hidden shadow-none">
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
           </div>
         </div>
       </main>
 
-      <footer className="h-[8vh] flex items-center justify-center gap-4 border-t border-foreground/10 shrink-0 px-10 bg-background/50 backdrop-blur-sm">
+      <footer className="h-[10vh] flex items-center justify-center gap-8 border-t border-foreground/10 shrink-0 px-12 bg-background/50 backdrop-blur-sm">
         <Button 
           variant="outline" 
           size="icon" 
           onClick={handlePrev}
           disabled={currentIdx === 0}
-          className="h-10 w-10 rounded-full border border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background"
+          className="h-12 w-12 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-6 w-6" />
         </Button>
         
-        <div className="flex items-center gap-4 bg-foreground/5 px-6 py-2 rounded-2xl border border-foreground/10 text-foreground">
-           <Button variant="ghost" className="font-bold uppercase tracking-widest text-[9px] h-8 px-3">
-             <LayoutGrid className="h-3 w-3 mr-2" /> Views
+        <div className="flex items-center gap-6 bg-foreground/5 px-8 py-3 rounded-2xl border border-foreground/10 text-foreground">
+           <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[11px] h-10 px-4 hover:bg-foreground/10">
+             <LayoutGrid className="h-4 w-4 mr-3" /> Grid View
            </Button>
-           <div className="w-px h-4 bg-foreground/10" />
-           <Button variant="ghost" className="font-bold uppercase tracking-widest text-[9px] h-8 px-3">
-             <Timer className="h-3 w-3 mr-2" /> Timer
+           <div className="w-px h-6 bg-foreground/10" />
+           <Button variant="ghost" className="font-bold uppercase tracking-[0.2em] text-[11px] h-10 px-4 hover:bg-foreground/10">
+             <Timer className="h-4 w-4 mr-3" /> Stop Watch
            </Button>
         </div>
 
@@ -151,9 +152,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           size="icon" 
           onClick={handleNext}
           disabled={currentIdx === questions.length - 1}
-          className="h-10 w-10 rounded-full border border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background"
+          className="h-12 w-12 rounded-full border-2 border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background transition-all"
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-6 w-6" />
         </Button>
       </footer>
     </div>

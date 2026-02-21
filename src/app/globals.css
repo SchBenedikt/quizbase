@@ -28,19 +28,19 @@
 
   /* Presenter Dashboard UI - Clean & Focused */
   .presenter-ui {
-    --background: 60 5% 96%; /* Light Grayish White */
-    --foreground: 35 20% 12%; /* Softer Dark */
-    --card: 0 0% 100%;
-    --card-foreground: 35 20% 12%;
-    --primary: 33 100% 54%; /* Orange as accent only */
-    --primary-foreground: 0 0% 100%;
-    --border: 0 0% 89%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --background: 60 5% 96% !important;
+    --foreground: 35 20% 12% !important;
+    --card: 0 0% 100% !important;
+    --card-foreground: 35 20% 12% !important;
+    --primary: 33 100% 54% !important;
+    --primary-foreground: 0 0% 100% !important;
+    --border: 0 0% 89% !important;
+    --muted: 0 0% 96% !important;
+    --muted-foreground: 0 0% 45% !important;
     --radius: 1.5rem;
   }
 
-  /* Theme Overrides */
+  /* Theme Overrides - High Specificity */
   .theme-orange {
     --background: 33 100% 54% !important;
     --foreground: 35 88% 16% !important;
@@ -72,7 +72,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased transition-colors duration-300;
+    @apply bg-background text-foreground font-body antialiased transition-colors duration-500;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-headline font-bold tracking-tight uppercase;
@@ -82,6 +82,11 @@
 .no-scroll {
   height: 100vh;
   overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .animate-float {
