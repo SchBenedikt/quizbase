@@ -1,10 +1,9 @@
-
 "use client";
 
 import { useState, useEffect, use, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Palette, Sparkles, Monitor, Settings2 } from "lucide-react";
+import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Palette, Sparkles, Monitor, Settings2, Moon, Sun } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession } from "@/app/types/poll";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
@@ -163,6 +162,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   else if (currentTheme === 'red') finalBg = '#780c16';
   else if (currentTheme === 'green') finalBg = '#d2e822';
   else if (currentTheme === 'blue') finalBg = '#0d99ff';
+  else if (currentTheme === 'minimal-light') finalBg = '#f4f4f5';
+  else if (currentTheme === 'minimal-dark') finalBg = '#18181b';
   else if (currentTheme === 'custom' && customColor) finalBg = customColor;
 
   const finalFg = getContrastColor(finalBg);
@@ -268,13 +269,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                   <Palette className="h-5 w-5 mr-3" /> Vibe
                 </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-64 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="center">
-                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Preset Vibes</p>
+             <PopoverContent className="w-[400px] p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="center">
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Immersion Presets</p>
                 <div className="grid grid-cols-2 gap-3">
                   <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Orange</Button>
                   <Button onClick={() => setTheme('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Red</Button>
                   <Button onClick={() => setTheme('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Acid</Button>
                   <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Blue</Button>
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-2">Minimalist Presets</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button onClick={() => setTheme('minimal-light')} className="bg-[#f4f4f5] text-zinc-950 rounded-[1rem] font-black h-12 border-2 border-zinc-200 uppercase text-[10px]"><Sun className="w-3 h-3 mr-2" /> Studio Light</Button>
+                  <Button onClick={() => setTheme('minimal-dark')} className="bg-[#18181b] text-zinc-100 rounded-[1rem] font-black h-12 border-2 border-zinc-800 uppercase text-[10px]"><Moon className="w-3 h-3 mr-2" /> Studio Dark</Button>
                 </div>
                 <div className="space-y-3 pt-3 border-t-2">
                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Custom Color</p>

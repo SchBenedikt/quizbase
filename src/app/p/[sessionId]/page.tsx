@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle } from "lucide-react";
+import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle, ArrowUp, ArrowDown } from "lucide-react";
 import { PollQuestion, PollSession } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
@@ -30,6 +30,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const [currentQuestion, setCurrentQuestion] = useState<PollQuestion | null>(null);
   const [voted, setVoted] = useState(false);
   const [selection, setSelection] = useState<number | null>(null);
+  const [ranking, setRanking] = useState<number[]>([]);
   const [textValue, setTextValue] = useState("");
   const [sliderValue, setSliderValue] = useState(50);
   const [ratingValue, setRatingValue] = useState(0);
@@ -58,6 +59,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setTextValue("");
             setRatingValue(0);
             setSliderValue(qData.range?.min || 50);
+            setRanking(qData.options ? qData.options.map((_, i) => i) : []);
             
             if (qData.timeLimit && qData.timeLimit > 0) {
               setTimeLeft(qData.timeLimit);
@@ -85,9 +87,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       if (currentQuestion.type === 'multiple-choice') value = selection;
       if (currentQuestion.type === 'word-cloud') value = textValue.trim().toUpperCase();
       if (currentQuestion.type === 'open-text') value = textValue.trim();
-      if (currentQuestion.type === 'slider') value = sliderValue;
+      if (currentQuestion.type === 'slider' || currentQuestion.type === 'scale') value = sliderValue;
       if (currentQuestion.type === 'rating') value = ratingValue;
       if (currentQuestion.type === 'guess-number') value = parseFloat(textValue) || 0;
+      if (currentQuestion.type === 'ranking') value = ranking;
 
       await addDoc(collection(db, `sessions/${session.id}/responses`), {
         sessionId: session.id,
@@ -102,6 +105,15 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     } finally {
       setLoading(false);
     }
+  };
+
+  const moveRank = (index: number, direction: 'up' | 'down') => {
+    const newRanking = [...ranking];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newRanking.length) return;
+    
+    [newRanking[index], newRanking[targetIndex]] = [newRanking[targetIndex], newRanking[index]];
+    setRanking(newRanking);
   };
 
   const getContrastColor = (hex: string) => {
@@ -141,6 +153,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   else if (currentTheme === 'red') finalBg = '#780c16';
   else if (currentTheme === 'green') finalBg = '#d2e822';
   else if (currentTheme === 'blue') finalBg = '#0d99ff';
+  else if (currentTheme === 'minimal-light') finalBg = '#f4f4f5';
+  else if (currentTheme === 'minimal-dark') finalBg = '#18181b';
   else if (currentTheme === 'custom' && customColor) finalBg = customColor;
 
   const finalFg = getContrastColor(finalBg);
@@ -276,6 +290,45 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             </div>
           )}
 
+          {currentQuestion.type === 'ranking' && (
+            <div className="grid gap-3">
+              {ranking.map((optIdx, i) => (
+                <div 
+                  key={optIdx} 
+                  className="flex items-center gap-4 p-4 rounded-[1.5rem] border-2 bg-black/5 transition-all"
+                  style={{ borderColor: finalFg + '33' }}
+                >
+                  <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center font-black text-xl shrink-0" style={{ backgroundColor: finalFg, color: finalBg }}>
+                    {i + 1}
+                  </div>
+                  <span className="flex-1 font-black uppercase text-lg truncate">
+                    {currentQuestion.options![optIdx]}
+                  </span>
+                  <div className="flex flex-col gap-1">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => moveRank(i, 'up')}
+                      disabled={i === 0}
+                      className="h-10 w-10 rounded-[0.75rem] hover:bg-black/10"
+                    >
+                      <ArrowUp className="h-5 w-5" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => moveRank(i, 'down')}
+                      disabled={i === ranking.length - 1}
+                      className="h-10 w-10 rounded-[0.75rem] hover:bg-black/10"
+                    >
+                      <ArrowDown className="h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {currentQuestion.type === 'rating' && (
             <div className="flex justify-center gap-3 py-10 bg-black/5 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '10' }}>
               {[1, 2, 3, 4, 5].map((s) => (
@@ -329,7 +382,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             </div>
           )}
 
-          {currentQuestion.type === 'slider' && currentQuestion.range && (
+          {(currentQuestion.type === 'slider' || currentQuestion.type === 'scale') && currentQuestion.range && (
             <div className="space-y-12 py-12 bg-black/5 rounded-[1.5rem] border-2 px-10" style={{ borderColor: finalFg + '10' }}>
               <div className="text-center">
                 <span className="text-9xl font-black tracking-tighter leading-none">{sliderValue}</span>
@@ -343,14 +396,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 className="py-6"
               />
               <div className="flex justify-between font-black text-[10px] uppercase tracking-widest opacity-40 px-4">
-                <span>{currentQuestion.range.min}</span>
-                <span>{currentQuestion.range.max}</span>
+                <span>{currentQuestion.labels?.min || currentQuestion.range.min}</span>
+                <span>{currentQuestion.labels?.max || currentQuestion.range.max}</span>
               </div>
             </div>
           )}
 
           <Button 
-            disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
+            disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider' && currentQuestion.type !== 'scale' && currentQuestion.type !== 'ranking')}
             onClick={handleSubmit}
             className="w-full h-24 text-3xl font-black rounded-[1.5rem] hover:opacity-90 transition-all mt-8 uppercase tracking-tighter border-2"
             style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}

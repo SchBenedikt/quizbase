@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion } from "@/app/types/poll";
-import { ArrowLeft, Loader2, CheckCircle2, Palette } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
@@ -72,12 +72,15 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         updatedAt: serverTimestamp() 
       }, { merge: true });
 
-      const qCol = collection(db, `users/${user.uid}/surveys/${resolvedParams.pollId}/questions`);
+      const qCol = collection(db, `users/${user.uid}/surveys/${user.uid}/surveys/${resolvedParams.pollId}/questions`);
       const batch = writeBatch(db);
       
+      // Need correct path for questions
+      const finalQCol = collection(db, `users/${user.uid}/surveys/${resolvedParams.pollId}/questions`);
+
       for (let i = 0; i < questionsToSave.length; i++) {
         const q = questionsToSave[i];
-        const qRef = doc(qCol, q.id);
+        const qRef = doc(finalQCol, q.id);
         
         const qData: any = {
           id: q.id,
@@ -92,6 +95,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         if (q.correctOptionIndices) qData.correctOptionIndices = q.correctOptionIndices;
         if (q.timeLimit !== undefined) qData.timeLimit = q.timeLimit;
         if (q.range) qData.range = q.range;
+        if (q.labels) qData.labels = q.labels;
 
         batch.set(qRef, qData, { merge: true });
       }
@@ -174,13 +178,18 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
                       <Palette className="h-5 w-5" /> Vibe
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-72 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="end">
+                  <PopoverContent className="w-[400px] p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="end">
                     <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Presentation Style</p>
                     <div className="grid grid-cols-2 gap-3">
                       <Button onClick={() => updateVibe('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Orange</Button>
                       <Button onClick={() => updateVibe('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Red</Button>
                       <Button onClick={() => updateVibe('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Acid</Button>
                       <Button onClick={() => updateVibe('blue')} className="bg-[#0d99ff] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Blue</Button>
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-2">Minimalist Presets</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button onClick={() => updateVibe('minimal-light')} className="bg-[#f4f4f5] text-zinc-950 rounded-[1rem] font-black h-12 border-2 border-zinc-200 uppercase text-[10px]"><Sun className="w-3 h-3 mr-2" /> Studio Light</Button>
+                      <Button onClick={() => updateVibe('minimal-dark')} className="bg-[#18181b] text-zinc-100 rounded-[1rem] font-black h-12 border-2 border-zinc-800 uppercase text-[10px]"><Moon className="w-3 h-3 mr-2" /> Studio Dark</Button>
                     </div>
                     <div className="space-y-3 pt-3 border-t-2">
                       <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Custom Theme</p>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical, Hash } from "lucide-react";
+import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical, Hash, ListOrdered, Ruler } from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
 import { PollQuestion, PollType } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
@@ -52,8 +52,9 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
       id: Math.random().toString(36).substr(2, 9),
       type,
       question: "",
-      options: type === 'multiple-choice' ? ["Option 1", "Option 2"] : undefined,
-      range: (type === 'slider' || type === 'guess-number') ? { min: 0, max: 100, step: 1 } : undefined,
+      options: (type === 'multiple-choice' || type === 'ranking') ? ["Option 1", "Option 2"] : undefined,
+      range: (type === 'slider' || type === 'guess-number' || type === 'scale') ? { min: 0, max: type === 'scale' ? 10 : 100, step: 1 } : undefined,
+      labels: type === 'scale' ? { min: "Disagree", max: "Agree" } : undefined,
       correctOptionIndices: [],
       timeLimit: 0,
       createdAt: Date.now()
@@ -121,6 +122,8 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                             {q.type === 'rating' && <Star className="h-5 w-5" />}
                             {q.type === 'slider' && <SlidersHorizontal className="h-5 w-5" />}
                             {q.type === 'guess-number' && <Hash className="h-5 w-5" />}
+                            {q.type === 'ranking' && <ListOrdered className="h-5 w-5" />}
+                            {q.type === 'scale' && <Ruler className="h-5 w-5" />}
                           </div>
                           <span className="text-xs font-black uppercase tracking-widest opacity-40">{q.type.replace('-', ' ')}</span>
                         </div>
@@ -173,28 +176,30 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                             </div>
                           </div>
 
-                          {q.type === 'multiple-choice' && q.options && (
+                          {(q.type === 'multiple-choice' || q.type === 'ranking') && q.options && (
                             <div className="space-y-4 pt-2">
                               <div className="flex items-center justify-between px-2">
-                                <Label className="text-xs font-black uppercase tracking-widest opacity-40">Options & Correct Answers</Label>
-                                <span className="text-[10px] font-black uppercase opacity-30 italic">Toggle correct answers</span>
+                                <Label className="text-xs font-black uppercase tracking-widest opacity-40">Options {q.type === 'multiple-choice' && "& Correct Answers"}</Label>
+                                {q.type === 'multiple-choice' && <span className="text-[10px] font-black uppercase opacity-30 italic">Toggle correct answers</span>}
                               </div>
                               <div className="grid gap-3">
                                 {q.options.map((opt, oIdx) => (
                                   <div key={oIdx} className="flex gap-3 items-center group/opt">
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon"
-                                      onClick={() => toggleCorrectAnswer(q.id, oIdx)}
-                                      className={cn(
-                                        "h-12 w-12 rounded-[0.75rem] border-2 transition-all shrink-0",
-                                        q.correctOptionIndices?.includes(oIdx) 
-                                          ? "bg-primary text-primary-foreground border-primary" 
-                                          : "bg-foreground/5 text-foreground/10 border-transparent hover:border-primary/20"
-                                      )}
-                                    >
-                                      <CheckCircle2 className="h-5 w-5" />
-                                    </Button>
+                                    {q.type === 'multiple-choice' && (
+                                      <Button 
+                                        variant="ghost" 
+                                        size="icon"
+                                        onClick={() => toggleCorrectAnswer(q.id, oIdx)}
+                                        className={cn(
+                                          "h-12 w-12 rounded-[0.75rem] border-2 transition-all shrink-0",
+                                          q.correctOptionIndices?.includes(oIdx) 
+                                            ? "bg-primary text-primary-foreground border-primary" 
+                                            : "bg-foreground/5 text-foreground/10 border-transparent hover:border-primary/20"
+                                        )}
+                                      >
+                                        <CheckCircle2 className="h-5 w-5" />
+                                      </Button>
+                                    )}
                                     <Input 
                                       value={opt} 
                                       onChange={(e) => {
@@ -233,8 +238,8 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                             </div>
                           )}
 
-                          {(q.type === 'slider' || q.type === 'guess-number') && q.range && (
-                            <div className="space-y-4 pt-2">
+                          {(q.type === 'slider' || q.type === 'guess-number' || q.type === 'scale') && q.range && (
+                            <div className="space-y-6 pt-2">
                                <Label className="text-xs font-black uppercase tracking-widest opacity-40">Numeric Parameters</Label>
                                <div className="grid grid-cols-3 gap-6">
                                  <div className="space-y-2">
@@ -265,6 +270,27 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                    />
                                  </div>
                                </div>
+
+                               {q.type === 'scale' && q.labels && (
+                                 <div className="grid grid-cols-2 gap-6">
+                                   <div className="space-y-2">
+                                     <span className="text-[10px] font-black uppercase opacity-30">Min Label</span>
+                                     <Input 
+                                       value={q.labels.min}
+                                       onChange={(e) => updateQuestion(q.id, { labels: { ...q.labels!, min: e.target.value } })}
+                                       className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                     />
+                                   </div>
+                                   <div className="space-y-2">
+                                     <span className="text-[10px] font-black uppercase opacity-30">Max Label</span>
+                                     <Input 
+                                       value={q.labels.max}
+                                       onChange={(e) => updateQuestion(q.id, { labels: { ...q.labels!, max: e.target.value } })}
+                                       className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                     />
+                                   </div>
+                                 </div>
+                               )}
                             </div>
                           )}
                         </div>
@@ -281,6 +307,8 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
       <div className="fixed bottom-12 left-1/2 -translate-x-1/2 bg-background/90 dark:bg-card/90 border-2 border-foreground/10 p-3 rounded-[2rem] flex items-center gap-2 z-50 backdrop-blur-md">
         {[
           { type: 'multiple-choice', icon: ListChecks, label: 'Quiz' },
+          { type: 'ranking', icon: ListOrdered, label: 'Rank' },
+          { type: 'scale', icon: Ruler, label: 'Scale' },
           { type: 'word-cloud', icon: Cloud, label: 'Cloud' },
           { type: 'open-text', icon: MessageSquare, label: 'Text' },
           { type: 'rating', icon: Star, label: 'Rate' },

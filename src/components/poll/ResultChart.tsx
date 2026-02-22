@@ -15,11 +15,34 @@ interface ResultChartProps {
 export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
   const chartColor = 'currentColor';
 
-  if (question.type === 'multiple-choice' && question.options) {
-    const data = question.options.map((opt, idx) => ({
-      name: opt.toUpperCase(),
-      value: results[idx] || 0
-    }));
+  if ((question.type === 'multiple-choice' || question.type === 'ranking') && question.options) {
+    let data: any[] = [];
+
+    if (question.type === 'multiple-choice') {
+      data = question.options.map((opt, idx) => ({
+        name: opt.toUpperCase(),
+        value: results[idx] || 0
+      }));
+    } else {
+      // Ranking visualization: Calculate average position for each option
+      // lower rank = better. We'll show average "points" where higher is better.
+      const optionScores: Record<number, number> = {};
+      const numOptions = question.options.length;
+      
+      allResponses.forEach(res => {
+        if (Array.isArray(res.value)) {
+          res.value.forEach((optIdx: number, rankIdx: number) => {
+            const points = numOptions - rankIdx;
+            optionScores[optIdx] = (optionScores[optIdx] || 0) + points;
+          });
+        }
+      });
+
+      data = question.options.map((opt, idx) => ({
+        name: opt.toUpperCase(),
+        value: allResponses.length > 0 ? optionScores[idx] / allResponses.length : 0
+      })).sort((a, b) => b.value - a.value);
+    }
 
     return (
       <div className="h-full w-full max-w-[1400px] animate-in fade-in duration-1000 flex items-center px-12">
@@ -41,8 +64,10 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
                   return (
                     <div className="bg-foreground p-8 rounded-[1.5rem] border-2 border-background shadow-none">
                       <p className="font-black text-background text-5xl leading-none">
-                        {payload[0].value}
-                        <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">TOTAL VOTES</span>
+                        {payload[0].value.toFixed(1)}
+                        <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">
+                          {question.type === 'multiple-choice' ? 'TOTAL VOTES' : 'AVG SCORE'}
+                        </span>
                       </p>
                     </div>
                   );
@@ -57,7 +82,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               animationDuration={1500}
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={chartColor} fillOpacity={1 - (index * 0.15)} />
+                <Cell key={`cell-${index}`} fill={chartColor} fillOpacity={1 - (index * 0.1)} />
               ))}
             </Bar>
           </BarChart>
@@ -137,7 +162,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     );
   }
 
-  if (question.type === 'slider' || question.type === 'guess-number') {
+  if (question.type === 'slider' || question.type === 'guess-number' || question.type === 'scale') {
     const values = allResponses.map(r => Number(r.value));
     const average = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
     const min = question.range?.min ?? 0;
@@ -146,16 +171,16 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
     return (
       <div className="h-full w-full max-w-[1400px] flex flex-col items-center justify-center space-y-32">
-        {question.type === 'slider' && (
+        {(question.type === 'slider' || question.type === 'scale') && (
           <div className="relative h-40 w-full bg-black/5 rounded-[1.5rem] border-2 border-current flex items-center px-16 overflow-hidden">
              <div 
                className="absolute left-0 h-full bg-current transition-all duration-1500 ease-out"
                style={{ width: `${Math.max(0, Math.min(100, percentage))}%` }}
              />
              <div className="relative z-10 w-full flex justify-between font-black text-4xl mix-blend-difference text-white uppercase tracking-[0.5em]">
-               <span>{min}</span>
-               <span>INTENSITY</span>
-               <span>{max}</span>
+               <span>{question.labels?.min || min}</span>
+               <span className="opacity-40">{question.type === 'scale' ? 'SYNC SCALE' : 'INTENSITY'}</span>
+               <span>{question.labels?.max || max}</span>
              </div>
           </div>
         )}
