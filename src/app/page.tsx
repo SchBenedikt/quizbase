@@ -47,7 +47,7 @@ export default function Home() {
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="JOIN CODE" 
                   maxLength={6}
-                  className="border-none bg-transparent focus-visible:ring-0 text-5xl font-black p-0 placeholder:opacity-20 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter"
+                  className="border-none bg-transparent focus-visible:ring-0 text-5xl font-black p-0 placeholder:opacity-20 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05]"
                   aria-label="Enter 6-digit session code"
                 />
               </div>

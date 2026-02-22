@@ -110,8 +110,18 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                   </Button>
                 </div>
               ) : (
-                <Button onClick={handleSignOut} variant="outline" className="rounded-[1.25rem] h-11 px-6 border-2 border-foreground/10 font-black uppercase text-xs tracking-widest hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all shadow-none">
-                  <LogOut className="h-4 w-4 mr-2" /> <span className="hidden sm:inline">Logout</span>
+                <Button 
+                  onClick={handleSignOut} 
+                  variant="outline" 
+                  className={cn(
+                    "rounded-[1.25rem] h-11 px-6 border-2 font-black uppercase text-xs tracking-widest transition-all shadow-none",
+                    variant === 'brand' 
+                      ? "border-[#4c2f05]/30 text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312] hover:border-[#4c2f05]" 
+                      : "border-foreground/20 text-foreground hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+                  )}
+                >
+                  <LogOut className="h-4 w-4 mr-2" /> 
+                  <span className="hidden sm:inline">Logout</span>
                 </Button>
               )}
             </div>
