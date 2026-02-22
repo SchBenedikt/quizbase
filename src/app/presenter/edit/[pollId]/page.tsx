@@ -139,7 +139,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   return (
     <div className="min-h-screen bg-background font-body selection:bg-primary selection:text-primary-foreground">
       <Header variant="minimal" />
-      <div className="max-w-[1400px] mx-auto px-6 py-12 pb-40">
+      <div className="studio-container px-6 py-12 pb-40">
         <div className="flex flex-col sm:flex-row items-center gap-6 mt-32 mb-12">
           <div className="flex items-center gap-6 w-full">
             <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="rounded-[1.25rem] h-12 w-12 border-2 shrink-0">

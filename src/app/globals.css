@@ -4,49 +4,55 @@
 
 @layer base {
   :root {
-    /* DEFAULT VIBRANT ORANGE THEME */
-    --background: 33 100% 50%;
-    --foreground: 37 92% 10%;
-    --card: 33 100% 55%;
-    --card-foreground: 37 92% 10%;
-    --popover: 33 100% 50%;
-    --popover-foreground: 37 92% 10%;
-    --primary: 37 92% 10%;
-    --primary-foreground: 33 100% 50%;
-    --secondary: 33 100% 45%;
-    --secondary-foreground: 37 92% 10%;
-    --muted: 33 100% 45%;
-    --muted-foreground: 37 92% 20%;
-    --accent: 0 0% 100%;
-    --accent-foreground: 33 100% 50%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 33 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 37 92% 10% / 0.1;
-    --input: 37 92% 10% / 0.1;
-    --ring: 37 92% 10%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 33 100% 50%;
     --radius: 1.5rem;
   }
 
   .dark {
-    --background: 33 100% 5%;
-    --foreground: 33 100% 95%;
-    --card: 33 100% 7%;
-    --card-foreground: 33 100% 95%;
-    --popover: 33 100% 5%;
-    --popover-foreground: 33 100% 95%;
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
     --primary: 33 100% 50%;
-    --primary-foreground: 33 100% 5%;
-    --secondary: 33 100% 15%;
-    --secondary-foreground: 33 100% 95%;
-    --muted: 33 100% 10%;
-    --muted-foreground: 33 100% 60%;
-    --accent: 33 100% 20%;
-    --accent-foreground: 33 100% 95%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 33 100% 95%;
-    --border: 33 100% 20%;
-    --input: 33 100% 20%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
     --ring: 33 100% 50%;
+  }
+
+  [data-theme='orange'] {
+    --background: 33 100% 50%;
+    --foreground: 37 92% 10%;
+    --primary: 37 92% 10%;
+    --primary-foreground: 33 100% 50%;
   }
 
   [data-theme='red'] {
@@ -54,10 +60,6 @@
     --foreground: 300 48% 84%;
     --primary: 300 48% 84%;
     --primary-foreground: 354 82% 26%;
-    --secondary: 354 82% 22%;
-    --accent: 300 48% 84% / 0.2;
-    --ring: 300 48% 84%;
-    --border: 300 48% 84% / 0.2;
   }
 
   [data-theme='green'] {
@@ -65,10 +67,6 @@
     --foreground: 107 50% 21%;
     --primary: 107 50% 21%;
     --primary-foreground: 67 83% 52%;
-    --secondary: 67 83% 45%;
-    --accent: 107 50% 21% / 0.2;
-    --ring: 107 50% 21%;
-    --border: 107 50% 21% / 0.2;
   }
 
   [data-theme='blue'] {
@@ -76,34 +74,6 @@
     --foreground: 0 0% 100%;
     --primary: 0 0% 100%;
     --primary-foreground: 221 83% 50%;
-    --secondary: 221 83% 45%;
-    --accent: 0 0% 100% / 0.2;
-    --ring: 0 0% 100%;
-    --border: 0 0% 100% / 0.2;
-  }
-
-  .presenter-ui {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
-    --primary: 33 100% 50%; 
-    --primary-foreground: 0 0% 100%;
-    --muted: 0 0% 97%;
-    --muted-foreground: 0 0% 40%;
-    --border: 0 0% 0% / 0.1;
-  }
-
-  .dark .presenter-ui {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 9%;
-    --card-foreground: 0 0% 95%;
-    --primary: 33 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 60%;
-    --border: 0 0% 100% / 0.1;
   }
 }
 
@@ -137,4 +107,11 @@
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
+}
+
+.studio-container {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
 }

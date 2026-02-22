@@ -85,7 +85,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background flex flex-col font-body selection:bg-primary selection:text-primary-foreground">
       <Header variant="minimal" />
       
-      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 py-32 space-y-10">
+      <main className="flex-1 studio-container px-6 py-32 space-y-10">
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 opacity-30" />

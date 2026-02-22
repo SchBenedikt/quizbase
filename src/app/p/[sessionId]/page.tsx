@@ -104,7 +104,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   };
 
   const getContrastColor = (hex: string) => {
-    if (!hex) return 'black';
+    if (!hex) return '#000000';
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
