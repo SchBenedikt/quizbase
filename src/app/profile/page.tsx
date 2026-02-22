@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,14 +5,15 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Eye, Moon, Sun, Monitor } from "lucide-react";
+import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Eye, Moon, Sun, Monitor, Palette } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { useUser, useAuth, useFirestore } from "@/firebase";
+import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -21,10 +21,23 @@ export default function ProfilePage() {
   const auth = useAuth();
   const db = useFirestore();
   const { toast } = useToast();
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
+  
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  // Custom Vibe State
+  const [defaultTheme, setDefaultTheme] = useState("orange");
+  const [defaultCustomColor, setDefaultCustomColor] = useState<string | null>(null);
+
+  const userRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return doc(db, "users", user.uid);
+  }, [user, db]);
+
+  const { data: userDoc } = useDoc(userRef);
 
   useEffect(() => {
     setMounted(true);
@@ -34,7 +47,11 @@ export default function ProfilePage() {
     if (user) {
       setName(user.displayName || "");
     }
-  }, [user, isUserLoading, router]);
+    if (userDoc) {
+      setDefaultTheme(userDoc.defaultTheme || "orange");
+      setDefaultCustomColor(userDoc.defaultCustomColor || null);
+    }
+  }, [user, isUserLoading, router, userDoc]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +60,15 @@ export default function ProfilePage() {
     try {
       await updateProfile(auth.currentUser, { displayName: name });
       const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, { name });
+      await updateDoc(userRef, { 
+        name,
+        defaultTheme,
+        defaultCustomColor
+      });
 
       toast({ 
         title: "Identity Synced", 
-        description: "Your profile has been updated across all surveys." 
+        description: "Your profile and preferences have been updated." 
       });
     } catch (e: any) {
       toast({ 
@@ -66,7 +87,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-background presenter-ui font-body flex flex-col">
       <Header variant="minimal" />
       
-      <main className="flex-1 max-w-[1400px] mx-auto w-full px-6 py-32 space-y-12 pb-40">
+      <main className="flex-1 studio-container py-32 space-y-12 pb-40">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Button 
@@ -156,7 +177,7 @@ export default function ProfilePage() {
           <TabsContent value="preferences" className="mt-0">
              <Card className="border-2 rounded-[1.5rem] p-10 bg-card space-y-12 shadow-none">
                 <div className="space-y-6">
-                   <h3 className="text-xl font-black uppercase tracking-tight">Theme Protocol</h3>
+                   <h3 className="text-xl font-black uppercase tracking-tight">System Theme</h3>
                    <div className="grid grid-cols-3 gap-4">
                       <Button 
                         variant={mounted && theme === 'light' ? 'default' : 'outline'}
@@ -184,17 +205,70 @@ export default function ProfilePage() {
 
                 <div className="h-px bg-foreground/10 w-full" />
 
-                <div className="flex items-center justify-between">
-                   <div className="space-y-1">
-                      <h4 className="text-xl font-black uppercase tracking-tight">Default Vibe</h4>
-                      <p className="text-sm font-bold opacity-40 uppercase">Default theme for your next survey.</p>
+                <div className="space-y-8">
+                   <div className="space-y-2">
+                      <h4 className="text-xl font-black uppercase tracking-tight">Default Presentation Vibe</h4>
+                      <p className="text-sm font-bold opacity-40 uppercase">Initial style for all new surveys.</p>
                    </div>
-                   <div className="flex gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#ff9312] border-2 border-foreground" />
-                      <div className="w-8 h-8 rounded-full bg-[#14ae5c] opacity-20 border-2 border-transparent" />
-                      <div className="w-8 h-8 rounded-full bg-[#f24822] opacity-20 border-2 border-transparent" />
-                      <div className="w-8 h-8 rounded-full bg-[#0d99ff] opacity-20 border-2 border-transparent" />
+                   
+                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                      {[
+                        { id: 'orange', color: '#ff9312', label: 'Orange' },
+                        { id: 'red', color: '#780c16', label: 'Deep Red' },
+                        { id: 'green', color: '#d2e822', label: 'Acid Green' },
+                        { id: 'blue', color: '#0d99ff', label: 'Pulse Blue' },
+                        { id: 'minimal-light', color: '#f4f4f5', label: 'Studio Light' },
+                        { id: 'minimal-dark', color: '#18181b', label: 'Studio Dark' }
+                      ].map((preset) => (
+                        <button
+                          key={preset.id}
+                          onClick={() => setDefaultTheme(preset.id)}
+                          className={cn(
+                            "group flex flex-col items-center gap-3 p-4 rounded-[1.5rem] border-2 transition-all",
+                            defaultTheme === preset.id ? "border-primary bg-primary/5" : "border-foreground/10 hover:border-foreground/30"
+                          )}
+                        >
+                          <div 
+                            className="w-10 h-10 rounded-full border-2" 
+                            style={{ backgroundColor: preset.color, borderColor: defaultTheme === preset.id ? 'transparent' : 'rgba(0,0,0,0.1)' }}
+                          />
+                          <span className="text-[10px] font-black uppercase tracking-widest">{preset.label}</span>
+                        </button>
+                      ))}
                    </div>
+
+                   <div className="pt-4 space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Palette className="h-4 w-4 opacity-40" />
+                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Custom Color Touch-up</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <Input 
+                          type="color" 
+                          value={defaultCustomColor || "#ff9312"}
+                          className="h-16 w-32 rounded-[1rem] border-2 p-1 cursor-pointer shadow-none"
+                          onChange={(e) => {
+                            setDefaultTheme('custom');
+                            setDefaultCustomColor(e.target.value);
+                          }}
+                        />
+                        <Button 
+                          variant="ghost" 
+                          onClick={() => setDefaultCustomColor(null)}
+                          className="text-[10px] font-black uppercase tracking-widest h-16 px-6 rounded-[1.5rem] hover:bg-muted"
+                        >
+                          Reset to Preset
+                        </Button>
+                      </div>
+                   </div>
+
+                   <Button 
+                    onClick={handleUpdate}
+                    disabled={loading}
+                    className="w-full h-16 font-black uppercase tracking-widest text-sm rounded-[1.5rem] bg-foreground text-background border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all mt-8"
+                  >
+                    {loading ? "Syncing..." : "Save Preferences"}
+                  </Button>
                 </div>
              </Card>
           </TabsContent>
