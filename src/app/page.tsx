@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -5,10 +6,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, Users2, ListOrdered, Hash, BrainCircuit, Palette } from "lucide-react";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, Users2, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Header } from "@/components/layout/Header";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const [joinCode, setJoinCode] = useState("");
@@ -38,11 +40,11 @@ export default function Home() {
               </h1>
             </header>
             <p className="text-xl md:text-2xl font-bold max-w-xl leading-tight uppercase tracking-tight">
-              Transform any room into an interactive experience. No apps, no stress. Pure energy.
+              Transform any room into an interactive experience. No apps, no registration. Just pure energy.
             </p>
             
             <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6">
-              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-6 min-h-[6.5rem] flex items-center border-2 border-[#4c2f05]/20 focus-within:border-[#4c2f05] transition-all relative">
+              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-6 min-h-[7rem] flex items-center border-4 border-[#4c2f05] focus-within:bg-white/30 transition-all relative">
                 <Input 
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
@@ -52,17 +54,17 @@ export default function Home() {
                   aria-label="Enter 6-digit session code"
                 />
               </div>
-              <Button type="submit" disabled={joinCode.length < 6} className="h-[6.5rem] px-12 rounded-[1.5rem] text-xl font-black bg-[#4c2f05] text-[#ff9312] border-2 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
+              <Button type="submit" disabled={joinCode.length < 6} className="h-[7rem] px-12 rounded-[1.5rem] text-xl font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
                 JOIN NOW <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
               </Button>
             </form>
           </div>
 
           <div className="relative group hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000">
-            <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-[#4c2f05] transform rotate-2 transition-all group-hover:rotate-0 duration-1000 shadow-[20px_20px_0px_0px_#4c2f05]">
+            <div className="relative rounded-[2rem] overflow-hidden border-4 border-[#4c2f05] transform rotate-2 transition-all group-hover:rotate-0 duration-1000 shadow-[30px_30px_0px_0px_#4c2f05]">
               <Image 
                 src={heroImage?.imageUrl || "https://picsum.photos/seed/poppulse1/800/1000"} 
-                alt="Audience participating in a live survey using smartphones"
+                alt="Audience participating in a live survey"
                 width={800}
                 height={1000}
                 className="object-cover aspect-[4/5] contrast-125 transition-all group-hover:scale-105 duration-1000"
@@ -70,22 +72,82 @@ export default function Home() {
                 data-ai-hint="presentation interactive"
               />
               <div className="absolute inset-0 bg-[#4c2f05]/10 mix-blend-multiply" />
-              <div className="absolute top-10 right-10 bg-[#ff9312] border-2 border-[#4c2f05] p-6 rounded-[1.5rem] animate-bounce">
+              <div className="absolute top-10 right-10 bg-[#ff9312] border-4 border-[#4c2f05] p-6 rounded-[1.5rem] animate-bounce">
                 <Zap className="h-10 w-10 fill-[#4c2f05] text-[#4c2f05]" />
               </div>
             </div>
           </div>
         </section>
 
+        {/* HOW IT WORKS / DEMO PREVIEW */}
+        <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-hidden">
+          <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
+            <div className="relative">
+              {/* Mockup Presentation View */}
+              <div className="bg-white rounded-[2rem] border-4 border-[#ff9312] p-8 shadow-[20px_20px_0px_0px_rgba(255,147,18,0.3)] rotate-[-2deg] z-10 relative">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-4 h-4 rounded-full bg-red-500" />
+                  <div className="w-4 h-4 rounded-full bg-yellow-500" />
+                  <div className="w-4 h-4 rounded-full bg-green-500" />
+                </div>
+                <h4 className="text-3xl font-black uppercase tracking-tighter text-[#4c2f05] mb-6">Live Pulse Results</h4>
+                <div className="space-y-4">
+                  <div className="h-12 bg-[#ff9312] rounded-[1rem] w-[85%] border-2 border-[#4c2f05]" />
+                  <div className="h-12 bg-[#ff9312]/30 rounded-[1rem] w-[45%] border-2 border-[#4c2f05]/20" />
+                  <div className="h-12 bg-[#ff9312]/50 rounded-[1rem] w-[65%] border-2 border-[#4c2f05]/20" />
+                </div>
+              </div>
+              
+              {/* Mockup Mobile View */}
+              <div className="absolute -bottom-20 -right-10 w-64 bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-6 shadow-[15px_15px_0px_0px_#ff9312] rotate-[5deg] z-20">
+                <div className="w-16 h-1 bg-[#4c2f05]/10 rounded-full mx-auto mb-10" />
+                <div className="space-y-4">
+                  <div className="h-12 bg-[#4c2f05] rounded-[1rem] flex items-center justify-center">
+                    <span className="text-white font-black text-xs uppercase">Option A</span>
+                  </div>
+                  <div className="h-12 bg-[#4c2f05]/10 rounded-[1rem]" />
+                  <div className="h-12 bg-[#4c2f05]/10 rounded-[1rem]" />
+                </div>
+                <div className="mt-12 w-10 h-10 rounded-full border-2 border-[#4c2f05]/10 mx-auto" />
+              </div>
+            </div>
+
+            <div className="space-y-12">
+              <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
+                From Screen <br />
+                To Hand. <br />
+                <span className="opacity-30">Instantly.</span>
+              </h2>
+              <div className="grid gap-8">
+                {[
+                  { icon: Monitor, title: "Step 1: Create", desc: "Build your interaction in our minimalist editor." },
+                  { icon: Share2, title: "Step 2: Share", desc: "Display the 6-digit code on the big screen." },
+                  { icon: Smartphone, title: "Step 3: Pulse", desc: "Audience joins instantly on any mobile device." }
+                ].map((step, i) => (
+                  <div key={i} className="flex gap-6 items-start">
+                    <div className="w-12 h-12 rounded-[1rem] bg-[#ff9312] text-[#4c2f05] flex items-center justify-center shrink-0 border-2 border-[#ff9312]">
+                      <step.icon className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="text-xl font-black uppercase tracking-tighter">{step.title}</h4>
+                      <p className="font-bold opacity-60 uppercase text-xs tracking-widest">{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* FEATURES GRID */}
-        <section id="features" className="bg-[#4c2f05] text-[#ff9312] py-40">
+        <section id="features" className="py-40 bg-[#ff9312]">
           <div className="studio-container space-y-32">
             <div className="text-center space-y-6">
-              <h2 className="text-5xl md:text-[7rem] font-black leading-[0.8] uppercase tracking-tighter">
-                True <br />
-                Interaction.
+              <h2 className="text-5xl md:text-[8rem] font-black leading-[0.8] uppercase tracking-tighter">
+                Tools For <br />
+                Impact.
               </h2>
-              <p className="text-xs font-black uppercase tracking-widest opacity-40">Professional Engagement Toolkit</p>
+              <p className="text-xs font-black uppercase tracking-widest opacity-40">Zero barriers. High stakes interaction.</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -99,8 +161,8 @@ export default function Home() {
                 { icon: ListChecks, title: "Live Quizzes", desc: "Instant feedback with automated scoring." },
                 { icon: Palette, title: "Custom Vibes", desc: "Tailor the studio atmosphere to your brand." }
               ].map((tool, i) => (
-                <article key={i} className="bg-[#ff9312] text-[#4c2f05] p-10 rounded-[1.5rem] border-2 border-[#ff9312] space-y-6 transition-all hover:-translate-y-4 hover:bg-white duration-300">
-                  <div className="w-16 h-16 rounded-[1.5rem] bg-[#4c2f05] text-[#ff9312] flex items-center justify-center border-2 border-[#4c2f05]">
+                <article key={i} className="bg-[#4c2f05] text-[#ff9312] p-10 rounded-[2rem] border-4 border-[#4c2f05] space-y-6 transition-all hover:-translate-y-4 duration-300">
+                  <div className="w-16 h-16 rounded-[1.5rem] bg-[#ff9312] text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]">
                     <tool.icon className="h-8 w-8" aria-hidden="true" />
                   </div>
                   <h3 className="text-2xl font-black uppercase tracking-tighter">{tool.title}</h3>
@@ -111,35 +173,34 @@ export default function Home() {
           </div>
         </section>
 
-        {/* BRUTALIST PROMO */}
-        <section className="py-40 space-y-40">
-          <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
-            <div className="space-y-12">
+        {/* VIBE SHOWCASE */}
+        <section className="py-40 bg-[#f3f3f1] border-y-4 border-[#4c2f05]">
+          <div className="studio-container space-y-24">
+            <div className="max-w-3xl space-y-8">
               <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85]">
-                Zero Barriers. <br />
-                Instant Access. <br />
-                <span className="opacity-20 italic">No Apps.</span>
+                Match The <br />
+                Atmosphere.
               </h2>
-              <p className="text-xl font-bold uppercase opacity-70 leading-tight max-w-lg">
-                Participation should be easy. PopPulse* removes all registration requirements for your audience. One code, total sync across all devices.
+              <p className="text-xl font-bold uppercase opacity-70 leading-tight">
+                From high-octane stage energy to professional boardroom minimal, switch your studio vibe in a single click.
               </p>
-              <div className="flex gap-6 items-center p-8 bg-[#4c2f05]/5 rounded-[1.5rem] border-2 border-[#4c2f05]/10">
-                <Users2 className="h-10 w-10 text-[#4c2f05]" />
-                <div>
-                  <h4 className="text-xl font-black uppercase tracking-tighter text-[#4c2f05]">Frictionless Entry</h4>
-                  <p className="font-bold opacity-40 uppercase text-xs tracking-widest">Universal browser compatibility</p>
-                </div>
-              </div>
             </div>
-            <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-[#4c2f05] -rotate-1 group hidden lg:block shadow-[20px_20px_0px_0px_#4c2f05]">
-              <Image 
-                src="https://picsum.photos/seed/audience/800/800"
-                alt="Happy audience engaging with interactive presentation"
-                width={800}
-                height={800}
-                className="object-cover aspect-square contrast-110 group-hover:scale-105 transition-transform duration-1000"
-                data-ai-hint="audience happy"
-              />
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { name: "Orange", color: "bg-[#ff9312]", label: "High Energy" },
+                { name: "Red", color: "bg-[#780c16]", label: "Intense" },
+                { name: "Green", color: "bg-[#d2e822]", label: "Acid Funk" },
+                { name: "Blue", color: "bg-[#0d99ff]", label: "Deep Pulse" }
+              ].map((vibe, i) => (
+                <div key={i} className="space-y-4">
+                  <div className={cn("aspect-square rounded-[2rem] border-4 border-[#4c2f05] transition-transform hover:scale-105", vibe.color)} />
+                  <div className="px-2">
+                    <h4 className="font-black uppercase tracking-tighter">{vibe.name}</h4>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{vibe.label}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -152,20 +213,20 @@ export default function Home() {
               Launch?
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <Button size="lg" onClick={() => router.push('/login')} className="h-20 px-16 rounded-[1.5rem] text-xl font-black bg-[#ff9312] text-[#4c2f05] border-2 border-[#ff9312] hover:bg-transparent hover:text-[#ff9312] transition-all shadow-none">
+              <Button size="lg" onClick={() => router.push('/login')} className="h-24 px-16 rounded-[1.5rem] text-2xl font-black bg-[#ff9312] text-[#4c2f05] border-4 border-[#ff9312] hover:bg-transparent hover:text-[#ff9312] transition-all shadow-none">
                 START DASHBOARD
               </Button>
-              <Button variant="outline" size="lg" onClick={() => router.push('/join')} className="h-20 px-16 rounded-[1.5rem] text-xl font-black border-2 border-[#ff9312] text-[#ff9312] hover:bg-[#ff9312] hover:text-[#4c2f05] transition-all shadow-none">
+              <Button variant="outline" size="lg" onClick={() => router.push('/join')} className="h-24 px-16 rounded-[1.5rem] text-2xl font-black border-4 border-[#ff9312] text-[#ff9312] hover:bg-[#ff9312] hover:text-[#4c2f05] transition-all shadow-none">
                 JOIN SESSION
               </Button>
             </div>
-            <p className="text-sm font-black uppercase tracking-[0.4em] opacity-40 pt-12">Instant start. No credit card required.</p>
+            <p className="text-sm font-black uppercase tracking-[0.4em] opacity-40 pt-12">Instant start. Professional Grade. Always Sync.</p>
           </div>
         </section>
       </main>
 
       {/* FOOTER */}
-      <footer className="py-24 studio-container w-full flex flex-col md:flex-row items-center justify-between gap-12 font-black border-t-2 border-[#4c2f05]/10">
+      <footer className="py-24 studio-container w-full flex flex-col md:flex-row items-center justify-between gap-12 font-black border-t-4 border-[#4c2f05]/10">
         <div className="flex flex-col gap-4 text-center md:text-left">
           <span className="text-3xl tracking-tighter uppercase leading-none">PopPulse*</span>
           <p className="text-xs opacity-40 uppercase tracking-widest">&copy; {new Date().getFullYear()} Studio interaction</p>
