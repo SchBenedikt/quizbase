@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -67,7 +68,7 @@ export default function Home() {
                   </div>
                   <h3 className="text-3xl font-black uppercase leading-none tracking-tighter">What is our primary goal?</h3>
                   <div className="space-y-3">
-                    <div className="h-16 bg-[#ff9312] rounded-[1.25rem] border-2 border-[#4c2f05] flex items-center px-6">
+                    <div className="h-16 bg-[#ff9312] rounded-[1.25rem] border-2 border-[#4c2f05] flex items-center px-6 transition-transform hover:scale-[1.02] cursor-pointer">
                       <span className="font-black text-sm uppercase">Innovation</span>
                     </div>
                     <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
@@ -103,7 +104,7 @@ export default function Home() {
                 </div>
                 <h4 className="text-3xl font-black uppercase tracking-tighter text-[#4c2f05] mb-6">Live Pulse Results</h4>
                 <div className="space-y-4">
-                  <div className="h-12 bg-[#ff9312] rounded-[1rem] w-[85%] border-2 border-[#4c2f05]" />
+                  <div className="h-12 bg-[#ff9312] rounded-[1rem] w-[85%] border-2 border-[#4c2f05] transition-all duration-1000 animate-in slide-in-from-left-20" />
                   <div className="h-12 bg-[#ff9312]/30 rounded-[1rem] w-[45%] border-2 border-[#4c2f05]/20" />
                   <div className="h-12 bg-[#ff9312]/50 rounded-[1rem] w-[65%] border-2 border-[#4c2f05]/20" />
                 </div>
@@ -113,7 +114,7 @@ export default function Home() {
               <div className="absolute -bottom-20 -right-10 w-64 bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-6 shadow-[15px_15px_0px_0px_#ff9312] rotate-[5deg] z-20">
                 <div className="w-16 h-1 bg-[#4c2f05]/10 rounded-full mx-auto mb-10" />
                 <div className="space-y-4">
-                  <div className="h-12 bg-[#4c2f05] rounded-[1rem] flex items-center justify-center">
+                  <div className="h-12 bg-[#4c2f05] rounded-[1rem] flex items-center justify-center animate-pulse">
                     <span className="text-white font-black text-xs uppercase">Option A</span>
                   </div>
                   <div className="h-12 bg-[#4c2f05]/10 rounded-[1rem]" />
@@ -189,9 +190,9 @@ export default function Home() {
                    <div className="space-y-8">
                       <h4 className="text-3xl font-black text-white uppercase leading-none tracking-tight">How likely are you to recommend?</h4>
                       <div className="h-48 flex items-end gap-4 pt-10 px-6 bg-white/5 rounded-[1.5rem] border-2 border-dashed border-white/10">
-                         <div className="bg-[#ff9312] w-full h-[85%] rounded-t-[1rem]" />
-                         <div className="bg-[#ff9312]/30 w-full h-[45%] rounded-t-[1rem]" />
-                         <div className="bg-[#ff9312]/60 w-full h-[65%] rounded-t-[1rem]" />
+                         <div className="bg-[#ff9312] w-full h-[85%] rounded-t-[1rem] animate-in slide-in-from-bottom-20 duration-1000" />
+                         <div className="bg-[#ff9312]/30 w-full h-[45%] rounded-t-[1rem] animate-in slide-in-from-bottom-20 duration-700" />
+                         <div className="bg-[#ff9312]/60 w-full h-[65%] rounded-t-[1rem] animate-in slide-in-from-bottom-20 duration-500" />
                       </div>
                    </div>
                 </div>
@@ -338,7 +339,7 @@ export default function Home() {
                  <h4 className="text-xl font-black uppercase tracking-tight text-center">Correct Answer?</h4>
                  <div className="space-y-3">
                    {/* Option A - Correct & Selected */}
-                   <div className="h-14 bg-green-500 rounded-[1rem] border-2 border-[#4c2f05] flex items-center px-5 gap-3">
+                   <div className="h-14 bg-green-500 rounded-[1rem] border-2 border-[#4c2f05] flex items-center px-5 gap-3 transition-transform hover:scale-[1.02]">
                      <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border-2 border-[#4c2f05]">
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                      </div>
@@ -355,9 +356,9 @@ export default function Home() {
                  </div>
               </div>
 
-              {/* Smaller Feedback Card Overlay - Repositioned as OFFSET overlay */}
+              {/* Smaller Feedback Card Overlay */}
               <div className="absolute top-0 right-0 lg:-right-10 lg:top-10 w-64 rounded-[2rem] bg-green-500 border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-transform duration-700 z-10 flex flex-col items-center justify-center text-center space-y-4">
-                <div className="w-16 h-16 rounded-[1.25rem] bg-white flex items-center justify-center border-4 border-[#4c2f05]">
+                <div className="w-16 h-16 rounded-[1.25rem] bg-white flex items-center justify-center border-4 border-[#4c2f05] animate-bounce">
                   <CheckCircle2 className="h-8 w-8 text-green-500" />
                 </div>
                 <h3 className="text-3xl font-black text-white uppercase tracking-tighter">CORRECT!</h3>
@@ -381,8 +382,8 @@ export default function Home() {
                       <span className="text-8xl font-black text-[#4c2f05] tracking-tighter">84</span>
                    </div>
                    <div className="relative h-4 bg-[#4c2f05]/10 rounded-full border-2 border-[#4c2f05]">
-                      <div className="absolute left-0 top-0 h-full w-[84%] bg-[#ff9312] rounded-full" />
-                      <div className="absolute left-[84%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border-4 border-[#4c2f05]" />
+                      <div className="absolute left-0 top-0 h-full w-[84%] bg-[#ff9312] rounded-full transition-all duration-1000" />
+                      <div className="absolute left-[84%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border-4 border-[#4c2f05] shadow-lg" />
                    </div>
                    <div className="flex justify-between text-[10px] font-black uppercase text-[#4c2f05] opacity-40 tracking-widest">
                       <span>Low Intensity</span>
@@ -394,7 +395,7 @@ export default function Home() {
                 <div className="absolute -top-10 -left-10 w-64 bg-[#ff9312] rounded-[2rem] border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_white] rotate-[-6deg] z-20 text-[#4c2f05] space-y-4">
                    <Hash className="h-8 w-8 mb-2" />
                    <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Avg. Guess</p>
-                   <p className="text-6xl font-black tracking-tighter leading-none">42.5</p>
+                   <p className="text-6xl font-black tracking-tighter leading-none animate-pulse">42.5</p>
                 </div>
              </div>
 
@@ -408,11 +409,11 @@ export default function Home() {
                   Capture the spectrum of sentiment. From precision sliders to numeric estimation, PopPulse gets you the hard data behind the energy.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
-                   <div className="border-2 border-[#ff9312]/20 p-6 rounded-[1.5rem] space-y-2">
+                   <div className="border-2 border-[#ff9312]/20 p-6 rounded-[1.5rem] space-y-2 hover:border-[#ff9312] transition-colors">
                       <SlidersHorizontal className="h-6 w-6" />
                       <h4 className="font-black uppercase text-sm">Fine Control</h4>
                    </div>
-                   <div className="border-2 border-[#ff9312]/20 p-6 rounded-[1.5rem] space-y-2">
+                   <div className="border-2 border-[#ff9312]/20 p-6 rounded-[1.5rem] space-y-2 hover:border-[#ff9312] transition-colors">
                       <Hash className="h-6 w-6" />
                       <h4 className="font-black uppercase text-sm">Estimation</h4>
                    </div>
