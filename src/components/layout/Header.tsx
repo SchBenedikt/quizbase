@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -59,7 +60,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
           {/* Navigation */}
           <div className="flex items-center gap-4">
             {user && (
-              <div className="hidden sm:flex items-center gap-1 bg-foreground/5 p-1 rounded-[1.25rem] border-2 border-foreground/5">
+              <div className="flex items-center gap-1 bg-foreground/5 p-1 rounded-[1.25rem] border-2 border-foreground/5">
                 <Button 
                   variant="ghost" 
                   asChild 
@@ -84,6 +85,13 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                     <Settings className="h-3 w-3 mr-2" /> Settings
                   </Link>
                 </Button>
+                <Button 
+                  onClick={handleSignOut} 
+                  variant="ghost" 
+                  className="rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <LogOut className="h-3 w-3 mr-2" /> Logout
+                </Button>
               </div>
             )}
 
@@ -100,7 +108,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                 </Button>
               )}
 
-              {!user ? (
+              {!user && (
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" asChild className="rounded-[1.25rem] px-6 h-11 font-black uppercase text-xs tracking-widest hover:bg-foreground/5 shadow-none">
                     <Link href="/login">Login</Link>
@@ -109,20 +117,6 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                     <Link href="/login?signup=true">Sign Up</Link>
                   </Button>
                 </div>
-              ) : (
-                <Button 
-                  onClick={handleSignOut} 
-                  variant="ghost" 
-                  className={cn(
-                    "rounded-[1.25rem] h-11 px-6 font-black uppercase text-[10px] tracking-widest transition-all shadow-none",
-                    variant === 'brand' 
-                      ? "text-[#4c2f05] hover:bg-[#4c2f05]/10" 
-                      : "text-foreground hover:bg-foreground/10"
-                  )}
-                >
-                  <LogOut className="h-4 w-4 mr-2" /> 
-                  <span className="hidden sm:inline">Logout</span>
-                </Button>
               )}
             </div>
           </div>

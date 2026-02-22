@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -5,10 +6,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, BarChart3, MessageSquareText, Activity, Users, Heart, Star, CheckCircle2, Trophy } from "lucide-react";
-import Image from "next/image";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, Activity, Users, Star, CheckCircle2, Trophy, Ruler } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { cn } from "@/lib/utils";
 
 export default function Home() {
   const [joinCode, setJoinCode] = useState("");
@@ -152,59 +151,115 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AUDIENCE PULSE: WORD CLOUDS */}
+        {/* LIVE QUIZZES & GAMIFICATION */}
         <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-hidden">
           <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
-            <div className="order-2 lg:order-1 space-y-12">
+            <div className="space-y-12">
               <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
-                Live <br />
-                Sentiment. <br />
-                <span className="opacity-30 italic">Pure Pulse.</span>
+                High Stakes. <br />
+                Live Quiz. <br />
+                <span className="opacity-30">Pure Focus.</span>
               </h2>
               <p className="text-xl font-bold uppercase opacity-70 leading-tight max-w-lg">
-                Visualize the room's energy with real-time word clouds. As responses pour in, common themes grow, creating a living portrait of collective thought.
+                Turn learning into a competitive pulse. Instant feedback, automated scoring, and high-octane leaderboards that keep the room locked in.
               </p>
               <div className="flex gap-4">
-                <div className="bg-[#4c2f05] text-[#ff9312] p-8 rounded-[1.5rem] border-2 border-[#4c2f05] flex-1 group hover:-translate-y-2 transition-transform">
-                  <Cloud className="h-10 w-10 mb-4" />
-                  <h4 className="font-black uppercase tracking-tighter">Dynamic Clouds</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-60">Instant word growth</p>
+                <div className="bg-[#4c2f05] text-[#ff9312] p-8 rounded-[1.5rem] border-2 border-[#4c2f05] flex-1">
+                   <Trophy className="h-10 w-10 mb-4" />
+                   <h4 className="font-black uppercase tracking-tighter">Leaderboards</h4>
+                   <p className="text-[10px] font-bold uppercase opacity-60">Real-time ranking</p>
                 </div>
-                <div className="bg-[#ff9312] text-[#4c2f05] p-8 rounded-[1.5rem] border-2 border-[#4c2f05] flex-1 group hover:-translate-y-2 transition-transform">
-                  <Activity className="h-10 w-10 mb-4" />
-                  <h4 className="font-black uppercase tracking-tighter">Live Flow</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-60">High-octane updates</p>
+                <div className="bg-[#ff9312] text-[#4c2f05] p-8 rounded-[1.5rem] border-2 border-[#4c2f05] flex-1">
+                   <CheckCircle2 className="h-10 w-10 mb-4" />
+                   <h4 className="font-black uppercase tracking-tighter">Auto-Score</h4>
+                   <p className="text-[10px] font-bold uppercase opacity-60">Instant validation</p>
                 </div>
               </div>
             </div>
 
-            <div className="order-1 lg:order-2 relative group">
-              {/* Word Cloud Mockup */}
-              <div className="relative rounded-[2rem] overflow-hidden border-4 border-[#4c2f05] bg-white p-12 shadow-[20px_20px_0px_0px_#ff9312] rotate-[2deg] group-hover:rotate-0 transition-transform duration-700 z-10 flex flex-wrap items-center justify-center gap-6 min-h-[400px]">
-                <span className="text-6xl font-black uppercase tracking-tighter text-[#ff9312]">Innovation</span>
-                <span className="text-3xl font-black uppercase tracking-tighter opacity-20">Scale</span>
-                <span className="text-4xl font-black uppercase tracking-tighter opacity-40">Growth</span>
-                <span className="text-2xl font-black uppercase tracking-tighter opacity-10">Future</span>
-                <span className="text-5xl font-black uppercase tracking-tighter text-[#4c2f05]">Impact</span>
-                <span className="text-3xl font-black uppercase tracking-tighter opacity-30">Strategy</span>
-                <div className="absolute top-6 left-6 bg-[#4c2f05] text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  Live Sentiment
+            <div className="relative group">
+              {/* Correct Feedback Card */}
+              <div className="relative rounded-[2rem] bg-green-500 border-4 border-[#4c2f05] p-12 shadow-[20px_20px_0px_0px_#4c2f05] rotate-[-3deg] group-hover:rotate-0 transition-transform duration-700 z-10 flex flex-col items-center justify-center text-center space-y-6">
+                <div className="w-24 h-24 rounded-[1.5rem] bg-white flex items-center justify-center border-4 border-[#4c2f05]">
+                  <CheckCircle2 className="h-12 w-12 text-green-500" />
                 </div>
+                <h3 className="text-5xl font-black text-white uppercase tracking-tighter">CORRECT!</h3>
+                <p className="text-white/80 font-black uppercase text-xs tracking-widest">+100 PULSE POINTS</p>
               </div>
 
-              {/* Overlapping Phone Mockup */}
-              <div className="absolute -bottom-10 -left-10 w-56 bg-[#4c2f05] rounded-[2rem] border-4 border-white p-6 shadow-[15px_15px_0px_0px_rgba(76,47,5,0.1)] rotate-[-6deg] z-20 hidden sm:block">
-                <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-8" />
-                <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em] mb-4">Your Input</p>
-                <div className="h-12 bg-white/10 rounded-[1rem] border-2 border-white/20 mb-6 flex items-center px-4">
-                  <span className="text-white font-black text-xs">INNOVATION</span>
-                </div>
-                <div className="h-12 bg-[#ff9312] rounded-[1rem] flex items-center justify-center border-2 border-[#4c2f05]">
-                  <ArrowRight className="h-5 w-5 text-[#4c2f05]" />
+              {/* Leaderboard Card Overlap */}
+              <div className="absolute -bottom-10 -right-10 w-72 bg-white rounded-[2rem] border-4 border-[#4c2f05] p-6 shadow-[15px_15px_0px_0px_#ff9312] rotate-[5deg] z-20 space-y-4">
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Leaderboard Top 3</p>
+                <div className="space-y-2">
+                  <div className="h-12 bg-[#4c2f05] text-[#ff9312] rounded-[1rem] flex items-center justify-between px-4 font-black text-xs uppercase">
+                    <span>1. Studio_Master</span>
+                    <span>1450</span>
+                  </div>
+                  <div className="h-12 bg-[#4c2f05]/5 rounded-[1rem] flex items-center justify-between px-4 font-black text-xs uppercase opacity-40">
+                    <span>2. Pulse_Runner</span>
+                    <span>1220</span>
+                  </div>
+                  <div className="h-12 bg-[#4c2f05]/5 rounded-[1rem] flex items-center justify-between px-4 font-black text-xs uppercase opacity-40">
+                    <span>3. Energy_X</span>
+                    <span>1180</span>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* PRECISION & SCALE: SLIDERS & GUESSING */}
+        <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-hidden">
+          <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
+             <div className="order-2 lg:order-1 relative group">
+                {/* Precision Slider Mockup */}
+                <div className="relative rounded-[2rem] bg-white border-4 border-[#ff9312] p-12 shadow-[20px_20px_0px_0px_rgba(255,147,18,0.3)] rotate-[3deg] group-hover:rotate-0 transition-transform duration-700 z-10 space-y-10">
+                   <div className="flex justify-between items-center opacity-40">
+                      <Ruler className="h-5 w-5 text-[#4c2f05]" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#4c2f05]">Precision Scale</span>
+                   </div>
+                   <div className="text-center">
+                      <span className="text-8xl font-black text-[#4c2f05] tracking-tighter">84</span>
+                   </div>
+                   <div className="relative h-4 bg-[#4c2f05]/10 rounded-full border-2 border-[#4c2f05]">
+                      <div className="absolute left-0 top-0 h-full w-[84%] bg-[#ff9312] rounded-full" />
+                      <div className="absolute left-[84%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border-4 border-[#4c2f05]" />
+                   </div>
+                   <div className="flex justify-between text-[10px] font-black uppercase text-[#4c2f05] opacity-40 tracking-widest">
+                      <span>Low Intensity</span>
+                      <span>High Impact</span>
+                   </div>
+                </div>
+
+                {/* Guess Number Overlap */}
+                <div className="absolute -top-10 -left-10 w-64 bg-[#ff9312] rounded-[2rem] border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_white] rotate-[-6deg] z-20 text-[#4c2f05] space-y-4">
+                   <Hash className="h-8 w-8 mb-2" />
+                   <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Avg. Guess</p>
+                   <p className="text-6xl font-black tracking-tighter leading-none">42.5</p>
+                </div>
+             </div>
+
+             <div className="order-1 lg:order-2 space-y-12">
+                <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
+                  Precision. <br />
+                  Nuance. <br />
+                  <span className="opacity-30">Scale.</span>
+                </h2>
+                <p className="text-xl font-bold uppercase opacity-70 leading-tight max-w-lg">
+                  Capture the spectrum of sentiment. From precision sliders to numeric estimation, PopPulse gets you the hard data behind the energy.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                   <div className="border-2 border-[#ff9312]/20 p-6 rounded-[1.5rem] space-y-2">
+                      <SlidersHorizontal className="h-6 w-6" />
+                      <h4 className="font-black uppercase text-sm">Fine Control</h4>
+                   </div>
+                   <div className="border-2 border-[#ff9312]/20 p-6 rounded-[1.5rem] space-y-2">
+                      <Hash className="h-6 w-6" />
+                      <h4 className="font-black uppercase text-sm">Estimation</h4>
+                   </div>
+                </div>
+             </div>
           </div>
         </section>
 
