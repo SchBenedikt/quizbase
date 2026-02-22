@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -7,14 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, BarChart3, MessageSquareText, Activity, Users, Heart, Star, CheckCircle2, Trophy } from "lucide-react";
 import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Header } from "@/components/layout/Header";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
   const [joinCode, setJoinCode] = useState("");
   const router = useRouter();
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-poll');
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +42,7 @@ export default function Home() {
             </p>
             
             <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-2xl">
-              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 h-24 flex items-center border-4 border-[#4c2f05] focus-within:bg-white/30 transition-all relative overflow-hidden">
+              <div className="flex-grow bg-[#4c2f05]/10 rounded-[1.5rem] px-8 h-24 flex items-center border-4 border-[#4c2f05] focus-within:bg-[#4c2f05]/20 transition-all relative overflow-hidden">
                 <Input 
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
@@ -59,20 +58,34 @@ export default function Home() {
             </form>
           </div>
 
-          <div className="relative group hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000">
-            <div className="relative rounded-[2rem] overflow-hidden border-4 border-[#4c2f05] transform rotate-2 transition-all group-hover:rotate-0 duration-1000 shadow-[30px_30px_0px_0px_#4c2f05]">
-              <Image 
-                src={heroImage?.imageUrl || "https://picsum.photos/seed/poppulse1/800/1000"} 
-                alt="Audience participating in a live survey"
-                width={800}
-                height={1000}
-                className="object-cover aspect-[4/5] contrast-125 transition-all group-hover:scale-105 duration-1000"
-                priority
-                data-ai-hint="presentation interactive"
-              />
-              <div className="absolute inset-0 bg-[#4c2f05]/10 mix-blend-multiply" />
-              <div className="absolute top-10 right-10 bg-[#ff9312] border-4 border-[#4c2f05] p-6 rounded-[1.5rem] animate-bounce">
-                <Zap className="h-10 w-10 fill-[#4c2f05] text-[#4c2f05]" />
+          {/* PORTRAIT HERO MOCKUP */}
+          <div className="relative group hidden lg:flex justify-end animate-in fade-in slide-in-from-right-10 duration-1000">
+            <div className="relative w-[400px] h-[600px] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-8 shadow-[30px_30px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
+              <div className="w-20 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10 shrink-0" />
+              <div className="flex-1 space-y-8 overflow-hidden">
+                <div className="flex items-center justify-between opacity-40">
+                  <Zap className="h-5 w-5" />
+                  <span className="font-black text-[10px] tracking-widest uppercase">Live Session</span>
+                </div>
+                <h3 className="text-3xl font-black uppercase leading-none tracking-tighter">What is our primary goal?</h3>
+                <div className="space-y-3">
+                  <div className="h-16 bg-[#ff9312] rounded-[1.25rem] border-2 border-[#4c2f05] flex items-center px-6">
+                    <span className="font-black text-sm uppercase">Innovation</span>
+                  </div>
+                  <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
+                    <span className="font-black text-sm uppercase opacity-40">Growth</span>
+                  </div>
+                  <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
+                    <span className="font-black text-sm uppercase opacity-40">Sustainability</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-8 pt-8 border-t-2 border-[#4c2f05]/5 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-widest opacity-40">42 Transmitting</span>
+                </div>
+                <Users className="h-4 w-4 opacity-40" />
               </div>
             </div>
           </div>
@@ -194,142 +207,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* QUIZ SCORE: GAMIFIED SYNC */}
-        <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-hidden">
-          <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
-            <div className="relative group">
-              {/* Leaderboard/Quiz Card */}
-              <div className="relative rounded-[2rem] overflow-hidden border-4 border-[#ff9312] bg-white p-10 shadow-[20px_20px_0px_0px_rgba(255,147,18,0.3)] rotate-[-3deg] group-hover:rotate-0 transition-transform duration-700 z-10">
-                <div className="flex items-center gap-3 mb-8">
-                  <Trophy className="h-8 w-8 text-[#4c2f05]" />
-                  <h4 className="text-3xl font-black uppercase tracking-tighter text-[#4c2f05]">Top Scores</h4>
-                </div>
-                <div className="space-y-4">
-                  {[
-                    { name: "Alpha", score: 2450, color: "#ff9312" },
-                    { name: "Beta", score: 1890, color: "rgba(255,147,18,0.3)" },
-                    { name: "Gamma", score: 1540, color: "rgba(255,147,18,0.1)" }
-                  ].map((p, i) => (
-                    <div key={i} className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-[0.75rem] border-2 border-[#4c2f05] flex items-center justify-center font-black text-[#4c2f05]">
-                        {i + 1}
-                      </div>
-                      <div className="flex-1 h-12 rounded-[1rem] border-2 border-[#4c2f05] overflow-hidden relative">
-                         <div className="absolute inset-0 transition-all duration-1000" style={{ backgroundColor: p.color, width: `${(p.score/2450)*100}%` }} />
-                         <div className="absolute inset-0 px-4 flex items-center justify-between z-10">
-                           <span className="font-black uppercase text-xs text-[#4c2f05]">{p.name}</span>
-                           <span className="font-black text-xs text-[#4c2f05]">{p.score}</span>
-                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Phone "Correct" View */}
-              <div className="absolute -top-12 -right-12 w-64 bg-green-500 rounded-[2.5rem] border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_#ff9312] rotate-[8deg] z-20 hidden md:block">
-                <div className="w-16 h-1 bg-white/20 rounded-full mx-auto mb-8" />
-                <div className="flex flex-col items-center gap-6 text-white">
-                  <div className="w-20 h-20 rounded-[1.5rem] bg-white/20 border-4 border-white flex items-center justify-center">
-                    <CheckCircle2 className="h-10 w-10" />
-                  </div>
-                  <div className="text-center">
-                    <h5 className="text-2xl font-black uppercase leading-none">Correct!</h5>
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mt-2">+500 Points</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-12">
-              <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
-                Live <br />
-                Quizzes. <br />
-                <span className="opacity-30">Pure Focus.</span>
-              </h2>
-              <p className="text-xl font-bold uppercase opacity-70 leading-tight">
-                Turn your presentation into a high-stakes arena. Instant scoring, automated leaderboards, and real-time feedback keep every pulse racing.
-              </p>
-              <div className="grid grid-cols-2 gap-8">
-                <div className="flex items-center gap-4">
-                   <div className="p-3 bg-[#ff9312] rounded-[1rem] border-2 border-[#ff9312]">
-                     <Star className="h-6 w-6 text-[#4c2f05]" />
-                   </div>
-                   <span className="font-black uppercase text-xs tracking-tighter">Auto-Scoring</span>
-                </div>
-                <div className="flex items-center gap-4">
-                   <div className="p-3 bg-[#ff9312] rounded-[1rem] border-2 border-[#ff9312]">
-                     <Users className="h-6 w-6 text-[#4c2f05]" />
-                   </div>
-                   <span className="font-black uppercase text-xs tracking-tighter">Live Ranking</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* AI DEMO: INTELLIGENT FLOW */}
-        <section className="py-40 bg-[#ff9312] text-[#4c2f05] border-t-4 border-[#4c2f05]">
-          <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
-            <div className="relative h-[500px] flex items-center justify-center">
-              {/* Main AI Card */}
-              <div className="w-full max-w-md bg-[#4c2f05] rounded-[2rem] border-4 border-white p-10 shadow-[20px_20px_0px_0px_rgba(76,47,5,0.2)] rotate-[-3deg] z-10 transition-transform group-hover:rotate-0 duration-700">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="p-3 bg-[#ff9312] rounded-[1rem] border-2 border-white">
-                    <Sparkles className="h-6 w-6 text-[#4c2f05]" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-black text-white uppercase tracking-tighter leading-none">Studio AI</h4>
-                    <p className="text-[10px] font-black text-[#ff9312] uppercase tracking-[0.4em] mt-1">Refinement Active</p>
-                  </div>
-                </div>
-                <div className="space-y-6">
-                  <div className="p-6 bg-white/5 rounded-[1.25rem] border-2 border-white/10 opacity-40">
-                    <p className="text-white font-black uppercase text-[10px] tracking-widest mb-2">Draft Question</p>
-                    <p className="text-white font-bold text-lg leading-tight">DO YOU LIKE THE NEW PLAN?</p>
-                  </div>
-                  <div className="p-6 bg-white rounded-[1.25rem] border-4 border-[#ff9312] transform translate-x-4 -translate-y-2">
-                    <p className="text-[#4c2f05] font-black uppercase text-[10px] tracking-widest mb-2">AI Optimization</p>
-                    <p className="text-[#4c2f05] font-black text-xl leading-tight">TO WHAT EXTENT DOES THE PROPOSED STRATEGY ALIGN WITH YOUR 2024 GOALS?</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Chat Bubble Accent */}
-              <div className="absolute -top-12 -left-12 w-24 h-24 bg-[#4c2f05] rounded-[2.5rem] flex items-center justify-center border-4 border-[#ff9312] animate-bounce hidden md:flex z-20">
-                <MessageSquareText className="h-10 w-10 text-[#ff9312]" />
-              </div>
-            </div>
-
-            <div className="space-y-12">
-              <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
-                Refine with <br />
-                Intelligence. <br />
-                <span className="opacity-30">GenAI Ready.</span>
-              </h2>
-              <p className="text-xl font-bold uppercase opacity-70 leading-tight">
-                Don't settle for boring questions. Use our integrated AI to craft questions that spark engagement, maintain neutrality, and extract meaningful data.
-              </p>
-              <div className="grid grid-cols-2 gap-8 pt-8">
-                <div className="space-y-3">
-                  <div className="w-12 h-12 rounded-[1rem] bg-[#ff9312] text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]">
-                    <Sparkles className="h-6 w-6" />
-                  </div>
-                  <h4 className="text-lg font-black uppercase tracking-tighter">Refinement</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider leading-tight">Perfect clarity and professional tone</p>
-                </div>
-                <div className="space-y-3">
-                  <div className="w-12 h-12 rounded-[1rem] bg-[#ff9312] text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]">
-                    <BrainCircuit className="h-6 w-6" />
-                  </div>
-                  <h4 className="text-lg font-black uppercase tracking-tighter">Analysis</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider leading-tight">Summarize 100s of responses instantly</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* FEATURES GRID */}
         <section id="features" className="py-40 bg-[#4c2f05] text-[#ff9312]">
           <div className="studio-container space-y-32">
@@ -399,3 +276,4 @@ export default function Home() {
     </div>
   );
 }
+
