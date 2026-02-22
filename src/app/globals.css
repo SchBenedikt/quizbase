@@ -117,3 +117,16 @@
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
+
+/* Custom Studio Brutalist Utilities */
+.studio-border {
+  border: 2px solid currentColor;
+}
+
+.studio-shadow {
+  box-shadow: 10px 10px 0px 0px currentColor;
+}
+
+.studio-shadow-hover:hover {
+  box-shadow: 15px 15px 0px 0px currentColor;
+}

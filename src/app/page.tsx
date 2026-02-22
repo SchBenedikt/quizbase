@@ -27,8 +27,9 @@ export default function Home() {
       <Header variant="brand" className="text-[#4c2f05]" />
 
       <main className="flex-grow pt-32">
+        {/* HERO SECTION */}
         <section className="studio-container pt-12 pb-32 grid lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-12">
+          <div className="space-y-12 animate-in fade-in slide-in-from-left-10 duration-1000">
             <header className="space-y-4">
               <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-black leading-[0.75] tracking-tighter uppercase">
                 Your <br />
@@ -41,7 +42,7 @@ export default function Home() {
             </p>
             
             <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6">
-              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-6 min-h-[6.5rem] flex items-center border-2 border-[#4c2f05]/20 focus-within:border-[#4c2f05] transition-all">
+              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-6 min-h-[6.5rem] flex items-center border-2 border-[#4c2f05]/20 focus-within:border-[#4c2f05] transition-all relative">
                 <Input 
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
@@ -57,8 +58,8 @@ export default function Home() {
             </form>
           </div>
 
-          <div className="relative group hidden lg:block">
-            <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-[#4c2f05] transform rotate-2 transition-all group-hover:rotate-0 duration-1000">
+          <div className="relative group hidden lg:block animate-in fade-in slide-in-from-right-10 duration-1000">
+            <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-[#4c2f05] transform rotate-2 transition-all group-hover:rotate-0 duration-1000 shadow-[20px_20px_0px_0px_#4c2f05]">
               <Image 
                 src={heroImage?.imageUrl || "https://picsum.photos/seed/poppulse1/800/1000"} 
                 alt="Audience participating in a live survey using smartphones"
@@ -69,13 +70,14 @@ export default function Home() {
                 data-ai-hint="presentation interactive"
               />
               <div className="absolute inset-0 bg-[#4c2f05]/10 mix-blend-multiply" />
-              <div className="absolute top-10 right-10 bg-[#ff9312] border-2 border-[#4c2f05] p-6 rounded-[1.5rem]">
+              <div className="absolute top-10 right-10 bg-[#ff9312] border-2 border-[#4c2f05] p-6 rounded-[1.5rem] animate-bounce">
                 <Zap className="h-10 w-10 fill-[#4c2f05] text-[#4c2f05]" />
               </div>
             </div>
           </div>
         </section>
 
+        {/* FEATURES GRID */}
         <section id="features" className="bg-[#4c2f05] text-[#ff9312] py-40">
           <div className="studio-container space-y-32">
             <div className="text-center space-y-6">
@@ -97,7 +99,7 @@ export default function Home() {
                 { icon: ListChecks, title: "Live Quizzes", desc: "Instant feedback with automated scoring." },
                 { icon: Palette, title: "Custom Vibes", desc: "Tailor the studio atmosphere to your brand." }
               ].map((tool, i) => (
-                <article key={i} className="bg-[#ff9312] text-[#4c2f05] p-10 rounded-[1.5rem] border-2 border-[#ff9312] space-y-6 transition-all hover:-translate-y-2">
+                <article key={i} className="bg-[#ff9312] text-[#4c2f05] p-10 rounded-[1.5rem] border-2 border-[#ff9312] space-y-6 transition-all hover:-translate-y-4 hover:bg-white duration-300">
                   <div className="w-16 h-16 rounded-[1.5rem] bg-[#4c2f05] text-[#ff9312] flex items-center justify-center border-2 border-[#4c2f05]">
                     <tool.icon className="h-8 w-8" aria-hidden="true" />
                   </div>
@@ -109,6 +111,7 @@ export default function Home() {
           </div>
         </section>
 
+        {/* BRUTALIST PROMO */}
         <section className="py-40 space-y-40">
           <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
             <div className="space-y-12">
@@ -128,7 +131,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-[#4c2f05] -rotate-1 group hidden lg:block">
+            <div className="relative rounded-[1.5rem] overflow-hidden border-2 border-[#4c2f05] -rotate-1 group hidden lg:block shadow-[20px_20px_0px_0px_#4c2f05]">
               <Image 
                 src="https://picsum.photos/seed/audience/800/800"
                 alt="Happy audience engaging with interactive presentation"
@@ -141,6 +144,7 @@ export default function Home() {
           </div>
         </section>
 
+        {/* FINAL CTA */}
         <section className="py-60 text-center bg-[#4c2f05] text-[#ff9312]">
           <div className="studio-container space-y-16">
             <h2 className="text-7xl md:text-[10rem] font-black uppercase tracking-tighter leading-[0.75]">
@@ -160,15 +164,16 @@ export default function Home() {
         </section>
       </main>
 
+      {/* FOOTER */}
       <footer className="py-24 studio-container w-full flex flex-col md:flex-row items-center justify-between gap-12 font-black border-t-2 border-[#4c2f05]/10">
         <div className="flex flex-col gap-4 text-center md:text-left">
           <span className="text-3xl tracking-tighter uppercase leading-none">PopPulse*</span>
           <p className="text-xs opacity-40 uppercase tracking-widest">&copy; {new Date().getFullYear()} Studio interaction</p>
         </div>
         <div className="flex gap-12 text-xs uppercase tracking-widest opacity-40">
-          <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
-          <Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link>
-          <Link href="#" className="hover:text-primary transition-colors">Status</Link>
+          <Link href="#" className="hover:text-[#4c2f05] transition-colors">Privacy Policy</Link>
+          <Link href="#" className="hover:text-[#4c2f05] transition-colors">Terms of Service</Link>
+          <Link href="#" className="hover:text-[#4c2f05] transition-colors">Status</Link>
         </div>
       </footer>
     </div>
