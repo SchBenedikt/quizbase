@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, use, useRef } from "react";
@@ -140,9 +141,10 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   const getContrastColor = (hex: string) => {
     if (!hex) return '#000000';
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+    const cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
+    const r = parseInt(cleanHex.slice(0, 2), 16);
+    const g = parseInt(cleanHex.slice(2, 4), 16);
+    const b = parseInt(cleanHex.slice(4, 6), 16);
     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? '#000000' : '#ffffff';
   };
@@ -155,25 +157,32 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     );
   }
 
+  // Resolve final colors
+  let finalBg = '#ffffff';
+  if (currentTheme === 'orange') finalBg = '#ff9312';
+  else if (currentTheme === 'red') finalBg = '#780c16';
+  else if (currentTheme === 'green') finalBg = '#d2e822';
+  else if (currentTheme === 'blue') finalBg = '#0d99ff';
+  else if (currentTheme === 'custom' && customColor) finalBg = customColor;
+
+  const finalFg = getContrastColor(finalBg);
+  const dynamicStyles = {
+    backgroundColor: finalBg,
+    color: finalFg,
+    borderColor: finalFg + '33'
+  };
+
   const currentIdx = questions.findIndex(q => q.id === session?.currentQuestionId);
   const q = questions[currentIdx] || questions[0];
   if (!q) return null;
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
 
-  const dynamicForeground = customColor ? getContrastColor(customColor) : 'currentColor';
-  const dynamicStyles = customColor ? {
-    backgroundColor: customColor,
-    color: dynamicForeground,
-    borderColor: dynamicForeground + '33'
-  } : {};
-
   return (
     <div 
-      className="no-scroll h-screen w-screen flex flex-col font-body bg-background transition-colors duration-700" 
-      data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
+      className="no-scroll h-screen w-screen flex flex-col font-body transition-colors duration-700" 
       style={dynamicStyles}
     >
-      <header className="h-[12vh] px-16 flex items-center justify-between border-b-2 shrink-0 z-20 bg-black/5" style={{ borderColor: 'inherit' }}>
+      <header className="h-[12vh] px-16 flex items-center justify-between border-b-2 shrink-0 z-20 bg-black/5" style={{ borderColor: finalFg + '33' }}>
         <div className="flex items-center gap-8">
           <Zap className="h-10 w-10 fill-current" />
           <h1 className="text-4xl font-black tracking-tighter truncate max-w-2xl uppercase">{title}</h1>
@@ -181,7 +190,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         
         <div className="flex items-center gap-12">
           {timeLeft !== null && (
-            <div className="flex items-center gap-4 px-8 py-4 rounded-[1.5rem] border-2 animate-pulse bg-current" style={{ color: 'var(--background)' }}>
+            <div className="flex items-center gap-4 px-8 py-4 rounded-[1.5rem] border-2 animate-pulse" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
               <Timer className="h-8 w-8" />
               <span className="text-5xl font-black tabular-nums">{timeLeft}</span>
             </div>
@@ -190,7 +199,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             <p className="text-[10px] font-black uppercase tracking-widest opacity-50">JOIN CODE</p>
             <p className="text-6xl font-black tracking-tighter leading-none mt-1">{code}</p>
           </div>
-          <div className="flex items-center gap-6 bg-black/5 px-8 py-4 rounded-[1.5rem] border-2 border-current/10">
+          <div className="flex items-center gap-6 bg-black/5 px-8 py-4 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '10' }}>
             <Users className="h-8 w-8" />
             <span className="text-5xl font-black leading-none">{currentResponses.length}</span>
           </div>
@@ -200,7 +209,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-16 flex flex-col items-center justify-center relative">
         <div className="w-full max-w-[1400px] h-full flex flex-col gap-12">
           <div className="text-center shrink-0 space-y-4">
-             <div className="inline-block px-6 py-2 bg-current rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--background)' }}>
+             <div className="inline-block px-6 py-2 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest" style={{ backgroundColor: finalFg, color: finalBg }}>
                QUESTION {currentIdx + 1} / {questions.length}
              </div>
              <h2 className="text-6xl md:text-8xl lg:text-[7rem] font-black leading-[0.8] tracking-tighter max-w-7xl mx-auto uppercase">
@@ -209,7 +218,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           </div>
 
           <div className="flex-1 min-h-0 w-full relative">
-            <Card className="h-full border-2 rounded-[1.5rem] bg-black/5 p-16 flex items-center justify-center overflow-hidden border-current/10">
+            <Card className="h-full border-2 rounded-[1.5rem] bg-black/5 p-16 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '10', backgroundColor: 'rgba(0,0,0,0.05)' }}>
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
             
@@ -217,8 +226,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <Button 
                 onClick={handleSummarize}
                 disabled={isSummarizing}
-                className="absolute top-8 right-8 h-14 px-8 rounded-[1rem] bg-current font-black uppercase text-xs border-2 border-current hover:bg-transparent hover:text-current transition-all gap-3"
-                style={{ color: 'var(--background)' }}
+                className="absolute top-8 right-8 h-14 px-8 rounded-[1rem] font-black uppercase text-xs border-2 transition-all gap-3"
+                style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
               >
                 {isSummarizing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
                 AI ANALYZE
@@ -228,14 +237,15 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
       </main>
 
-      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-16 border-t-2 bg-black/5" style={{ borderColor: 'inherit' }}>
+      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-16 border-t-2 bg-black/5" style={{ borderColor: finalFg + '33' }}>
         <div className="flex items-center gap-4">
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all hover:bg-current hover:text-background"
+            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all hover:opacity-80"
+            style={{ borderColor: finalFg + '33', color: finalFg }}
           >
             <ChevronLeft className="h-7 w-7" />
           </Button>
@@ -244,16 +254,17 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             size="icon" 
             onClick={handleNext}
             disabled={currentIdx === questions.length - 1}
-            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all hover:bg-current hover:text-background"
+            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all hover:opacity-80"
+            style={{ borderColor: finalFg + '33', color: finalFg }}
           >
             <ChevronRight className="h-7 w-7" />
           </Button>
         </div>
         
-        <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2 border-current/10">
+        <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '10' }}>
            <Popover>
              <PopoverTrigger asChild>
-                <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all">
+                <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
                   <Palette className="h-5 w-5 mr-3" /> Vibe
                 </Button>
              </PopoverTrigger>
@@ -278,7 +289,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
            
            <Popover>
              <PopoverTrigger asChild>
-               <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all">
+               <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
                  <Settings2 className="h-5 w-5 mr-3" /> Sync
                </Button>
              </PopoverTrigger>
@@ -296,7 +307,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
              </PopoverContent>
            </Popover>
 
-           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all">
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
              <Monitor className="h-5 w-5 mr-3" /> Live
            </Button>
         </div>

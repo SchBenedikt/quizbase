@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, use, useEffect, useRef } from "react";
@@ -105,9 +106,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   const getContrastColor = (hex: string) => {
     if (!hex) return '#000000';
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
+    const cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
+    const r = parseInt(cleanHex.slice(0, 2), 16);
+    const g = parseInt(cleanHex.slice(2, 4), 16);
+    const b = parseInt(cleanHex.slice(4, 6), 16);
     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
     return (yiq >= 128) ? '#000000' : '#ffffff';
   };
@@ -133,12 +135,21 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const currentTheme = session.theme || 'orange';
   const customColor = session.customColor;
   const showResults = session.showResultsToParticipants;
-  const dynamicForeground = customColor ? getContrastColor(customColor) : 'currentColor';
-  const dynamicStyles = customColor ? {
-    backgroundColor: customColor,
-    color: dynamicForeground,
-    borderColor: dynamicForeground + '33'
-  } : {};
+
+  // Resolve final colors
+  let finalBg = '#ffffff';
+  if (currentTheme === 'orange') finalBg = '#ff9312';
+  else if (currentTheme === 'red') finalBg = '#780c16';
+  else if (currentTheme === 'green') finalBg = '#d2e822';
+  else if (currentTheme === 'blue') finalBg = '#0d99ff';
+  else if (currentTheme === 'custom' && customColor) finalBg = customColor;
+
+  const finalFg = getContrastColor(finalBg);
+  const dynamicStyles = {
+    backgroundColor: finalBg,
+    color: finalFg,
+    borderColor: finalFg + '33'
+  };
 
   if (voted || (timeLeft === 0 && currentQuestion?.timeLimit)) {
     const qResults: Record<string, number> = {};
@@ -153,8 +164,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
     return (
       <div 
-        className="min-h-screen flex flex-col p-8 bg-background transition-colors duration-700" 
-        data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
+        className="min-h-screen flex flex-col p-8 transition-colors duration-700" 
         style={dynamicStyles}
       >
         <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center text-center space-y-12">
@@ -177,7 +187,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
               )}
             </div>
           ) : (
-            <div className="p-14 rounded-[1.5rem] animate-float bg-current" style={{ color: 'var(--background)' }}>
+            <div className="p-14 rounded-[1.5rem] animate-float" style={{ backgroundColor: finalFg, color: finalBg }}>
               <Heart className="h-20 w-20 fill-current" />
             </div>
           )}
@@ -192,7 +202,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           {showResults && currentQuestion && (
             <div className="w-full mt-12 animate-in fade-in slide-in-from-bottom-10 duration-1000">
                <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-6 opacity-40">Live Audience Pulse</p>
-               <div className="h-64 border-2 border-current/10 rounded-[1.5rem] p-6 bg-black/5">
+               <div className="h-64 border-2 rounded-[1.5rem] p-6 bg-black/5" style={{ borderColor: finalFg + '33' }}>
                  <ResultChart question={currentQuestion} results={qResults} allResponses={currentResponses} />
                </div>
             </div>
@@ -205,8 +215,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (!currentQuestion) {
     return (
       <div 
-        className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background" 
-        data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
+        className="min-h-screen flex flex-col items-center justify-center p-8 text-center" 
         style={dynamicStyles}
       >
         <p className="text-3xl font-black uppercase opacity-30 tracking-widest">Waiting for Presenter...</p>
@@ -216,8 +225,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   return (
     <div 
-      className="min-h-screen flex flex-col p-8 font-body bg-background transition-colors duration-700" 
-      data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
+      className="min-h-screen flex flex-col p-8 font-body transition-colors duration-700" 
       style={dynamicStyles}
     >
       <div className="max-w-lg mx-auto w-full flex-1 flex flex-col">
@@ -227,7 +235,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             <span className="font-black text-2xl tracking-tighter uppercase">PopPulse*</span>
           </div>
           {timeLeft !== null && (
-            <div className="flex items-center gap-3 px-6 py-2 rounded-[1rem] border-2 bg-current" style={{ color: 'var(--background)' }}>
+            <div className="flex items-center gap-3 px-6 py-2 rounded-[1rem] border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
               <Timer className="h-4 w-4" />
               <span className="text-xl font-black tabular-nums">{timeLeft}</span>
             </div>
@@ -244,20 +252,23 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
               {currentQuestion.options.map((opt, idx) => (
                 <Button
                   key={idx}
-                  variant={selection === idx ? "default" : "outline"}
+                  variant="outline"
                   className={cn(
                     "h-24 text-xl font-black rounded-[1.5rem] border-2 transition-all active:scale-95 text-left justify-start px-8",
                     selection === idx 
-                      ? "bg-current border-current" 
+                      ? "border-current" 
                       : "border-current/20 bg-black/5 hover:bg-black/10"
                   )}
-                  style={selection === idx ? { color: 'var(--background)' } : {}}
+                  style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
                   onClick={() => setSelection(idx)}
                 >
                   <div className={cn(
                     "w-12 h-12 rounded-[1rem] flex items-center justify-center mr-6 shrink-0 transition-colors border-2 text-lg font-black",
-                    selection === idx ? "bg-background text-foreground border-background" : "bg-current text-background border-current"
-                  )} style={selection === idx ? { backgroundColor: 'var(--background)', color: 'var(--foreground)' } : { color: 'var(--background)' }}>
+                  )} style={{ 
+                    backgroundColor: selection === idx ? finalBg : finalFg, 
+                    color: selection === idx ? finalFg : finalBg,
+                    borderColor: selection === idx ? finalBg : finalFg
+                  }}>
                     {String.fromCharCode(65 + idx)}
                   </div>
                   <span className="truncate uppercase">{opt}</span>
@@ -267,7 +278,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           )}
 
           {currentQuestion.type === 'rating' && (
-            <div className="flex justify-center gap-3 py-10 bg-black/5 rounded-[1.5rem] border-2 border-current/10">
+            <div className="flex justify-center gap-3 py-10 bg-black/5 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '10' }}>
               {[1, 2, 3, 4, 5].map((s) => (
                 <Button
                   key={s}
@@ -295,23 +306,23 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   maxLength={20}
-                  className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 border-current"
-                  style={{ borderColor: 'inherit' }}
+                  className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20"
+                  style={{ borderColor: finalFg + '33', color: finalFg }}
                 />
               ) : (
                 <Textarea 
                   placeholder="Your thoughts..."
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
-                  className="min-h-[250px] text-2xl font-black p-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 leading-tight border-current"
-                  style={{ borderColor: 'inherit' }}
+                  className="min-h-[250px] text-2xl font-black p-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 leading-tight"
+                  style={{ borderColor: finalFg + '33', color: finalFg }}
                 />
               )}
             </div>
           )}
 
           {currentQuestion.type === 'slider' && (
-            <div className="space-y-12 py-12 bg-black/5 rounded-[1.5rem] border-2 border-current/10 px-10">
+            <div className="space-y-12 py-12 bg-black/5 rounded-[1.5rem] border-2 px-10" style={{ borderColor: finalFg + '10' }}>
               <div className="text-center">
                 <span className="text-9xl font-black tracking-tighter leading-none">{sliderValue}</span>
               </div>
@@ -332,14 +343,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           <Button 
             disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
             onClick={handleSubmit}
-            className="w-full h-24 text-3xl font-black rounded-[1.5rem] bg-current hover:opacity-90 transition-all mt-8 uppercase tracking-tighter border-2 border-current"
-            style={{ color: 'var(--background)' }}
+            className="w-full h-24 text-3xl font-black rounded-[1.5rem] hover:opacity-90 transition-all mt-8 uppercase tracking-tighter border-2"
+            style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
           >
             {loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}
           </Button>
         </main>
 
-        <footer className="mt-20 pt-12 text-center opacity-40 border-t-2 border-current/10">
+        <footer className="mt-20 pt-12 text-center opacity-40 border-t-2" style={{ borderColor: finalFg + '10' }}>
           <p className="text-[10px] font-black uppercase tracking-widest">Instant Sync Active</p>
         </footer>
       </div>
