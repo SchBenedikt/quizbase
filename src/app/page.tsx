@@ -41,18 +41,17 @@ export default function Home() {
             </p>
             
             <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6">
-              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-4 flex items-center border-2 border-[#4c2f05]/20 focus-within:border-[#4c2f05] transition-all">
-                <span className="font-black opacity-40 mr-4 text-xs tracking-widest uppercase">JOIN CODE:</span>
+              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-4 min-h-[5.5rem] flex items-center border-2 border-[#4c2f05]/20 focus-within:border-[#4c2f05] transition-all">
                 <Input 
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                  placeholder="000000" 
+                  placeholder="JOIN CODE" 
                   maxLength={6}
-                  className="border-none bg-transparent focus-visible:ring-0 text-3xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05]"
+                  className="border-none bg-transparent focus-visible:ring-0 text-5xl font-black p-0 placeholder:opacity-20 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter"
                   aria-label="Enter 6-digit session code"
                 />
               </div>
-              <Button type="submit" disabled={joinCode.length < 6} className="h-20 px-12 rounded-[1.5rem] text-xl font-black bg-[#4c2f05] text-[#ff9312] border-2 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
+              <Button type="submit" disabled={joinCode.length < 6} className="h-[5.5rem] px-12 rounded-[1.5rem] text-xl font-black bg-[#4c2f05] text-[#ff9312] border-2 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
                 JOIN NOW <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
               </Button>
             </form>
