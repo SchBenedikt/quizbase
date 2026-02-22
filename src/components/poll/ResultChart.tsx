@@ -24,8 +24,6 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
         value: results[idx] || 0
       }));
     } else {
-      // Ranking visualization: Calculate average position for each option
-      // lower rank = better. We'll show average "points" where higher is better.
       const optionScores: Record<number, number> = {};
       const numOptions = question.options.length;
       
@@ -142,21 +140,21 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const avg = total > 0 ? allResponses.reduce((acc, r) => acc + Number(r.value), 0) / total : 0;
 
     return (
-      <div className="h-full w-full max-w-5xl flex flex-col items-center justify-center space-y-24">
-        <div className="flex gap-8">
+      <div className="h-full w-full max-w-5xl flex flex-col items-center justify-center space-y-12">
+        <div className="flex gap-4">
           {[1, 2, 3, 4, 5].map((s) => (
             <Star 
               key={s} 
               className={cn(
-                "h-40 w-40 transition-all duration-1000",
+                "h-24 w-24 transition-all duration-1000",
                 s <= Math.round(avg) ? "fill-current" : "opacity-10"
               )} 
             />
           ))}
         </div>
-        <div className="text-center space-y-4">
-          <span className="text-[24rem] font-black tracking-tighter leading-[0.7]">{avg.toFixed(1)}</span>
-          <p className="text-5xl font-black opacity-20 uppercase tracking-[1em] mt-8">AVERAGE</p>
+        <div className="text-center space-y-2">
+          <span className="text-[12rem] font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
+          <p className="text-4xl font-black opacity-20 uppercase tracking-[0.8em] mt-4">AVERAGE</p>
         </div>
       </div>
     );
@@ -170,14 +168,14 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const percentage = ((average - min) / (max - min)) * 100;
 
     return (
-      <div className="h-full w-full max-w-[1400px] flex flex-col items-center justify-center space-y-32">
+      <div className="h-full w-full max-w-[1400px] flex flex-col items-center justify-center space-y-24">
         {(question.type === 'slider' || question.type === 'scale') && (
-          <div className="relative h-40 w-full bg-black/5 rounded-[1.5rem] border-2 border-current flex items-center px-16 overflow-hidden">
+          <div className="relative h-24 w-full bg-black/5 rounded-[1.5rem] border-2 border-current flex items-center px-12 overflow-hidden">
              <div 
                className="absolute left-0 h-full bg-current transition-all duration-1500 ease-out"
                style={{ width: `${Math.max(0, Math.min(100, percentage))}%` }}
              />
-             <div className="relative z-10 w-full flex justify-between font-black text-4xl mix-blend-difference text-white uppercase tracking-[0.5em]">
+             <div className="relative z-10 w-full flex justify-between font-black text-2xl mix-blend-difference text-white uppercase tracking-[0.4em]">
                <span>{question.labels?.min || min}</span>
                <span className="opacity-40">{question.type === 'scale' ? 'SYNC SCALE' : 'INTENSITY'}</span>
                <span>{question.labels?.max || max}</span>
@@ -185,8 +183,8 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
           </div>
         )}
         <div className="text-center">
-          <span className="text-[28rem] font-black tracking-tighter leading-[0.7]">{average.toFixed(question.type === 'guess-number' ? 1 : 0)}</span>
-          <p className="text-6xl font-black opacity-20 uppercase tracking-[1.2em] mt-8">
+          <span className="text-[14rem] font-black tracking-tighter leading-none">{average.toFixed(question.type === 'guess-number' ? 1 : 0)}</span>
+          <p className="text-5xl font-black opacity-20 uppercase tracking-[1em] mt-6">
             {question.type === 'guess-number' ? 'PRECISION AVERAGE' : 'RESULT'}
           </p>
         </div>
@@ -195,8 +193,8 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
   }
 
   return (
-    <div className="bg-transparent p-40 rounded-[1.5rem] text-center border-2 border-dashed border-current/10">
-      <p className="text-5xl font-black uppercase opacity-10 tracking-[1em] animate-pulse">CONNECTING...</p>
+    <div className="bg-transparent p-20 rounded-[1.5rem] text-center border-2 border-dashed border-current/10">
+      <p className="text-3xl font-black uppercase opacity-10 tracking-[0.6em] animate-pulse">CONNECTING...</p>
     </div>
   );
 }

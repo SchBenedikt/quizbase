@@ -66,7 +66,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   }, [session, questions, sessionRef]);
 
-  // Timer logic
   useEffect(() => {
     if (!session?.currentQuestionId || !questions) return;
     const currentQ = questions.find(q => q.id === session.currentQuestionId);
@@ -156,7 +155,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     );
   }
 
-  // Resolve final colors
   let finalBg = '#ffffff';
   if (currentTheme === 'orange') finalBg = '#ff9312';
   else if (currentTheme === 'red') finalBg = '#780c16';
@@ -184,42 +182,44 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       style={dynamicStyles}
     >
       <header className="h-[12vh] px-16 flex items-center justify-between border-b-2 shrink-0 z-20 bg-black/5" style={{ borderColor: finalFg + '33' }}>
-        <div className="flex items-center gap-8">
-          <Zap className="h-10 w-10 fill-current" />
-          <h1 className="text-4xl font-black tracking-tighter truncate max-w-2xl uppercase">{title}</h1>
-        </div>
-        
-        <div className="flex items-center gap-12">
-          {timeLeft !== null && (
-            <div className="flex items-center gap-4 px-8 py-4 rounded-[1.5rem] border-2 animate-pulse" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-              <Timer className="h-8 w-8" />
-              <span className="text-5xl font-black tabular-nums">{timeLeft}</span>
-            </div>
-          )}
-          <div className="flex flex-col items-end">
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-50">JOIN CODE</p>
-            <p className="text-6xl font-black tracking-tighter leading-none mt-1">{code}</p>
+        <div className="flex items-center gap-8 studio-container mx-0 max-w-none w-full justify-between">
+          <div className="flex items-center gap-8">
+            <Zap className="h-10 w-10 fill-current" />
+            <h1 className="text-3xl font-black tracking-tighter truncate max-w-xl uppercase">{title}</h1>
           </div>
-          <div className="flex items-center gap-6 bg-black/5 px-8 py-4 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '10' }}>
-            <Users className="h-8 w-8" />
-            <span className="text-5xl font-black leading-none">{currentResponses.length}</span>
+          
+          <div className="flex items-center gap-10">
+            {timeLeft !== null && (
+              <div className="flex items-center gap-4 px-6 py-3 rounded-[1.5rem] border-2 animate-pulse" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                <Timer className="h-6 w-6" />
+                <span className="text-4xl font-black tabular-nums">{timeLeft}</span>
+              </div>
+            )}
+            <div className="flex flex-col items-end">
+              <p className="text-[10px] font-black uppercase tracking-widest opacity-50">JOIN CODE</p>
+              <p className="text-5xl font-black tracking-tighter leading-none mt-1">{code}</p>
+            </div>
+            <div className="flex items-center gap-5 bg-black/5 px-6 py-3 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '10' }}>
+              <Users className="h-6 w-6" />
+              <span className="text-4xl font-black leading-none">{currentResponses.length}</span>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 p-16 flex flex-col items-center justify-center relative">
-        <div className="w-full max-w-[1400px] h-full flex flex-col gap-12">
+      <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center relative">
+        <div className="w-full max-w-[1400px] h-full flex flex-col gap-10">
           <div className="text-center shrink-0 space-y-4">
-             <div className="inline-block px-6 py-2 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest" style={{ backgroundColor: finalFg, color: finalBg }}>
+             <div className="inline-block px-5 py-2 rounded-[1rem] text-[10px] font-black uppercase tracking-widest" style={{ backgroundColor: finalFg, color: finalBg }}>
                QUESTION {currentIdx + 1} / {questions.length}
              </div>
-             <h2 className="text-6xl md:text-8xl lg:text-[7rem] font-black leading-[0.8] tracking-tighter max-w-7xl mx-auto uppercase">
+             <h2 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter max-w-5xl mx-auto uppercase">
                {q.question}
              </h2>
           </div>
 
           <div className="flex-1 min-h-0 w-full relative">
-            <Card className="h-full border-2 rounded-[1.5rem] bg-black/5 p-16 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '10', backgroundColor: 'rgba(0,0,0,0.05)' }}>
+            <Card className="h-full border-2 rounded-[1.5rem] bg-black/5 p-12 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '10' }}>
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
             
@@ -227,10 +227,10 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <Button 
                 onClick={handleSummarize}
                 disabled={isSummarizing}
-                className="absolute top-8 right-8 h-14 px-8 rounded-[1rem] font-black uppercase text-xs border-2 transition-all gap-3"
+                className="absolute top-6 right-6 h-12 px-6 rounded-[1rem] font-black uppercase text-[10px] border-2 transition-all gap-2"
                 style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
               >
-                {isSummarizing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+                {isSummarizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                 AI ANALYZE
               </Button>
             )}
@@ -245,48 +245,48 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             size="icon" 
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all hover:opacity-80"
+            className="h-12 w-12 rounded-[1.25rem] border-2 bg-black/5 transition-all hover:opacity-80"
             style={{ borderColor: finalFg + '33', color: finalFg }}
           >
-            <ChevronLeft className="h-7 w-7" />
+            <ChevronLeft className="h-6 w-6" />
           </Button>
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handleNext}
             disabled={currentIdx === questions.length - 1}
-            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all hover:opacity-80"
+            className="h-12 w-12 rounded-[1.25rem] border-2 bg-black/5 transition-all hover:opacity-80"
             style={{ borderColor: finalFg + '33', color: finalFg }}
           >
-            <ChevronRight className="h-7 w-7" />
+            <ChevronRight className="h-6 w-6" />
           </Button>
         </div>
         
-        <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '10' }}>
+        <div className="flex items-center gap-3 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '10' }}>
            <Popover>
              <PopoverTrigger asChild>
-                <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
-                  <Palette className="h-5 w-5 mr-3" /> Vibe
+                <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
+                  <Palette className="h-4 w-4 mr-2" /> Vibe
                 </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-[400px] p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="center">
-                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Immersion Presets</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Orange</Button>
-                  <Button onClick={() => setTheme('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Red</Button>
-                  <Button onClick={() => setTheme('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Acid</Button>
-                  <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Blue</Button>
+             <PopoverContent className="w-[380px] p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground shadow-none" align="center">
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Immersive Experience</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-11 border-2 uppercase text-[10px] shadow-none">Orange</Button>
+                  <Button onClick={() => setTheme('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[1rem] font-black h-11 border-2 uppercase text-[10px] shadow-none">Deep Red</Button>
+                  <Button onClick={() => setTheme('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[1rem] font-black h-11 border-2 uppercase text-[10px] shadow-none">Acid Green</Button>
+                  <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] text-white rounded-[1rem] font-black h-11 border-2 uppercase text-[10px] shadow-none">Pulse Blue</Button>
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-2">Minimalist Presets</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button onClick={() => setTheme('minimal-light')} className="bg-[#f4f4f5] text-zinc-950 rounded-[1rem] font-black h-12 border-2 border-zinc-200 uppercase text-[10px]"><Sun className="w-3 h-3 mr-2" /> Studio Light</Button>
-                  <Button onClick={() => setTheme('minimal-dark')} className="bg-[#18181b] text-zinc-100 rounded-[1rem] font-black h-12 border-2 border-zinc-800 uppercase text-[10px]"><Moon className="w-3 h-3 mr-2" /> Studio Dark</Button>
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-2">Minimalist Studio</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button onClick={() => setTheme('minimal-light')} className="bg-[#f4f4f5] text-zinc-950 rounded-[1rem] font-black h-11 border-2 border-zinc-200 uppercase text-[10px] shadow-none"><Sun className="w-3 h-3 mr-2" /> Studio Light</Button>
+                  <Button onClick={() => setTheme('minimal-dark')} className="bg-[#18181b] text-zinc-100 rounded-[1rem] font-black h-11 border-2 border-zinc-800 uppercase text-[10px] shadow-none"><Moon className="w-3 h-3 mr-2" /> Studio Dark</Button>
                 </div>
                 <div className="space-y-3 pt-3 border-t-2">
-                   <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Custom Color</p>
+                   <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Touch-up Background</p>
                    <Input 
                      type="color" 
-                     className="h-12 w-full rounded-[1rem] border-2 p-1 cursor-pointer"
+                     className="h-11 w-full rounded-[1rem] border-2 p-1 cursor-pointer shadow-none"
                      onChange={(e) => setTheme('custom', e.target.value)}
                    />
                 </div>
@@ -295,11 +295,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
            
            <Popover>
              <PopoverTrigger asChild>
-               <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
-                 <Settings2 className="h-5 w-5 mr-3" /> Sync
+               <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
+                 <Settings2 className="h-4 w-4 mr-2" /> Sync
                </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-72 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-6 text-foreground" align="center">
+             <PopoverContent className="w-72 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-6 text-foreground shadow-none" align="center">
                 <div className="space-y-4">
                   <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Audience Controls</p>
                   <div className="flex items-center justify-between">
@@ -307,20 +307,20 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                     <Switch id="show-results" checked={showResults} onCheckedChange={toggleResultVisibility} />
                   </div>
                   <p className="text-[10px] opacity-40 uppercase leading-tight font-bold">
-                    When active, participants see real-time charts on their devices after submitting.
+                    Participants see real-time updates after submitting.
                   </p>
                 </div>
              </PopoverContent>
            </Popover>
 
-           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
-             <Monitor className="h-5 w-5 mr-3" /> Live
+           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-11 px-6 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
+             <Monitor className="h-4 w-4 mr-2" /> Fullscreen
            </Button>
         </div>
 
         <div className="flex items-center gap-3 opacity-30">
-           <Zap className="h-6 w-6 fill-current" />
-           <span className="font-black text-[10px] uppercase tracking-widest">Presenter Mode</span>
+           <Zap className="h-5 w-5 fill-current" />
+           <span className="font-black text-[10px] uppercase tracking-widest">Presenter</span>
         </div>
       </footer>
     </div>
