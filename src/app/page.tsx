@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, Activity, Users, Star, CheckCircle2, Trophy, Ruler, Layout, MousePointer2, Plus } from "lucide-react";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, Activity, Users, Star, CheckCircle2, Trophy, Ruler, Layout, MousePointer2, Plus, MessageSquare, Timer } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 
 export default function Home() {
@@ -213,30 +213,66 @@ export default function Home() {
           <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
              <div className="order-2 lg:order-1 relative group">
                 {/* Editor Shell */}
-                <div className="bg-white rounded-[2rem] border-4 border-[#ff9312] shadow-[20px_20px_0px_0px_rgba(255,147,18,0.3)] rotate-[-3deg] group-hover:rotate-0 transition-transform duration-700 overflow-hidden">
-                   <div className="h-10 bg-[#4c2f05]/5 border-b-2 border-[#4c2f05]/10 flex items-center px-6 gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[#4c2f05]/10" />
-                      <div className="w-2 h-2 rounded-full bg-[#4c2f05]/10" />
+                <div className="bg-white rounded-[2rem] border-4 border-[#ff9312] shadow-[25px_25px_0px_0px_rgba(255,147,18,0.3)] rotate-[-3deg] group-hover:rotate-0 transition-transform duration-700 overflow-hidden min-h-[500px] flex flex-col">
+                   <div className="h-12 bg-[#4c2f05]/5 border-b-2 border-[#4c2f05]/10 flex items-center px-6 gap-3">
+                      <div className="w-3 h-3 rounded-full bg-red-400" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                      <div className="ml-auto flex items-center gap-2 opacity-30">
+                        <Palette className="h-3 w-3" />
+                        <span className="text-[8px] font-black uppercase tracking-widest">Studio Vibe</span>
+                      </div>
                    </div>
-                   <div className="p-8 space-y-6">
-                      <div className="space-y-2">
-                         <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Question 1</span>
-                         <div className="h-12 bg-[#4c2f05]/5 rounded-[1rem] border-2 border-[#4c2f05]/10 px-5 flex items-center">
-                            <span className="font-black uppercase text-xs">What is our primary goal?</span>
+                   <div className="p-10 space-y-10 flex-1">
+                      {/* Question 1 Active */}
+                      <div className="space-y-4">
+                         <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary">01 / Active Question</span>
+                            <Timer className="h-3 w-3 opacity-20" />
+                         </div>
+                         <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-primary/20 px-6 flex items-center">
+                            <span className="font-black uppercase text-sm tracking-tight">What is our primary goal?</span>
+                         </div>
+                         <div className="grid grid-cols-2 gap-4">
+                            <div className="h-12 bg-[#ff9312] rounded-[1rem] border-2 border-[#4c2f05] flex items-center px-4">
+                               <CheckCircle2 className="h-3 w-3 mr-2" />
+                               <div className="h-1.5 w-full bg-[#4c2f05]/20 rounded-full" />
+                            </div>
+                            <div className="h-12 bg-[#4c2f05]/5 rounded-[1rem] border-2 border-dashed border-[#4c2f05]/10" />
                          </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                         <div className="h-10 bg-[#ff9312] rounded-[0.75rem] border-2 border-[#4c2f05]" />
-                         <div className="h-10 bg-[#4c2f05]/5 rounded-[0.75rem] border-2 border-dashed border-[#4c2f05]/10" />
+
+                      {/* Question 2 Draft */}
+                      <div className="space-y-4 opacity-30">
+                         <span className="text-[10px] font-black uppercase tracking-widest">02 / Draft</span>
+                         <div className="h-14 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/10 px-6 flex items-center">
+                            <span className="font-black uppercase text-xs">Enter question...</span>
+                         </div>
+                      </div>
+
+                      {/* Studio Settings Preview */}
+                      <div className="mt-auto pt-8 border-t-2 border-[#4c2f05]/5 grid grid-cols-3 gap-3">
+                         <div className="h-8 bg-[#ff9312]/20 rounded-full border-2 border-[#ff9312]/30 flex items-center justify-center">
+                            <span className="text-[8px] font-black uppercase">Live Result</span>
+                         </div>
+                         <div className="h-8 bg-[#4c2f05]/5 rounded-full border-2 border-[#4c2f05]/10 flex items-center justify-center">
+                            <span className="text-[8px] font-black uppercase">Anonymous</span>
+                         </div>
+                         <div className="h-8 bg-[#4c2f05]/5 rounded-full border-2 border-[#4c2f05]/10 flex items-center justify-center">
+                            <span className="text-[8px] font-black uppercase">Quiz Mode</span>
+                         </div>
                       </div>
                    </div>
                 </div>
 
-                {/* Floating Tool Palette */}
-                <div className="absolute -top-12 -left-12 bg-[#ff9312] p-6 rounded-[2rem] border-4 border-[#4c2f05] shadow-[15px_15px_0px_0px_#4c2f05] rotate-[12deg] z-20 space-y-4 group-hover:rotate-0 transition-transform duration-700">
-                   <div className="w-12 h-12 rounded-[1rem] bg-[#4c2f05] text-white flex items-center justify-center border-2 border-white"><ListChecks className="h-6 w-6" /></div>
-                   <div className="w-12 h-12 rounded-[1rem] bg-white/50 flex items-center justify-center"><Cloud className="h-6 w-6 opacity-40" /></div>
-                   <div className="w-12 h-12 rounded-[1rem] bg-white/50 flex items-center justify-center"><Ruler className="h-6 w-6 opacity-40" /></div>
+                {/* Floating Tool Palette - Expanded */}
+                <div className="absolute -top-16 -left-16 bg-[#ff9312] p-8 rounded-[2.5rem] border-4 border-[#4c2f05] shadow-[20px_20px_0px_0px_#4c2f05] rotate-[10deg] z-20 grid grid-cols-2 gap-4 group-hover:rotate-0 transition-transform duration-700">
+                   <div className="w-14 h-14 rounded-[1.25rem] bg-[#4c2f05] text-white flex items-center justify-center border-2 border-white"><ListChecks className="h-7 w-7" /></div>
+                   <div className="w-14 h-14 rounded-[1.25rem] bg-white text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]"><Cloud className="h-7 w-7" /></div>
+                   <div className="w-14 h-14 rounded-[1.25rem] bg-white text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]"><Ruler className="h-7 w-7" /></div>
+                   <div className="w-14 h-14 rounded-[1.25rem] bg-white text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]"><SlidersHorizontal className="h-7 w-7" /></div>
+                   <div className="w-14 h-14 rounded-[1.25rem] bg-white text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]"><Hash className="h-7 w-7" /></div>
+                   <div className="w-14 h-14 rounded-[1.25rem] bg-white text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]"><MessageSquare className="h-7 w-7" /></div>
                 </div>
              </div>
 
@@ -427,12 +463,12 @@ export default function Home() {
               Launch?
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <Button size="lg" onClick={() => router.push('/login')} className="h-24 px-16 rounded-[1.5rem] text-2xl font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all shadow-none">
+              <Link href="/login" className="h-24 px-16 rounded-[1.5rem] text-2xl font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all shadow-none flex items-center justify-center">
                 START DASHBOARD
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => router.push('/join')} className="h-24 px-16 rounded-[1.5rem] text-2xl font-black border-4 border-[#4c2f05] text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312] transition-all shadow-none">
+              </Link>
+              <Link href="/join" className="h-24 px-16 rounded-[1.5rem] text-2xl font-black border-4 border-[#4c2f05] text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312] transition-all shadow-none flex items-center justify-center">
                 JOIN SESSION
-              </Button>
+              </Link>
             </div>
             <p className="text-sm font-black uppercase tracking-[0.4em] opacity-40 pt-12">Instant start. Professional Grade. Always Sync.</p>
           </div>
