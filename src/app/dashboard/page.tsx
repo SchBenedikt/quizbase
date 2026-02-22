@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, query, orderBy, getDocs, setDoc, serverTimestamp } from "firebase/firestore";
-import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { collection, doc, query, orderBy, getDocs, serverTimestamp } from "firebase/firestore";
+import { deleteDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -18,6 +20,14 @@ export default function DashboardPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (!isUserLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isUserLoading, router]);
 
   const surveysQuery = useMemoFirebase(() => {
     if (!user) return null;
@@ -25,12 +35,6 @@ export default function DashboardPage() {
   }, [user, db]);
 
   const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
-
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push("/login");
-    }
-  }, [user, isUserLoading, router]);
 
   const handleDeleteSurvey = (surveyId: string) => {
     if (!user) return;
@@ -50,7 +54,7 @@ export default function DashboardPage() {
       const qSnap = await getDocs(query(qCol, orderBy("order", "asc")));
       const firstQId = qSnap.docs[0]?.id || null;
 
-      await setDoc(sessionRef, {
+      const sessionData = {
         id: sessionRef.id,
         pollId: survey.id,
         userId: user.uid,
@@ -62,11 +66,15 @@ export default function DashboardPage() {
         theme: survey.theme || 'orange',
         customColor: survey.customColor || null,
         showResultsToParticipants: true
-      });
+      };
 
+      setDocumentNonBlocking(sessionRef, sessionData, { merge: true });
       router.push(`/presenter/${sessionRef.id}`);
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Launch Failed", description: e.message });
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: sessionRef.path,
+        operation: 'create'
+      }));
     } finally {
       setLoading(false);
     }
@@ -138,7 +146,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2 text-primary">
                     <Calendar className="h-4 w-4" />
                     <time className="text-sm font-black uppercase tracking-wider">
-                      {new Date(survey.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {mounted && survey.createdAt ? new Date(survey.createdAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "---"}
                     </time>
                   </div>
                 </div>

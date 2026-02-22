@@ -7,7 +7,8 @@ import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Palette, Sparkle
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession } from "@/app/types/poll";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
-import { doc, collection, updateDoc, query, orderBy } from "firebase/firestore";
+import { doc, collection, query, orderBy } from "firebase/firestore";
+import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { aiOpenTextSummarizer } from "@/ai/flows/ai-open-text-summarizer";
 import { useToast } from "@/hooks/use-toast";
@@ -62,7 +63,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   useEffect(() => {
     if (session && !session.currentQuestionId && questions && questions.length > 0) {
-      updateDoc(sessionRef, { currentQuestionId: questions[0].id });
+      updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[0].id });
     }
   }, [session, questions, sessionRef]);
 
@@ -96,7 +97,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     if (!questions || !session) return;
     const currentIdx = questions.findIndex(q => q.id === session.currentQuestionId);
     if (currentIdx < questions.length - 1) {
-      updateDoc(sessionRef, { currentQuestionId: questions[currentIdx + 1].id });
+      updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[currentIdx + 1].id });
     }
   };
 
@@ -104,18 +105,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     if (!questions || !session) return;
     const currentIdx = questions.findIndex(q => q.id === session.currentQuestionId);
     if (currentIdx > 0) {
-      updateDoc(sessionRef, { currentQuestionId: questions[currentIdx - 1].id });
+      updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[currentIdx - 1].id });
     }
   };
 
   const setTheme = (theme: string, customColor?: string) => {
     if (!sessionRef) return;
-    updateDoc(sessionRef, { theme, customColor: customColor || null });
+    updateDocumentNonBlocking(sessionRef, { theme, customColor: customColor || null });
   };
 
   const toggleResultVisibility = () => {
     if (!sessionRef) return;
-    updateDoc(sessionRef, { showResultsToParticipants: !showResults });
+    updateDocumentNonBlocking(sessionRef, { showResultsToParticipants: !showResults });
   };
 
   const handleSummarize = async () => {

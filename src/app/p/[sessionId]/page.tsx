@@ -9,8 +9,11 @@ import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle, ArrowUp, Arrow
 import { PollQuestion, PollSession } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { doc, collection, addDoc, serverTimestamp, getDoc, query, where, limit } from "firebase/firestore";
+import { doc, collection, serverTimestamp, getDoc, query, where, limit } from "firebase/firestore";
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { ResultChart } from "@/components/poll/ResultChart";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function ParticipantView({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
@@ -72,7 +75,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             }
           }
         } catch (error) {
-          console.error("Failed to fetch current question:", error);
+          // Contextual error handled by fetch hook if applicable, but getDoc is single-time.
+          // Fallback silence or specific UI handling if needed.
         }
       };
       fetchQ();
@@ -82,29 +86,27 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const handleSubmit = async () => {
     if (!currentQuestion || !session || (timeLeft === 0 && currentQuestion.timeLimit)) return;
     setLoading(true);
-    try {
-      let value: any = "";
-      if (currentQuestion.type === 'multiple-choice') value = selection;
-      if (currentQuestion.type === 'word-cloud') value = textValue.trim().toUpperCase();
-      if (currentQuestion.type === 'open-text') value = textValue.trim();
-      if (currentQuestion.type === 'slider' || currentQuestion.type === 'scale') value = sliderValue;
-      if (currentQuestion.type === 'rating') value = ratingValue;
-      if (currentQuestion.type === 'guess-number') value = parseFloat(textValue) || 0;
-      if (currentQuestion.type === 'ranking') value = ranking;
+    
+    let value: any = "";
+    if (currentQuestion.type === 'multiple-choice') value = selection;
+    if (currentQuestion.type === 'word-cloud') value = textValue.trim().toUpperCase();
+    if (currentQuestion.type === 'open-text') value = textValue.trim();
+    if (currentQuestion.type === 'slider' || currentQuestion.type === 'scale') value = sliderValue;
+    if (currentQuestion.type === 'rating') value = ratingValue;
+    if (currentQuestion.type === 'guess-number') value = parseFloat(textValue) || 0;
+    if (currentQuestion.type === 'ranking') value = ranking;
 
-      await addDoc(collection(db, `sessions/${session.id}/responses`), {
-        sessionId: session.id,
-        questionId: currentQuestion.id,
-        value,
-        userId: session.userId, 
-        createdAt: serverTimestamp(),
-      });
-      setVoted(true);
-    } catch (e) {
-      console.error("Submission failed:", e);
-    } finally {
-      setLoading(false);
-    }
+    const responseCol = collection(db, `sessions/${session.id}/responses`);
+    addDocumentNonBlocking(responseCol, {
+      sessionId: session.id,
+      questionId: currentQuestion.id,
+      value,
+      userId: session.userId, 
+      createdAt: serverTimestamp(),
+    });
+    
+    setVoted(true);
+    setLoading(false);
   };
 
   const moveRank = (index: number, direction: 'up' | 'down') => {
