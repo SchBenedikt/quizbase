@@ -145,7 +145,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              className="text-3xl font-black h-20 border-2 bg-card rounded-[1.25rem] px-8 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter"
+              className="text-xl font-black h-14 border-2 bg-card rounded-[1.25rem] px-8 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter"
             />
           </div>
           <Button 

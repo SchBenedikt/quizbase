@@ -1,17 +1,15 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, LayoutDashboard } from "lucide-react";
+import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, query, orderBy, getDocs, setDoc, serverTimestamp } from "firebase/firestore";
 import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -132,7 +130,7 @@ export default function DashboardPage() {
                 
                 <div className="flex-1 space-y-2">
                   <p className="text-xl font-black tracking-tight uppercase leading-tight line-clamp-2 group-hover:text-primary transition-colors">{survey.title || "Untitled Survey"}</p>
-                  <p className="text-sm font-black uppercase tracking-widest text-primary/60">
+                  <p className="text-lg font-black uppercase tracking-widest text-primary/60">
                     {new Date(survey.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
