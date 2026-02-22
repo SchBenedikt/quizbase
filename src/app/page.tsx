@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -57,8 +56,8 @@ export default function Home() {
               </form>
             </div>
 
-            {/* PORTRAIT HERO MOCKUP */}
-            <div className="relative group hidden lg:flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000 lg:-ml-16">
+            {/* PORTRAIT HERO MOCKUP - Shifted Inward */}
+            <div className="relative group hidden lg:flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000 lg:-ml-32">
               <div className="relative w-[400px] h-[600px] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-8 shadow-[30px_30px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
                 <div className="w-20 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10 shrink-0" />
                 <div className="flex-1 space-y-8 overflow-hidden">
@@ -177,32 +176,48 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative group">
-              {/* Correct Feedback Card */}
-              <div className="relative rounded-[2rem] bg-green-500 border-4 border-[#4c2f05] p-12 shadow-[20px_20px_0px_0px_#4c2f05] rotate-[-3deg] group-hover:rotate-0 transition-transform duration-700 z-10 flex flex-col items-center justify-center text-center space-y-6">
-                <div className="w-24 h-24 rounded-[1.5rem] bg-white flex items-center justify-center border-4 border-[#4c2f05]">
-                  <CheckCircle2 className="h-12 w-12 text-green-500" />
-                </div>
-                <h3 className="text-5xl font-black text-white uppercase tracking-tighter">CORRECT!</h3>
-                <p className="text-white/80 font-black uppercase text-xs tracking-widest">+100 PULSE POINTS</p>
+            <div className="relative group flex items-center justify-center min-h-[500px]">
+              {/* Main Quiz Options Card (Participant View) */}
+              <div className="relative w-80 bg-white rounded-[2rem] border-4 border-[#4c2f05] p-8 shadow-[20px_20px_0px_0px_#ff9312] rotate-3 transition-transform duration-700 z-0 space-y-6">
+                 <div className="w-16 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-8" />
+                 <h4 className="text-xl font-black uppercase tracking-tight text-center">Correct Answer?</h4>
+                 <div className="space-y-3">
+                   {/* Option A - Correct & Selected */}
+                   <div className="h-14 bg-green-500 rounded-[1rem] border-2 border-[#4c2f05] flex items-center px-5 gap-3">
+                     <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border-2 border-[#4c2f05]">
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                     </div>
+                     <span className="font-black text-xs uppercase text-white">Innovation</span>
+                   </div>
+                   {/* Option B */}
+                   <div className="h-14 bg-[#4c2f05]/5 rounded-[1rem] border-2 border-[#4c2f05]/20 flex items-center px-5">
+                     <span className="font-black text-xs uppercase opacity-40">Growth</span>
+                   </div>
+                   {/* Option C */}
+                   <div className="h-14 bg-[#4c2f05]/5 rounded-[1rem] border-2 border-[#4c2f05]/20 flex items-center px-5">
+                     <span className="font-black text-xs uppercase opacity-40">Stability</span>
+                   </div>
+                 </div>
               </div>
 
-              {/* Leaderboard Card Overlap */}
-              <div className="absolute -bottom-10 -right-10 w-72 bg-white rounded-[2rem] border-4 border-[#4c2f05] p-6 shadow-[15px_15px_0px_0px_#ff9312] rotate-[5deg] z-20 space-y-4">
-                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Leaderboard Top 3</p>
-                <div className="space-y-2">
-                  <div className="h-12 bg-[#4c2f05] text-[#ff9312] rounded-[1rem] flex items-center justify-between px-4 font-black text-xs uppercase">
-                    <span>1. Studio_Master</span>
-                    <span>1450</span>
-                  </div>
-                  <div className="h-12 bg-[#4c2f05]/5 rounded-[1rem] flex items-center justify-between px-4 font-black text-xs uppercase opacity-40">
-                    <span>2. Pulse_Runner</span>
-                    <span>1220</span>
-                  </div>
-                  <div className="h-12 bg-[#4c2f05]/5 rounded-[1rem] flex items-center justify-between px-4 font-black text-xs uppercase opacity-40">
-                    <span>3. Energy_X</span>
-                    <span>1180</span>
-                  </div>
+              {/* Smaller Feedback Card Overlay */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 rounded-[2rem] bg-green-500 border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-transform duration-700 z-10 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-16 h-16 rounded-[1.25rem] bg-white flex items-center justify-center border-4 border-[#4c2f05]">
+                  <CheckCircle2 className="h-8 w-8 text-green-500" />
+                </div>
+                <h3 className="text-3xl font-black text-white uppercase tracking-tighter">CORRECT!</h3>
+                <p className="text-white/80 font-black uppercase text-[10px] tracking-widest">+100 POINTS</p>
+              </div>
+
+              {/* Leaderboard Glimpse Overlay */}
+              <div className="absolute -bottom-10 -right-10 w-56 bg-white rounded-[2rem] border-4 border-[#4c2f05] p-6 shadow-[10px_10px_0px_0px_#ff9312] rotate-12 z-20 space-y-3">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest opacity-40">
+                  <span>Top 1</span>
+                  <Trophy className="h-3 w-3" />
+                </div>
+                <div className="h-10 bg-[#4c2f05] text-[#ff9312] rounded-[0.75rem] flex items-center justify-between px-4 font-black text-[10px] uppercase">
+                   <span>Studio_X</span>
+                   <span>1450</span>
                 </div>
               </div>
             </div>
