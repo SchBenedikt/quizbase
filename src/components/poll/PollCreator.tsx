@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical, Hash, ListOrdered, Ruler } from "lucide-react";
+import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical, Hash, ListOrdered, Ruler, ArrowUp, ArrowDown } from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
 import { PollQuestion, PollType } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
@@ -71,6 +72,19 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
     setQuestions(questions.filter(q => q.id !== id));
   };
 
+  const moveQuestion = (idx: number, direction: 'up' | 'down') => {
+    const newQuestions = [...questions];
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= newQuestions.length) return;
+    
+    // Swap
+    const temp = newQuestions[idx];
+    newQuestions[idx] = newQuestions[targetIdx];
+    newQuestions[targetIdx] = temp;
+    
+    setQuestions(newQuestions);
+  };
+
   const toggleCorrectAnswer = (qId: string, optIdx: number) => {
     const question = questions.find(q => q.id === qId);
     if (!question) return;
@@ -98,9 +112,29 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
             >
               <CardContent className="p-0">
                 <div className="flex">
-                  <div className="w-16 flex flex-col items-center py-6 bg-muted/20 border-r-2 border-foreground/5 shrink-0">
-                    <div className="text-xl font-black opacity-20 mb-4">{idx + 1}</div>
-                    <GripVertical className="h-5 w-5 opacity-10" />
+                  <div className="w-16 flex flex-col items-center py-6 bg-muted/20 border-r-2 border-foreground/5 shrink-0 gap-4">
+                    <div className="text-xl font-black opacity-20">{idx + 1}</div>
+                    <div className="flex flex-col gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => moveQuestion(idx, 'up')}
+                        disabled={idx === 0}
+                        className="h-8 w-8 rounded-[0.5rem] hover:bg-primary/10 transition-colors disabled:opacity-5"
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => moveQuestion(idx, 'down')}
+                        disabled={idx === questions.length - 1}
+                        className="h-8 w-8 rounded-[0.5rem] hover:bg-primary/10 transition-colors disabled:opacity-5"
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <GripVertical className="h-5 w-5 opacity-10 mt-auto" />
                   </div>
 
                   <div className="flex-1 p-6 sm:p-8">
