@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, Users2 } from "lucide-react";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, Users2, ListOrdered, Hash, BrainCircuit, Palette } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Header } from "@/components/layout/Header";
@@ -41,17 +41,17 @@ export default function Home() {
             </p>
             
             <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6">
-              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-4 min-h-[5.5rem] flex items-center border-2 border-[#4c2f05]/20 focus-within:border-[#4c2f05] transition-all">
+              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-6 min-h-[6.5rem] flex items-center border-2 border-[#4c2f05]/20 focus-within:border-[#4c2f05] transition-all">
                 <Input 
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="JOIN CODE" 
                   maxLength={6}
-                  className="border-none bg-transparent focus-visible:ring-0 text-5xl font-black p-0 placeholder:opacity-20 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05]"
+                  className="border-none bg-transparent focus-visible:ring-0 text-7xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05]"
                   aria-label="Enter 6-digit session code"
                 />
               </div>
-              <Button type="submit" disabled={joinCode.length < 6} className="h-[5.5rem] px-12 rounded-[1.5rem] text-xl font-black bg-[#4c2f05] text-[#ff9312] border-2 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
+              <Button type="submit" disabled={joinCode.length < 6} className="h-[6.5rem] px-12 rounded-[1.5rem] text-xl font-black bg-[#4c2f05] text-[#ff9312] border-2 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
                 JOIN NOW <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
               </Button>
             </form>
@@ -83,15 +83,19 @@ export default function Home() {
                 True <br />
                 Interaction.
               </h2>
-              <p className="text-xs font-black uppercase tracking-widest opacity-40">Professional Engagement Tools</p>
+              <p className="text-xs font-black uppercase tracking-widest opacity-40">Professional Engagement Toolkit</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { icon: Cloud, title: "Word Clouds", desc: "Instantly visualize collective audience thoughts." },
-                { icon: ListChecks, title: "Live Polls", desc: "Real-time decisions and instant audience feedback." },
-                { icon: SlidersHorizontal, title: "Precision Sliders", desc: "Capture detailed sentiment with high-precision data." },
-                { icon: Sparkles, title: "AI Assistant", desc: "Perfect your questions for clarity and neutrality." }
+                { icon: Cloud, title: "Word Clouds", desc: "Visualize the collective thought in real-time." },
+                { icon: ListOrdered, title: "Ranking", desc: "Prioritize ideas with live audience rankings." },
+                { icon: SlidersHorizontal, title: "Precision Sliders", desc: "Capture nuanced sentiment with detailed data." },
+                { icon: Sparkles, title: "AI Assistant", desc: "Perfect your questions for clarity and neutrality." },
+                { icon: Hash, title: "Numeric Guessing", desc: "Gamify your session with estimation challenges." },
+                { icon: BrainCircuit, title: "AI Summaries", desc: "Extract key themes from hundreds of text responses." },
+                { icon: ListChecks, title: "Live Quizzes", desc: "Instant feedback with automated scoring." },
+                { icon: Palette, title: "Custom Vibes", desc: "Tailor the studio atmosphere to your brand." }
               ].map((tool, i) => (
                 <article key={i} className="bg-[#ff9312] text-[#4c2f05] p-10 rounded-[1.5rem] border-2 border-[#ff9312] space-y-6 transition-all hover:-translate-y-2">
                   <div className="w-16 h-16 rounded-[1.5rem] bg-[#4c2f05] text-[#ff9312] flex items-center justify-center border-2 border-[#4c2f05]">
@@ -114,13 +118,13 @@ export default function Home() {
                 <span className="opacity-20 italic">No Apps.</span>
               </h2>
               <p className="text-xl font-bold uppercase opacity-70 leading-tight max-w-lg">
-                Participation should be easy. PopPulse* removes all registration requirements for your audience. One code, total sync.
+                Participation should be easy. PopPulse* removes all registration requirements for your audience. One code, total sync across all devices.
               </p>
               <div className="flex gap-6 items-center p-8 bg-[#4c2f05]/5 rounded-[1.5rem] border-2 border-[#4c2f05]/10">
                 <Users2 className="h-10 w-10 text-[#4c2f05]" />
                 <div>
-                  <h4 className="text-xl font-black uppercase tracking-tighter text-[#4c2f05]">100% Participation</h4>
-                  <p className="font-bold opacity-40 uppercase text-xs tracking-widest">Global accessibility</p>
+                  <h4 className="text-xl font-black uppercase tracking-tighter text-[#4c2f05]">Frictionless Entry</h4>
+                  <p className="font-bold opacity-40 uppercase text-xs tracking-widest">Universal browser compatibility</p>
                 </div>
               </div>
             </div>
