@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -5,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, Activity, Users, Star, CheckCircle2, Trophy, Ruler, Layout, MousePointer2, Plus, MessageSquare, Timer } from "lucide-react";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, Monitor, Smartphone, Share2, CheckCircle2, Ruler, MessageSquare, Star, Palette, Settings2, Activity } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 
 export default function Home() {
@@ -23,19 +24,19 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-[#ff9312] text-[#4c2f05] overflow-x-clip">
       <Header variant="brand" className="text-[#4c2f05]" />
 
-      <main className="flex-grow overflow-x-clip">
+      <main className="flex-grow">
         {/* HERO SECTION */}
         <section className="studio-container min-h-[100dvh] flex items-center pt-24 pb-12">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center w-full">
             <div className="space-y-8 animate-in fade-in slide-in-from-left-10 duration-1000">
               <header className="space-y-4">
-                <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[0.85] tracking-tighter uppercase">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[0.85] tracking-tighter uppercase">
                   Pop. <br />
                   Pulse. <br />
                   <span className="opacity-30 italic">*</span>
                 </h1>
               </header>
-              <p className="text-base md:text-lg font-bold max-w-lg leading-tight uppercase tracking-tight">
+              <p className="text-sm md:text-base font-bold max-w-sm leading-tight uppercase tracking-tight">
                 Transform any room into an interactive experience. No apps, no registration. Just pure energy.
               </p>
               
@@ -50,15 +51,14 @@ export default function Home() {
                     aria-label="Enter 6-digit session code"
                   />
                 </div>
-                <button type="submit" disabled={joinCode.length < 6} className="h-14 px-8 rounded-[1.5rem] text-xs font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none uppercase flex items-center justify-center gap-2">
+                <button type="submit" disabled={joinCode.length < 6} className="h-14 px-8 rounded-[1.5rem] text-[10px] font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none uppercase flex items-center justify-center gap-2 tracking-widest">
                   JOIN NOW <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </form>
             </div>
 
-            {/* PORTRAIT HERO MOCKUP */}
             <div className="relative group flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000 lg:-ml-20 py-10 px-4">
-              <div className="relative w-full max-w-[320px] aspect-[4/6] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-6 shadow-[15px_15px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
+              <div className="relative w-full max-w-[280px] aspect-[4/6] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-6 shadow-[15px_15px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
                 <div className="w-20 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10 shrink-0" />
                 <div className="flex-1 space-y-8 overflow-hidden">
                   <div className="flex items-center justify-between opacity-40">
@@ -73,9 +73,6 @@ export default function Home() {
                     <div className="h-12 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
                       <span className="font-black text-xs uppercase opacity-40">Growth</span>
                     </div>
-                    <div className="h-12 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
-                      <span className="font-black text-xs uppercase opacity-40">Sustainability</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -87,32 +84,24 @@ export default function Home() {
         <section className="py-24 bg-[#4c2f05] text-[#ff9312] overflow-x-clip">
           <div className="studio-container grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative px-6 flex justify-center lg:justify-start">
-              <div className="bg-white rounded-[2rem] border-4 border-[#ff9312] p-8 shadow-[15px_15px_0px_0px_rgba(255,147,18,0.3)] rotate-[-2deg] z-10 relative max-w-[380px] w-full">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
-                </div>
-                <h4 className="text-xl font-black uppercase tracking-tighter text-[#4c2f05] mb-6">Live Pulse Results</h4>
+              <div className="bg-white rounded-[2rem] border-4 border-[#ff9312] p-8 shadow-[15px_15px_0px_0px_rgba(255,147,18,0.3)] rotate-[-2deg] z-10 relative max-w-[340px] w-full">
+                <h4 className="text-lg font-black uppercase tracking-tighter text-[#4c2f05] mb-6">Live Pulse Results</h4>
                 <div className="space-y-4">
-                  <div className="h-8 bg-[#ff9312] rounded-[1rem] w-[85%] border-2 border-[#4c2f05] transition-all duration-1000 animate-in slide-in-from-left-20" />
+                  <div className="h-8 bg-[#ff9312] rounded-[1rem] w-[85%] border-2 border-[#4c2f05] transition-all duration-1000" />
                   <div className="h-8 bg-[#ff9312]/30 rounded-[1rem] w-[45%] border-2 border-[#4c2f05]/20" />
                   <div className="h-8 bg-[#ff9312]/50 rounded-[1rem] w-[65%] border-2 border-[#4c2f05]/20" />
                 </div>
               </div>
-              <div className="absolute -bottom-8 -right-4 w-48 bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-6 shadow-[10px_10px_0px_0px_#ff9312] rotate-[5deg] z-20 hidden sm:block">
+              <div className="absolute -bottom-8 -right-4 w-44 bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-6 shadow-[10px_10px_0px_0px_#ff9312] rotate-[5deg] z-20 hidden sm:block">
                 <div className="w-16 h-1 bg-[#4c2f05]/10 rounded-full mx-auto mb-8" />
-                <div className="space-y-3">
-                  <div className="h-10 bg-[#4c2f05] rounded-[1rem] flex items-center justify-center animate-pulse">
-                    <span className="text-white font-black text-[10px] uppercase">Option A</span>
-                  </div>
-                  <div className="h-10 bg-[#4c2f05]/10 rounded-[1rem]" />
+                <div className="h-10 bg-[#4c2f05] rounded-[1rem] flex items-center justify-center animate-pulse">
+                  <span className="text-white font-black text-[10px] uppercase">Option A</span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-8 px-4">
-              <h2 className="text-4xl md:text-5xl font-black leading-[0.9] uppercase tracking-tighter">
+              <h2 className="text-3xl md:text-4xl font-black leading-[0.9] uppercase tracking-tighter">
                 From Screen <br />
                 To Hand. <br />
                 <span className="opacity-30">Instantly.</span>
@@ -142,12 +131,12 @@ export default function Home() {
         <section className="py-24 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip">
           <div className="studio-container grid lg:grid-cols-2 gap-16 items-center">
              <div className="space-y-8 px-4">
-                <h2 className="text-4xl md:text-5xl font-black leading-[0.9] uppercase tracking-tighter">
+                <h2 className="text-3xl md:text-4xl font-black leading-[0.9] uppercase tracking-tighter">
                   Command the <br />
                   Grand Stage.
                 </h2>
-                <p className="text-lg font-bold opacity-70 uppercase leading-tight max-w-lg">
-                   Absolute clarity for thousands. High-octane visuals designed for the biggest screens in the boardroom.
+                <p className="text-base font-bold opacity-70 uppercase leading-tight max-w-sm">
+                   Absolute clarity for thousands. visuals designed for the biggest screens in the boardroom.
                 </p>
              </div>
 
@@ -169,13 +158,6 @@ export default function Home() {
                       </div>
                    </div>
                 </div>
-                <div className="absolute -top-6 -right-2 bg-[#ff9312] p-5 rounded-[1.5rem] border-4 border-[#4c2f05] shadow-[10px_10px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-transform duration-700 z-20 hidden sm:block">
-                   <p className="text-[8px] font-black uppercase tracking-widest leading-none mb-1">JOIN AT</p>
-                   <p className="text-lg font-black tracking-tighter leading-none">POPPULSE.COM</p>
-                   <div className="mt-3 pt-3 border-t-2 border-[#4c2f05]/10">
-                      <p className="text-2xl font-black tracking-tighter leading-none">X8Y9Z2</p>
-                   </div>
-                </div>
              </div>
           </div>
         </section>
@@ -184,17 +166,17 @@ export default function Home() {
         <section className="py-24 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip border-t-4 border-[#4c2f05]/5">
           <div className="studio-container grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8 px-4">
-              <h2 className="text-4xl md:text-5xl font-black leading-[0.9] uppercase tracking-tighter">
+              <h2 className="text-3xl md:text-4xl font-black leading-[0.9] uppercase tracking-tighter">
                 High Stakes. <br />
                 Live Quiz.
               </h2>
-              <p className="text-lg font-bold uppercase opacity-70 leading-tight max-w-lg">
-                Turn learning into a competitive pulse. Instant feedback, automated scoring, and high-octane results.
+              <p className="text-base font-bold uppercase opacity-70 leading-tight max-w-sm">
+                Turn learning into a competitive pulse. Instant feedback and high-octane results.
               </p>
             </div>
 
             <div className="relative group flex items-center justify-center min-h-[400px] px-4">
-              <div className="relative w-full max-w-[300px] bg-white rounded-[2rem] border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_#ff9312] rotate-3 transition-transform duration-700 space-y-6">
+              <div className="relative w-full max-w-[280px] bg-white rounded-[2rem] border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_#ff9312] rotate-3 transition-transform duration-700 space-y-6">
                  <h4 className="text-lg font-black uppercase tracking-tight text-center">Correct Answer?</h4>
                  <div className="space-y-3">
                    <div className="h-12 bg-green-500 rounded-[1rem] border-2 border-[#4c2f05] flex items-center px-5 gap-3">
@@ -215,11 +197,94 @@ export default function Home() {
           </div>
         </section>
 
+        {/* PRECISION DATA */}
+        <section className="py-24 bg-[#4c2f05] text-[#ff9312] overflow-x-clip">
+          <div className="studio-container grid lg:grid-cols-2 gap-16 items-center">
+             <div className="space-y-8 px-4 order-last lg:order-first">
+                <div className="relative group">
+                   <div className="bg-white rounded-[2rem] border-4 border-[#ff9312] p-10 shadow-[20px_20px_0px_0px_rgba(255,147,18,0.2)] -rotate-3 group-hover:rotate-0 transition-all duration-700">
+                      <div className="space-y-12">
+                         <div className="text-center">
+                            <span className="text-8xl font-black tracking-tighter text-[#4c2f05] leading-none">84.2</span>
+                            <p className="text-[10px] font-black uppercase tracking-[0.6em] text-[#4c2f05]/30 mt-4">Precision Average</p>
+                         </div>
+                         <div className="h-4 bg-[#4c2f05]/10 rounded-full border-2 border-[#4c2f05] relative overflow-hidden">
+                            <div className="absolute left-0 h-full bg-[#ff9312] w-[84%] animate-in slide-in-from-left-full duration-1000" />
+                         </div>
+                         <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-40 text-[#4c2f05]">
+                            <span>Intensity</span>
+                            <span>Scale 0-100</span>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+
+             <div className="space-y-8 px-4">
+                <h2 className="text-3xl md:text-4xl font-black leading-[0.9] uppercase tracking-tighter">
+                  Precision <br />
+                  Data Points.
+                </h2>
+                <p className="text-base font-bold opacity-70 uppercase leading-tight max-sm">
+                   Capture nuanced sentiment with sliders and numeric guessing. High-fidelity feedback for complex decisions.
+                </p>
+             </div>
+          </div>
+        </section>
+
+        {/* STUDIO ARCHITECT */}
+        <section className="py-24 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip">
+          <div className="studio-container grid lg:grid-cols-2 gap-16 items-center">
+             <div className="space-y-8 px-4">
+                <h2 className="text-3xl md:text-4xl font-black leading-[0.9] uppercase tracking-tighter">
+                  Studio <br />
+                  Architect. <br />
+                  <span className="opacity-30">Zero Friction.</span>
+                </h2>
+                <p className="text-base font-bold opacity-70 uppercase leading-tight max-w-sm">
+                   A surgical interface for survey creation. Build complex interactions in minutes with a minimalist command palette.
+                </p>
+             </div>
+
+             <div className="relative group px-4">
+                {/* Editor Surface - Clean Studio Layout */}
+                <div className="bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-10 shadow-[30px_30px_0px_0px_rgba(76,47,5,0.05)] rotate-2 group-hover:rotate-0 transition-transform duration-700">
+                   <div className="space-y-8">
+                      <div className="space-y-3">
+                         <div className="h-3 bg-[#4c2f05]/5 rounded-full w-24" />
+                         <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/10 flex items-center px-6">
+                            <span className="text-lg font-black uppercase tracking-tighter opacity-20">WHAT IS OUR CORE VALUE?</span>
+                         </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                         <div className="h-12 bg-[#4c2f05]/5 rounded-[1rem] border-2 border-[#4c2f05]/10" />
+                         <div className="h-12 bg-[#ff9312] rounded-[1rem] border-2 border-[#4c2f05]" />
+                      </div>
+                   </div>
+                </div>
+
+                {/* Floating Tool Palette */}
+                <div className="absolute -top-12 -right-4 bg-[#4c2f05] p-6 rounded-[2rem] border-4 border-[#ff9312] shadow-[15px_15px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-all duration-700 z-20">
+                   <div className="grid grid-cols-2 gap-3">
+                      {[Cloud, ListChecks, SlidersHorizontal, MessageSquare, Star, Ruler].map((Icon, i) => (
+                         <div key={i} className="w-10 h-10 bg-white/10 rounded-[0.75rem] flex items-center justify-center border-2 border-white/5 hover:bg-[#ff9312] hover:text-[#4c2f05] transition-colors cursor-pointer">
+                            <Icon className="h-5 w-5 text-white" />
+                         </div>
+                      ))}
+                   </div>
+                   <div className="mt-6 pt-4 border-t-2 border-white/5 flex items-center justify-center">
+                      <Zap className="h-4 w-4 text-[#ff9312] animate-pulse" />
+                   </div>
+                </div>
+             </div>
+          </div>
+        </section>
+
         {/* FEATURES GRID */}
         <section className="py-24 bg-[#4c2f05] text-[#ff9312]">
           <div className="studio-container space-y-20">
             <div className="text-center space-y-4 px-4">
-              <h2 className="text-4xl md:text-6xl font-black leading-[0.85] uppercase tracking-tighter">
+              <h2 className="text-4xl md:text-5xl font-black leading-[0.85] uppercase tracking-tighter">
                 Tools For <br />
                 Impact.
               </h2>
@@ -246,15 +311,15 @@ export default function Home() {
         {/* FINAL CTA */}
         <section className="py-32 text-center bg-[#ff9312] text-[#4c2f05] border-t-4 border-[#4c2f05]">
           <div className="studio-container space-y-12 px-4">
-            <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.8]">
+            <h2 className="text-5xl md:text-6xl font-black uppercase tracking-tighter leading-[0.8]">
               Ready to <br />
               Launch?
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/login" className="h-16 px-10 rounded-[1.5rem] text-sm font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all flex items-center justify-center uppercase">
+              <Link href="/login" className="h-16 px-10 rounded-[1.5rem] text-[10px] font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all flex items-center justify-center uppercase tracking-widest">
                 START DASHBOARD
               </Link>
-              <Link href="/join" className="h-16 px-10 rounded-[1.5rem] text-sm font-black border-4 border-[#4c2f05] text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312] transition-all flex items-center justify-center uppercase">
+              <Link href="/join" className="h-16 px-10 rounded-[1.5rem] text-[10px] font-black border-4 border-[#4c2f05] text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312] transition-all flex items-center justify-center uppercase tracking-widest">
                 JOIN SESSION
               </Link>
             </div>
