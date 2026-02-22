@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles } from "lucide-react";
+import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, query, orderBy, getDocs, setDoc, serverTimestamp } from "firebase/firestore";
@@ -113,42 +113,45 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredSurveys.map((survey) => (
-              <div key={survey.id} className="bg-card p-8 rounded-[1.5rem] border-2 border-foreground/10 flex flex-col gap-6 group hover:border-primary transition-all h-full relative">
+              <div key={survey.id} className="bg-card p-6 rounded-[1.5rem] border-2 border-foreground/10 flex flex-col gap-5 group hover:border-primary transition-all h-full relative">
                 <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center border-2 border-foreground/10 shrink-0 bg-muted group-hover:bg-primary/10 transition-colors">
-                     <BarChart3 className="h-5 w-5 text-primary" />
+                  <div className="w-10 h-10 rounded-[0.75rem] flex items-center justify-center border-2 border-foreground/10 shrink-0 bg-muted group-hover:bg-primary/10 transition-colors">
+                     <BarChart3 className="h-4 w-4 text-primary" />
                   </div>
                   <Button 
                      variant="ghost" 
                      size="icon"
                      onClick={() => handleDeleteSurvey(survey.id)}
-                     className="h-10 w-10 rounded-[0.75rem] hover:text-destructive hover:bg-destructive/5 transition-colors"
+                     className="h-9 w-9 rounded-[0.75rem] hover:text-destructive hover:bg-destructive/5 transition-colors"
                    >
                      <Trash2 className="h-4 w-4" />
                    </Button>
                 </div>
                 
                 <div className="flex-1 space-y-2">
-                  <p className="text-xl font-black tracking-tight uppercase leading-tight line-clamp-2 group-hover:text-primary transition-colors">{survey.title || "Untitled Survey"}</p>
-                  <p className="text-lg font-black uppercase tracking-widest text-primary/60">
-                    {new Date(survey.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                  </p>
+                  <p className="text-lg font-black tracking-tight uppercase leading-tight line-clamp-2 group-hover:text-primary transition-colors">{survey.title || "Untitled Survey"}</p>
+                  <div className="flex items-center gap-2 text-primary">
+                    <Calendar className="h-4 w-4" />
+                    <p className="text-sm font-black uppercase tracking-wider">
+                      {new Date(survey.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-6 border-t-2 border-foreground/10">
+                <div className="flex items-center gap-2 pt-5 border-t-2 border-foreground/10">
                    <Button 
                      variant="ghost" 
                      onClick={() => handleLaunchExisting(survey)}
-                     className="flex-1 h-12 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-foreground hover:text-background transition-all"
+                     className="flex-1 h-11 rounded-[1rem] font-black uppercase text-[10px] tracking-widest hover:bg-foreground hover:text-background transition-all"
                    >
                      Launch
                    </Button>
                    <Button 
                      variant="ghost" 
                      onClick={() => router.push(`/presenter/edit/${survey.id}`)}
-                     className="h-12 w-12 rounded-[1rem] hover:bg-muted border-2 border-transparent hover:border-foreground/10 flex items-center justify-center"
+                     className="h-11 w-11 rounded-[1rem] hover:bg-muted border-2 border-transparent hover:border-foreground/10 flex items-center justify-center"
                    >
-                     <Edit2 className="h-4 w-4" />
+                     <Edit2 className="h-3.5 w-3.5" />
                    </Button>
                 </div>
               </div>

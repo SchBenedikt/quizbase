@@ -109,7 +109,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? 'black' : 'white';
+    return (yiq >= 128) ? '#000000' : '#ffffff';
   };
 
   if (sessionLoading) {
@@ -133,10 +133,11 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const currentTheme = session.theme || 'orange';
   const customColor = session.customColor;
   const showResults = session.showResultsToParticipants;
+  const dynamicForeground = customColor ? getContrastColor(customColor) : 'currentColor';
   const dynamicStyles = customColor ? {
     backgroundColor: customColor,
-    color: getContrastColor(customColor),
-    borderColor: getContrastColor(customColor) + '22'
+    color: dynamicForeground,
+    borderColor: dynamicForeground + '33'
   } : {};
 
   if (voted || (timeLeft === 0 && currentQuestion?.timeLimit)) {
@@ -176,8 +177,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
               )}
             </div>
           ) : (
-            <div className="bg-foreground p-14 rounded-[1.5rem] animate-float">
-              <Heart className="h-20 w-20 text-background fill-background" />
+            <div className="p-14 rounded-[1.5rem] animate-float bg-current" style={{ color: 'var(--background)' }}>
+              <Heart className="h-20 w-20 fill-current" />
             </div>
           )}
 
@@ -226,7 +227,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             <span className="font-black text-2xl tracking-tighter uppercase">PopPulse*</span>
           </div>
           {timeLeft !== null && (
-            <div className="flex items-center gap-3 bg-foreground text-background px-6 py-2 rounded-[1rem] border-2 border-foreground">
+            <div className="flex items-center gap-3 px-6 py-2 rounded-[1rem] border-2 bg-current" style={{ color: 'var(--background)' }}>
               <Timer className="h-4 w-4" />
               <span className="text-xl font-black tabular-nums">{timeLeft}</span>
             </div>
@@ -247,15 +248,16 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   className={cn(
                     "h-24 text-xl font-black rounded-[1.5rem] border-2 transition-all active:scale-95 text-left justify-start px-8",
                     selection === idx 
-                      ? "bg-foreground text-background border-foreground" 
+                      ? "bg-current border-current" 
                       : "border-current/20 bg-black/5 hover:bg-black/10"
                   )}
+                  style={selection === idx ? { color: 'var(--background)' } : {}}
                   onClick={() => setSelection(idx)}
                 >
                   <div className={cn(
                     "w-12 h-12 rounded-[1rem] flex items-center justify-center mr-6 shrink-0 transition-colors border-2 text-lg font-black",
-                    selection === idx ? "bg-background text-foreground border-background" : "bg-foreground text-background border-foreground"
-                  )}>
+                    selection === idx ? "bg-background text-foreground border-background" : "bg-current text-background border-current"
+                  )} style={selection === idx ? { backgroundColor: 'var(--background)', color: 'var(--foreground)' } : { color: 'var(--background)' }}>
                     {String.fromCharCode(65 + idx)}
                   </div>
                   <span className="truncate uppercase">{opt}</span>
@@ -294,6 +296,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   onChange={(e) => setTextValue(e.target.value)}
                   maxLength={20}
                   className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 border-current"
+                  style={{ borderColor: 'inherit' }}
                 />
               ) : (
                 <Textarea 
@@ -301,6 +304,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   className="min-h-[250px] text-2xl font-black p-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 leading-tight border-current"
+                  style={{ borderColor: 'inherit' }}
                 />
               )}
             </div>
@@ -328,7 +332,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           <Button 
             disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider')}
             onClick={handleSubmit}
-            className="w-full h-24 text-3xl font-black rounded-[1.5rem] bg-foreground text-background hover:opacity-90 transition-all mt-8 uppercase tracking-tighter border-2 border-foreground"
+            className="w-full h-24 text-3xl font-black rounded-[1.5rem] bg-current hover:opacity-90 transition-all mt-8 uppercase tracking-tighter border-2 border-current"
+            style={{ color: 'var(--background)' }}
           >
             {loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}
           </Button>

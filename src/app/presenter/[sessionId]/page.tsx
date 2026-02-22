@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect, use, useRef } from "react";
@@ -144,8 +143,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
+    // YIQ algorithm for perceived brightness
     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-    return (yiq >= 128) ? 'black' : 'white';
+    return (yiq >= 128) ? '#000000' : '#ffffff';
   };
 
   if (sessionLoading || !questions) {
@@ -161,10 +161,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   if (!q) return null;
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
 
+  const dynamicForeground = customColor ? getContrastColor(customColor) : 'currentColor';
   const dynamicStyles = customColor ? {
     backgroundColor: customColor,
-    color: getContrastColor(customColor),
-    borderColor: getContrastColor(customColor) + '22'
+    color: dynamicForeground,
+    borderColor: dynamicForeground + '33'
   } : {};
 
   return (
@@ -173,7 +174,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
       style={dynamicStyles}
     >
-      <header className="h-[12vh] px-16 flex items-center justify-between border-b-2 shrink-0 z-20 bg-black/5">
+      <header className="h-[12vh] px-16 flex items-center justify-between border-b-2 shrink-0 z-20 bg-black/5" style={{ borderColor: 'inherit' }}>
         <div className="flex items-center gap-8">
           <Zap className="h-10 w-10 fill-current" />
           <h1 className="text-4xl font-black tracking-tighter truncate max-w-2xl uppercase">{title}</h1>
@@ -181,7 +182,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         
         <div className="flex items-center gap-12">
           {timeLeft !== null && (
-            <div className="flex items-center gap-4 bg-foreground text-background px-8 py-4 rounded-[1.5rem] border-2 border-foreground animate-pulse">
+            <div className="flex items-center gap-4 px-8 py-4 rounded-[1.5rem] border-2 animate-pulse bg-current" style={{ color: 'var(--background)' }}>
               <Timer className="h-8 w-8" />
               <span className="text-5xl font-black tabular-nums">{timeLeft}</span>
             </div>
@@ -200,7 +201,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-16 flex flex-col items-center justify-center relative">
         <div className="w-full max-w-[1400px] h-full flex flex-col gap-12">
           <div className="text-center shrink-0 space-y-4">
-             <div className="inline-block px-6 py-2 bg-foreground text-background rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest">
+             <div className="inline-block px-6 py-2 bg-current rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--background)' }}>
                QUESTION {currentIdx + 1} / {questions.length}
              </div>
              <h2 className="text-6xl md:text-8xl lg:text-[7rem] font-black leading-[0.8] tracking-tighter max-w-7xl mx-auto uppercase">
@@ -217,7 +218,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <Button 
                 onClick={handleSummarize}
                 disabled={isSummarizing}
-                className="absolute top-8 right-8 h-14 px-8 rounded-[1rem] bg-foreground text-background font-black uppercase text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all gap-3"
+                className="absolute top-8 right-8 h-14 px-8 rounded-[1rem] bg-current font-black uppercase text-xs border-2 border-current hover:bg-transparent hover:text-current transition-all gap-3"
+                style={{ color: 'var(--background)' }}
               >
                 {isSummarizing ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
                 AI ANALYZE
@@ -227,14 +229,14 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
       </main>
 
-      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-16 border-t-2 bg-black/5">
+      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-16 border-t-2 bg-black/5" style={{ borderColor: 'inherit' }}>
         <div className="flex items-center gap-4">
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all"
+            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all hover:bg-current hover:text-background"
           >
             <ChevronLeft className="h-7 w-7" />
           </Button>
@@ -243,7 +245,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             size="icon" 
             onClick={handleNext}
             disabled={currentIdx === questions.length - 1}
-            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all"
+            className="h-14 w-14 rounded-[1.5rem] border-2 bg-black/5 transition-all hover:bg-current hover:text-background"
           >
             <ChevronRight className="h-7 w-7" />
           </Button>
@@ -256,7 +258,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                   <Palette className="h-5 w-5 mr-3" /> Vibe
                 </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-64 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4" align="center">
+             <PopoverContent className="w-64 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="center">
                 <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Preset Vibes</p>
                 <div className="grid grid-cols-2 gap-3">
                   <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Orange</Button>
@@ -281,7 +283,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                  <Settings2 className="h-5 w-5 mr-3" /> Sync
                </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-72 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-6" align="center">
+             <PopoverContent className="w-72 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-6 text-foreground" align="center">
                 <div className="space-y-4">
                   <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Audience Controls</p>
                   <div className="flex items-center justify-between">
