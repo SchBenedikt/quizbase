@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, use, useEffect, useRef } from "react";
@@ -58,7 +57,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setSelection(null);
             setTextValue("");
             setRatingValue(0);
-            setSliderValue(50);
+            setSliderValue(qData.range?.min || 50);
             
             if (qData.timeLimit && qData.timeLimit > 0) {
               setTimeLeft(qData.timeLimit);
@@ -88,6 +87,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       if (currentQuestion.type === 'open-text') value = textValue.trim();
       if (currentQuestion.type === 'slider') value = sliderValue;
       if (currentQuestion.type === 'rating') value = ratingValue;
+      if (currentQuestion.type === 'guess-number') value = parseFloat(textValue) || 0;
 
       await addDoc(collection(db, `sessions/${session.id}/responses`), {
         sessionId: session.id,
@@ -136,7 +136,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const customColor = session.customColor;
   const showResults = session.showResultsToParticipants;
 
-  // Resolve final colors
   let finalBg = '#ffffff';
   if (currentTheme === 'orange') finalBg = '#ff9312';
   else if (currentTheme === 'red') finalBg = '#780c16';
@@ -298,7 +297,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             </div>
           )}
 
-          {(currentQuestion.type === 'word-cloud' || currentQuestion.type === 'open-text') && (
+          {(currentQuestion.type === 'word-cloud' || currentQuestion.type === 'open-text' || currentQuestion.type === 'guess-number') && (
             <div className="space-y-6">
               {currentQuestion.type === 'word-cloud' ? (
                 <Input 
@@ -307,6 +306,15 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   onChange={(e) => setTextValue(e.target.value)}
                   maxLength={20}
                   className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20"
+                  style={{ borderColor: finalFg + '33', color: finalFg }}
+                />
+              ) : currentQuestion.type === 'guess-number' ? (
+                <Input 
+                  type="number"
+                  placeholder="Your guess..."
+                  value={textValue}
+                  onChange={(e) => setTextValue(e.target.value)}
+                  className="h-24 text-4xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 text-center"
                   style={{ borderColor: finalFg + '33', color: finalFg }}
                 />
               ) : (
@@ -321,7 +329,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             </div>
           )}
 
-          {currentQuestion.type === 'slider' && (
+          {currentQuestion.type === 'slider' && currentQuestion.range && (
             <div className="space-y-12 py-12 bg-black/5 rounded-[1.5rem] border-2 px-10" style={{ borderColor: finalFg + '10' }}>
               <div className="text-center">
                 <span className="text-9xl font-black tracking-tighter leading-none">{sliderValue}</span>
@@ -329,13 +337,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
               <Slider 
                 value={[sliderValue]}
                 onValueChange={(v) => setSliderValue(v[0])}
-                max={100}
-                step={1}
+                min={currentQuestion.range.min}
+                max={currentQuestion.range.max}
+                step={currentQuestion.range.step}
                 className="py-6"
               />
               <div className="flex justify-between font-black text-[10px] uppercase tracking-widest opacity-40 px-4">
-                <span>Low</span>
-                <span>High</span>
+                <span>{currentQuestion.range.min}</span>
+                <span>{currentQuestion.range.max}</span>
               </div>
             </div>
           )}

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
@@ -138,26 +137,33 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     );
   }
 
-  if (question.type === 'slider') {
+  if (question.type === 'slider' || question.type === 'guess-number') {
     const values = allResponses.map(r => Number(r.value));
     const average = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+    const min = question.range?.min ?? 0;
+    const max = question.range?.max ?? 100;
+    const percentage = ((average - min) / (max - min)) * 100;
 
     return (
       <div className="h-full w-full max-w-[1400px] flex flex-col items-center justify-center space-y-32">
-        <div className="relative h-40 w-full bg-black/5 rounded-[1.5rem] border-2 border-current flex items-center px-16 overflow-hidden">
-           <div 
-             className="absolute left-0 h-full bg-current transition-all duration-1500 ease-out"
-             style={{ width: `${average}%` }}
-           />
-           <div className="relative z-10 w-full flex justify-between font-black text-4xl mix-blend-difference text-white uppercase tracking-[0.5em]">
-             <span>0</span>
-             <span>INTENSITY</span>
-             <span>100</span>
-           </div>
-        </div>
+        {question.type === 'slider' && (
+          <div className="relative h-40 w-full bg-black/5 rounded-[1.5rem] border-2 border-current flex items-center px-16 overflow-hidden">
+             <div 
+               className="absolute left-0 h-full bg-current transition-all duration-1500 ease-out"
+               style={{ width: `${Math.max(0, Math.min(100, percentage))}%` }}
+             />
+             <div className="relative z-10 w-full flex justify-between font-black text-4xl mix-blend-difference text-white uppercase tracking-[0.5em]">
+               <span>{min}</span>
+               <span>INTENSITY</span>
+               <span>{max}</span>
+             </div>
+          </div>
+        )}
         <div className="text-center">
-          <span className="text-[28rem] font-black tracking-tighter leading-[0.7]">{average.toFixed(0)}</span>
-          <p className="text-6xl font-black opacity-20 uppercase tracking-[1.2em] mt-8">RESULT</p>
+          <span className="text-[28rem] font-black tracking-tighter leading-[0.7]">{average.toFixed(question.type === 'guess-number' ? 1 : 0)}</span>
+          <p className="text-6xl font-black opacity-20 uppercase tracking-[1.2em] mt-8">
+            {question.type === 'guess-number' ? 'PRECISION AVERAGE' : 'RESULT'}
+          </p>
         </div>
       </div>
     );

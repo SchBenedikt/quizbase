@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical } from "lucide-react";
+import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical, Hash } from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
 import { PollQuestion, PollType } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
@@ -53,6 +53,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
       type,
       question: "",
       options: type === 'multiple-choice' ? ["Option 1", "Option 2"] : undefined,
+      range: (type === 'slider' || type === 'guess-number') ? { min: 0, max: 100, step: 1 } : undefined,
       correctOptionIndices: [],
       timeLimit: 0,
       createdAt: Date.now()
@@ -96,13 +97,11 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
             >
               <CardContent className="p-0">
                 <div className="flex">
-                  {/* Left Indicator Bar */}
                   <div className="w-16 flex flex-col items-center py-6 bg-muted/20 border-r-2 border-foreground/5 shrink-0">
                     <div className="text-xl font-black opacity-20 mb-4">{idx + 1}</div>
                     <GripVertical className="h-5 w-5 opacity-10" />
                   </div>
 
-                  {/* Main Content Area */}
                   <div className="flex-1 p-6 sm:p-8">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
@@ -121,6 +120,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                             {q.type === 'open-text' && <MessageSquare className="h-5 w-5" />}
                             {q.type === 'rating' && <Star className="h-5 w-5" />}
                             {q.type === 'slider' && <SlidersHorizontal className="h-5 w-5" />}
+                            {q.type === 'guess-number' && <Hash className="h-5 w-5" />}
                           </div>
                           <span className="text-xs font-black uppercase tracking-widest opacity-40">{q.type.replace('-', ' ')}</span>
                         </div>
@@ -232,6 +232,41 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                               </Button>
                             </div>
                           )}
+
+                          {(q.type === 'slider' || q.type === 'guess-number') && q.range && (
+                            <div className="space-y-4 pt-2">
+                               <Label className="text-xs font-black uppercase tracking-widest opacity-40">Numeric Parameters</Label>
+                               <div className="grid grid-cols-3 gap-6">
+                                 <div className="space-y-2">
+                                   <span className="text-[10px] font-black uppercase opacity-30">Min Value</span>
+                                   <Input 
+                                     type="number"
+                                     value={q.range.min}
+                                     onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, min: parseInt(e.target.value) || 0 } })}
+                                     className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                   />
+                                 </div>
+                                 <div className="space-y-2">
+                                   <span className="text-[10px] font-black uppercase opacity-30">Max Value</span>
+                                   <Input 
+                                     type="number"
+                                     value={q.range.max}
+                                     onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, max: parseInt(e.target.value) || 100 } })}
+                                     className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                   />
+                                 </div>
+                                 <div className="space-y-2">
+                                   <span className="text-[10px] font-black uppercase opacity-30">Step</span>
+                                   <Input 
+                                     type="number"
+                                     value={q.range.step}
+                                     onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, step: parseInt(e.target.value) || 1 } })}
+                                     className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                   />
+                                 </div>
+                               </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -243,14 +278,14 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
         })}
       </div>
 
-      {/* Floating Tool Dock */}
       <div className="fixed bottom-12 left-1/2 -translate-x-1/2 bg-background/90 dark:bg-card/90 border-2 border-foreground/10 p-3 rounded-[2rem] flex items-center gap-2 z-50 backdrop-blur-md">
         {[
           { type: 'multiple-choice', icon: ListChecks, label: 'Quiz' },
           { type: 'word-cloud', icon: Cloud, label: 'Cloud' },
           { type: 'open-text', icon: MessageSquare, label: 'Text' },
           { type: 'rating', icon: Star, label: 'Rate' },
-          { type: 'slider', icon: SlidersHorizontal, label: 'Slider' }
+          { type: 'slider', icon: SlidersHorizontal, label: 'Slider' },
+          { type: 'guess-number', icon: Hash, label: 'Guess' }
         ].map((tool) => (
           <Button 
             key={tool.type}
