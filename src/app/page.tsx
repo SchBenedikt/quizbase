@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -5,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, Activity, Users, Star, CheckCircle2, Trophy, Ruler } from "lucide-react";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, Activity, Users, Star, CheckCircle2, Trophy, Ruler, Layout, MousePointer2, Plus } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 
 export default function Home() {
@@ -150,6 +151,129 @@ export default function Home() {
           </div>
         </section>
 
+        {/* PRESENTATION DISPLAY MOCKUP */}
+        <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-hidden">
+          <div className="studio-container space-y-24">
+             <div className="text-center space-y-6 max-w-4xl mx-auto">
+                <h2 className="text-5xl md:text-8xl font-black leading-[0.8] uppercase tracking-tighter">
+                  Command the <br />
+                  Grand Stage.
+                </h2>
+                <p className="text-xl font-bold opacity-70 uppercase max-w-2xl mx-auto">
+                   Absolute clarity for thousands. High-octane visuals designed for the biggest screens in the boardroom.
+                </p>
+             </div>
+
+             <div className="relative group">
+                <div className="bg-[#4c2f05] rounded-[2.5rem] border-8 border-[#ff9312] p-12 shadow-[40px_40px_0px_0px_rgba(76,47,5,0.2)] transition-transform duration-700 group-hover:scale-[1.02]">
+                   {/* Presentation Header */}
+                   <div className="flex items-center justify-between mb-16 pb-8 border-b-4 border-white/10">
+                      <div className="flex items-center gap-6">
+                         <Zap className="h-12 w-12 text-[#ff9312] fill-current" />
+                         <h3 className="text-4xl font-black text-white uppercase tracking-tighter">Live Insight Studio</h3>
+                      </div>
+                      <div className="bg-[#ff9312] p-6 rounded-[1.5rem] text-[#4c2f05]">
+                         <p className="text-[10px] font-black uppercase tracking-widest leading-none mb-1">JOIN AT POPPULSE.COM</p>
+                         <p className="text-6xl font-black tracking-tighter leading-none">X8Y9Z2</p>
+                      </div>
+                   </div>
+
+                   {/* Main Content Area */}
+                   <div className="grid lg:grid-cols-3 gap-12 min-h-[400px]">
+                      <div className="lg:col-span-2 space-y-10">
+                         <h4 className="text-5xl font-black text-white uppercase leading-none tracking-tight">How likely are you to recommend?</h4>
+                         <div className="h-64 flex items-end gap-6 pt-10 px-8 bg-white/5 rounded-[2rem] border-4 border-dashed border-white/10">
+                            <div className="bg-[#ff9312] w-full h-[85%] rounded-t-[1.5rem]" />
+                            <div className="bg-[#ff9312]/30 w-full h-[45%] rounded-t-[1.5rem]" />
+                            <div className="bg-[#ff9312]/60 w-full h-[65%] rounded-t-[1.5rem]" />
+                            <div className="bg-[#ff9312]/80 w-full h-[95%] rounded-t-[1.5rem]" />
+                         </div>
+                      </div>
+                      <div className="bg-white/5 rounded-[2.5rem] border-4 border-white/10 p-10 flex flex-col justify-center items-center text-center space-y-6">
+                         <div className="w-24 h-24 rounded-full bg-[#ff9312] flex items-center justify-center border-4 border-white">
+                            <Users className="h-10 w-10 text-white" />
+                         </div>
+                         <div className="space-y-1">
+                            <p className="text-8xl font-black text-white tracking-tighter leading-none">256</p>
+                            <p className="text-xs font-black text-[#ff9312] uppercase tracking-[0.4em]">PARTICIPANTS SYNCED</p>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </section>
+
+        {/* STUDIO ARCHITECT / EDIT MOCKUP */}
+        <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-hidden border-t-4 border-[#ff9312]">
+          <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
+             <div className="space-y-12">
+                <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
+                  Studio <br />
+                  Architect. <br />
+                  <span className="opacity-30">Zero Friction.</span>
+                </h2>
+                <p className="text-xl font-bold uppercase opacity-70 leading-tight max-w-lg">
+                  Craft your interactive experience in seconds. A surgical, minimalist editor that keeps you focused on the content, not the tool.
+                </p>
+                <div className="flex flex-col gap-4">
+                   {[
+                      { icon: Layout, title: "Visual Layout", desc: "Drag, drop, and refine your survey flow." },
+                      { icon: MousePointer2, title: "Precision Controls", desc: "Set time limits and correct answers instantly." }
+                   ].map((f, i) => (
+                      <div key={i} className="flex gap-6 items-center p-6 bg-[#ff9312]/10 rounded-[1.5rem] border-2 border-[#ff9312]/20">
+                         <div className="w-12 h-12 rounded-[1rem] bg-[#ff9312] text-[#4c2f05] flex items-center justify-center shrink-0">
+                            <f.icon className="h-6 w-6" />
+                         </div>
+                         <div>
+                            <h4 className="font-black uppercase tracking-tight">{f.title}</h4>
+                            <p className="text-[10px] font-bold uppercase opacity-60 tracking-widest">{f.desc}</p>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             </div>
+
+             <div className="relative">
+                {/* Editor Shell */}
+                <div className="bg-white rounded-[2rem] border-4 border-[#ff9312] shadow-[20px_20px_0px_0px_rgba(255,147,18,0.3)] overflow-hidden">
+                   <div className="h-12 bg-[#4c2f05]/5 border-b-2 border-[#4c2f05]/10 flex items-center px-6 gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#4c2f05]/10" />
+                      <div className="w-3 h-3 rounded-full bg-[#4c2f05]/10" />
+                      <div className="w-3 h-3 rounded-full bg-[#4c2f05]/10" />
+                   </div>
+                   <div className="p-8 space-y-8">
+                      {/* Active Edit Question */}
+                      <div className="space-y-4">
+                         <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Edit Question 1</span>
+                            <div className="flex gap-2">
+                               <div className="w-8 h-8 rounded-[0.5rem] bg-[#4c2f05]/5 flex items-center justify-center"><Plus className="h-4 w-4 opacity-20" /></div>
+                            </div>
+                         </div>
+                         <div className="h-16 bg-[#4c2f05]/5 rounded-[1rem] border-2 border-[#4c2f05]/10 px-6 flex items-center">
+                            <span className="font-black uppercase text-sm tracking-tight">What is our primary goal?</span>
+                         </div>
+                      </div>
+
+                      {/* Tool Palette Floating */}
+                      <div className="relative group/tool py-6">
+                         <div className="absolute -left-12 top-0 bg-[#ff9312] p-4 rounded-[1.5rem] border-4 border-[#4c2f05] shadow-[10px_10px_0px_0px_#4c2f05] rotate-[-12deg] z-20 space-y-4">
+                            <div className="w-10 h-10 rounded-[0.75rem] bg-[#4c2f05] text-white flex items-center justify-center"><ListChecks className="h-5 w-5" /></div>
+                            <div className="w-10 h-10 rounded-[0.75rem] bg-white/50 flex items-center justify-center"><Cloud className="h-5 w-5 opacity-40" /></div>
+                            <div className="w-10 h-10 rounded-[0.75rem] bg-white/50 flex items-center justify-center"><Ruler className="h-5 w-5 opacity-40" /></div>
+                         </div>
+                         <div className="bg-white rounded-[1.5rem] border-2 border-dashed border-[#4c2f05]/20 p-6 flex flex-col items-center justify-center space-y-4">
+                            <Sparkles className="h-10 w-10 text-[#ff9312] opacity-20" />
+                            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Refine with AI</p>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </section>
+
         {/* LIVE QUIZZES & GAMIFICATION */}
         <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-hidden">
           <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
@@ -177,7 +301,7 @@ export default function Home() {
             </div>
 
             <div className="relative group flex items-center justify-center min-h-[550px]">
-              {/* Main Quiz Options Card (Participant View) - Repositioned slightly */}
+              {/* Main Quiz Options Card (Participant View) */}
               <div className="relative w-80 bg-white rounded-[2rem] border-4 border-[#4c2f05] p-8 shadow-[20px_20px_0px_0px_#ff9312] rotate-3 transition-transform duration-700 z-0 space-y-6">
                  <div className="w-16 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-8" />
                  <h4 className="text-xl font-black uppercase tracking-tight text-center">Correct Answer?</h4>
@@ -200,7 +324,7 @@ export default function Home() {
                  </div>
               </div>
 
-              {/* Smaller Feedback Card Overlay - Repositioned to be an OFFSET overlay instead of centered */}
+              {/* Smaller Feedback Card Overlay - Repositioned as OFFSET overlay */}
               <div className="absolute top-0 right-0 lg:-right-10 lg:top-10 w-64 rounded-[2rem] bg-green-500 border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-transform duration-700 z-10 flex flex-col items-center justify-center text-center space-y-4">
                 <div className="w-16 h-16 rounded-[1.25rem] bg-white flex items-center justify-center border-4 border-[#4c2f05]">
                   <CheckCircle2 className="h-8 w-8 text-green-500" />
