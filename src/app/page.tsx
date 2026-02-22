@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -31,9 +30,6 @@ export default function Home() {
         <section className="px-6 pt-12 pb-32 max-w-[1400px] mx-auto grid lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-12">
             <div className="space-y-4">
-              <div className="inline-block px-4 py-2 bg-foreground text-background rounded-[1.5rem] text-xs font-black uppercase tracking-widest">
-                Interaction System v4.0
-              </div>
               <h1 className="text-6xl md:text-8xl lg:text-[9rem] font-black leading-[0.8] tracking-tighter uppercase">
                 Your <br />
                 Voice. <br />

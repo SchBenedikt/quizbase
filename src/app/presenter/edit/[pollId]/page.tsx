@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion } from "@/app/types/poll";
-import { ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, Palette } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export default function EditPollPage({ params }: { params: Promise<{ pollId: string }> }) {
   const resolvedParams = use(params);
@@ -34,13 +35,17 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   const { data: initialQuestions } = useCollection<PollQuestion>(questionsQuery);
 
   const [sessionTitle, setSessionTitle] = useState("");
+  const [theme, setTheme] = useState<string>("orange");
+  const [customColor, setCustomColor] = useState<string | null>(null);
   const [currentQuestions, setCurrentQuestions] = useState<PollQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<number | null>(null);
 
   useEffect(() => {
     if (poll) {
-      setSessionTitle(poll.title);
+      setSessionTitle(poll.title || "");
+      setTheme(poll.theme || "orange");
+      setCustomColor(poll.customColor || null);
     }
   }, [poll]);
 
@@ -56,11 +61,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
   }, [user, isUserLoading, router]);
 
-  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string) => {
-    if (!titleToSave || !user || !pollRef) return;
+  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null) => {
+    if (!user || !pollRef) return;
     
     try {
-      await setDoc(pollRef, { title: titleToSave, updatedAt: serverTimestamp() }, { merge: true });
+      await setDoc(pollRef, { 
+        title: titleToSave, 
+        theme: themeToSave, 
+        customColor: customColorToSave,
+        updatedAt: serverTimestamp() 
+      }, { merge: true });
 
       const qCol = collection(db, `users/${user.uid}/surveys/${resolvedParams.pollId}/questions`);
       const batch = writeBatch(db);
@@ -99,18 +109,23 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
 
     const timer = setTimeout(() => {
       if (currentQuestions.length > 0) {
-        performSave(currentQuestions, sessionTitle);
+        performSave(currentQuestions, sessionTitle, theme, customColor);
       }
     }, 2000); 
 
     return () => clearTimeout(timer);
-  }, [currentQuestions, sessionTitle, initialQuestions, performSave]);
+  }, [currentQuestions, sessionTitle, theme, customColor, initialQuestions, performSave]);
 
   const handleManualSave = async () => {
     setLoading(true);
-    await performSave(currentQuestions, sessionTitle);
+    await performSave(currentQuestions, sessionTitle, theme, customColor);
     toast({ title: "Survey Saved", description: "All changes have been synced." });
     setLoading(false);
+  };
+
+  const updateVibe = (newTheme: string, newColor?: string) => {
+    setTheme(newTheme);
+    setCustomColor(newColor || null);
   };
 
   if (pollLoading || !poll || !initialQuestions) {
@@ -141,20 +156,48 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         
         <div className="flex flex-col md:flex-row items-end gap-6 mb-12">
           <div className="flex-1 space-y-3 w-full">
-            <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Survey Title</label>
-            <Input 
-              value={sessionTitle} 
-              onChange={(e) => setSessionTitle(e.target.value)}
-              className="text-xl font-black h-14 border-2 bg-card rounded-[1.25rem] px-8 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter"
-            />
+            <label className="text-sm font-black uppercase tracking-[0.5em] opacity-40 ml-4">Survey Title</label>
+            <div className="flex gap-4">
+              <Input 
+                value={sessionTitle} 
+                onChange={(e) => setSessionTitle(e.target.value)}
+                placeholder="UNNAMED SURVEY..."
+                className="text-xl font-black h-14 border-2 bg-card rounded-[1.25rem] px-8 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter flex-1"
+              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="h-14 px-8 rounded-[1.25rem] border-2 font-black uppercase text-xs tracking-widest gap-3 shadow-none">
+                    <Palette className="h-5 w-5" /> Vibe
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="end">
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Presentation Style</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button onClick={() => updateVibe('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Orange</Button>
+                    <Button onClick={() => updateVibe('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Red</Button>
+                    <Button onClick={() => updateVibe('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Acid</Button>
+                    <Button onClick={() => updateVibe('blue')} className="bg-[#0d99ff] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Blue</Button>
+                  </div>
+                  <div className="space-y-3 pt-3 border-t-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Custom Theme</p>
+                    <Input 
+                      type="color" 
+                      value={customColor || "#ff9312"}
+                      className="h-12 w-full rounded-[1rem] border-2 p-1 cursor-pointer"
+                      onChange={(e) => updateVibe('custom', e.target.value)}
+                    />
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Button 
+                onClick={handleManualSave}
+                disabled={loading}
+                className="h-14 px-10 rounded-[1.25rem] bg-foreground text-background font-black uppercase tracking-widest text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shrink-0 shadow-none"
+              >
+                {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Save"}
+              </Button>
+            </div>
           </div>
-          <Button 
-            onClick={handleManualSave}
-            disabled={loading}
-            className="h-14 px-10 rounded-[1.25rem] bg-foreground text-background font-black uppercase tracking-widest text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shrink-0 shadow-none"
-          >
-            {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Save Changes"}
-          </Button>
         </div>
 
         <PollCreator 

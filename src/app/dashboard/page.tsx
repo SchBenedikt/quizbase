@@ -54,11 +54,13 @@ export default function DashboardPage() {
         id: sessionRef.id,
         pollId: survey.id,
         userId: user.uid,
+        title: survey.title || "Untitled Presentation",
         code,
         status: "active",
         currentQuestionId: firstQId,
         createdAt: serverTimestamp(),
-        theme: 'orange',
+        theme: survey.theme || 'orange',
+        customColor: survey.customColor || null,
         showResultsToParticipants: true
       });
 
