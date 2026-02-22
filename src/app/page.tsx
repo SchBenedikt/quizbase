@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -6,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, Monitor, Smartphone, Share2, MessageSquare, Star, Ruler, Activity, Users, Timer } from "lucide-react";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, MessageSquare, Star, Ruler, Activity, Users, Timer, Monitor, Share2, Smartphone, ListOrdered, Hash } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +21,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#ff9312] text-[#4c2f05] overflow-x-clip">
+    <div className="flex flex-col min-h-screen bg-[#ff9312] text-[#4c2f05] overflow-x-clip font-body">
       <Header variant="brand" className="text-[#4c2f05]" />
 
       <main className="flex-grow">
@@ -364,8 +363,8 @@ export default function Home() {
             <p className="text-[14px] opacity-40 uppercase tracking-[0.4em] text-[#4c2f05] dark:text-white">&copy; {new Date().getFullYear()} Studio interaction</p>
           </div>
           <div className="flex flex-wrap justify-center gap-16 text-[14px] uppercase tracking-[0.4em] opacity-40 text-[#4c2f05] dark:text-white">
-            <Link href="#" className="hover:text-[#ff9312] transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-[#ff9312] transition-colors">Terms</Link>
+            <Link href="/impressum" className="hover:text-[#ff9312] transition-colors">Impressum</Link>
+            <Link href="/datenschutz" className="hover:text-[#ff9312] transition-colors">Datenschutz</Link>
             <Link href="#" className="hover:text-[#ff9312] transition-colors">Contact</Link>
           </div>
         </div>
@@ -373,4 +372,3 @@ export default function Home() {
     </div>
   );
 }
-
