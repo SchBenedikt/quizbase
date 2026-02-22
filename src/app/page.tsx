@@ -32,16 +32,16 @@ export default function Home() {
             <div className="space-y-12 animate-in fade-in slide-in-from-left-10 duration-1000">
               <header className="space-y-4">
                 <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-black leading-[0.75] tracking-tighter uppercase">
-                  Your <br />
-                  Voice. <br />
-                  <span className="opacity-30 italic">Live.</span>
+                  Pure. <br />
+                  Pulse. <br />
+                  <span className="opacity-30 italic">Energy.</span>
                 </h1>
               </header>
               <p className="text-xl md:text-2xl font-bold max-w-xl leading-tight uppercase tracking-tight">
                 Transform any room into an interactive experience. No apps, no registration. Just pure energy.
               </p>
               
-              <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-xl">
+              <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-md">
                 <div className="flex-grow bg-[#4c2f05]/10 rounded-[1.5rem] px-8 h-24 flex items-center border-4 border-[#4c2f05] focus-within:bg-[#4c2f05]/20 transition-all relative overflow-hidden">
                   <Input 
                     value={joinCode}

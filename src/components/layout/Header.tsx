@@ -114,7 +114,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                   onClick={handleSignOut} 
                   variant="ghost" 
                   className={cn(
-                    "rounded-[1.25rem] h-11 px-6 border-2 font-black uppercase text-xs tracking-widest transition-all shadow-none",
+                    "rounded-[1.25rem] h-11 px-6 border-2 font-black uppercase text-[10px] tracking-widest transition-all shadow-none",
                     variant === 'brand' 
                       ? "border-[#4c2f05]/30 text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312]" 
                       : "border-foreground/20 text-foreground hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
