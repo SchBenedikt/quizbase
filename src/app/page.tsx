@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -26,66 +25,68 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-[#ff9312] text-[#4c2f05]">
       <Header variant="brand" className="text-[#4c2f05]" />
 
-      <main className="flex-grow pt-32">
-        {/* HERO SECTION */}
-        <section className="studio-container pt-12 pb-32 grid lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-12 animate-in fade-in slide-in-from-left-10 duration-1000">
-            <header className="space-y-4">
-              <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-black leading-[0.75] tracking-tighter uppercase">
-                Your <br />
-                Voice. <br />
-                <span className="opacity-30 italic">Live.</span>
-              </h1>
-            </header>
-            <p className="text-xl md:text-2xl font-bold max-w-xl leading-tight uppercase tracking-tight">
-              Transform any room into an interactive experience. No apps, no registration. Just pure energy.
-            </p>
-            
-            <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-xl">
-              <div className="flex-grow bg-[#4c2f05]/10 rounded-[1.5rem] px-8 h-24 flex items-center border-4 border-[#4c2f05] focus-within:bg-[#4c2f05]/20 transition-all relative overflow-hidden">
-                <Input 
-                  value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                  placeholder="JOIN CODE" 
-                  maxLength={6}
-                  className="border-none bg-transparent focus-visible:ring-0 text-6xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05] relative z-10"
-                  aria-label="Enter 6-digit session code"
-                />
-              </div>
-              <Button type="submit" disabled={joinCode.length < 6} className="h-24 px-10 rounded-[1.5rem] text-lg font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
-                JOIN NOW <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-              </Button>
-            </form>
-          </div>
+      <main className="flex-grow">
+        {/* HERO SECTION - Full Screen Dynamic */}
+        <section className="studio-container min-h-[100dvh] flex items-center pt-24 pb-12">
+          <div className="grid lg:grid-cols-2 gap-20 items-center w-full">
+            <div className="space-y-12 animate-in fade-in slide-in-from-left-10 duration-1000">
+              <header className="space-y-4">
+                <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-black leading-[0.75] tracking-tighter uppercase">
+                  Your <br />
+                  Voice. <br />
+                  <span className="opacity-30 italic">Live.</span>
+                </h1>
+              </header>
+              <p className="text-xl md:text-2xl font-bold max-w-xl leading-tight uppercase tracking-tight">
+                Transform any room into an interactive experience. No apps, no registration. Just pure energy.
+              </p>
+              
+              <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-xl">
+                <div className="flex-grow bg-[#4c2f05]/10 rounded-[1.5rem] px-8 h-24 flex items-center border-4 border-[#4c2f05] focus-within:bg-[#4c2f05]/20 transition-all relative overflow-hidden">
+                  <Input 
+                    value={joinCode}
+                    onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                    placeholder="JOIN CODE" 
+                    maxLength={6}
+                    className="border-none bg-transparent focus-visible:ring-0 text-6xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05] relative z-10"
+                    aria-label="Enter 6-digit session code"
+                  />
+                </div>
+                <Button type="submit" disabled={joinCode.length < 6} className="h-24 px-10 rounded-[1.5rem] text-lg font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
+                  JOIN NOW <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                </Button>
+              </form>
+            </div>
 
-          {/* PORTRAIT HERO MOCKUP */}
-          <div className="relative group hidden lg:flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000">
-            <div className="relative w-[400px] h-[600px] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-8 shadow-[30px_30px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
-              <div className="w-20 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10 shrink-0" />
-              <div className="flex-1 space-y-8 overflow-hidden">
-                <div className="flex items-center justify-between opacity-40">
-                  <Zap className="h-5 w-5" />
-                  <span className="font-black text-[10px] tracking-widest uppercase">Live Session</span>
-                </div>
-                <h3 className="text-3xl font-black uppercase leading-none tracking-tighter">What is our primary goal?</h3>
-                <div className="space-y-3">
-                  <div className="h-16 bg-[#ff9312] rounded-[1.25rem] border-2 border-[#4c2f05] flex items-center px-6">
-                    <span className="font-black text-sm uppercase">Innovation</span>
+            {/* PORTRAIT HERO MOCKUP */}
+            <div className="relative group hidden lg:flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000">
+              <div className="relative w-[400px] h-[600px] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-8 shadow-[30px_30px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
+                <div className="w-20 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10 shrink-0" />
+                <div className="flex-1 space-y-8 overflow-hidden">
+                  <div className="flex items-center justify-between opacity-40">
+                    <Zap className="h-5 w-5" />
+                    <span className="font-black text-[10px] tracking-widest uppercase">Live Session</span>
                   </div>
-                  <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
-                    <span className="font-black text-sm uppercase opacity-40">Growth</span>
-                  </div>
-                  <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
-                    <span className="font-black text-sm uppercase opacity-40">Sustainability</span>
+                  <h3 className="text-3xl font-black uppercase leading-none tracking-tighter">What is our primary goal?</h3>
+                  <div className="space-y-3">
+                    <div className="h-16 bg-[#ff9312] rounded-[1.25rem] border-2 border-[#4c2f05] flex items-center px-6">
+                      <span className="font-black text-sm uppercase">Innovation</span>
+                    </div>
+                    <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
+                      <span className="font-black text-sm uppercase opacity-40">Growth</span>
+                    </div>
+                    <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
+                      <span className="font-black text-sm uppercase opacity-40">Sustainability</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="mt-8 pt-8 border-t-2 border-[#4c2f05]/5 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-40">42 Transmitting</span>
+                <div className="mt-8 pt-8 border-t-2 border-[#4c2f05]/5 flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest opacity-40">42 Transmitting</span>
+                  </div>
+                  <Users className="h-4 w-4 opacity-40" />
                 </div>
-                <Users className="h-4 w-4 opacity-40" />
               </div>
             </div>
           </div>
