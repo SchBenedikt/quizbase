@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, BarChart3, MessageSquareText } from "lucide-react";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, BarChart3, MessageSquareText, Activity, Users } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Header } from "@/components/layout/Header";
@@ -141,7 +141,7 @@ export default function Home() {
         </section>
 
         {/* ANALYTICS DEMO: DATA POWER */}
-        <section className="py-40 bg-[#f3f3f1] text-[#4c2f05]">
+        <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-hidden">
           <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
             <div className="order-2 lg:order-1 space-y-12">
               <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
@@ -167,7 +167,8 @@ export default function Home() {
             </div>
 
             <div className="order-1 lg:order-2 relative group">
-              <div className="relative rounded-[2rem] overflow-hidden border-4 border-[#4c2f05] bg-white p-1 shadow-[20px_20px_0px_0px_#ff9312] rotate-[2deg] group-hover:rotate-0 transition-transform duration-700">
+              {/* Main Analytics Card */}
+              <div className="relative rounded-[2rem] overflow-hidden border-4 border-[#4c2f05] bg-white p-2 shadow-[20px_20px_0px_0px_#ff9312] rotate-[2deg] group-hover:rotate-0 transition-transform duration-700 z-10">
                 <Image 
                   src={analyticsImage?.imageUrl || "https://picsum.photos/seed/poppulse2/800/600"} 
                   alt="Live data visualization dashboard"
@@ -176,8 +177,25 @@ export default function Home() {
                   className="object-cover w-full h-full rounded-[1.5rem]"
                   data-ai-hint="data visualization"
                 />
-                <div className="absolute top-6 left-6 bg-[#4c2f05] text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
+                <div className="absolute top-6 left-6 bg-[#4c2f05] text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                   Studio Live Feed
+                </div>
+              </div>
+
+              {/* Overlapping Metric Card */}
+              <div className="absolute -top-10 -left-10 bg-white rounded-[1.5rem] border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_rgba(76,47,5,0.1)] rotate-[-4deg] z-20 hidden sm:block">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="bg-primary/10 p-3 rounded-[1rem]">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Live Sync</p>
+                    <h4 className="text-2xl font-black uppercase leading-none">1,248</h4>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-green-600 font-black text-[10px] uppercase">
+                  <Activity className="h-3 w-3" /> +12% Engagement
                 </div>
               </div>
             </div>
