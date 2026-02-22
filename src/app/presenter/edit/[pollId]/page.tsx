@@ -137,65 +137,70 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   }
 
   return (
-    <div className="min-h-screen bg-background presenter-ui font-body">
+    <div className="min-h-screen bg-background font-body selection:bg-primary selection:text-primary-foreground">
       <Header variant="minimal" />
       <div className="max-w-[1400px] mx-auto px-6 py-12 pb-40">
-        <div className="flex items-center gap-6 mt-32 mb-12">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="rounded-[1.25rem] h-12 w-12 border-2">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-4xl font-black uppercase tracking-tighter">Edit Survey</h1>
-            {lastSaved && (
-              <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 mt-1 flex items-center gap-2">
-                <CheckCircle2 className="h-3 w-3 text-green-500" /> Autosaved {new Date(lastSaved).toLocaleTimeString()}
-              </p>
-            )}
+        <div className="flex flex-col sm:flex-row items-center gap-6 mt-32 mb-12">
+          <div className="flex items-center gap-6 w-full">
+            <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="rounded-[1.25rem] h-12 w-12 border-2 shrink-0">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter truncate">Edit Survey</h1>
+              {lastSaved && (
+                <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] opacity-40 mt-1 flex items-center gap-2">
+                  <CheckCircle2 className="h-3 w-3 text-green-500" /> Autosaved {new Date(lastSaved).toLocaleTimeString()}
+                </p>
+              )}
+            </div>
           </div>
         </div>
         
-        <div className="flex flex-col md:flex-row items-end gap-6 mb-12">
-          <div className="flex-1 space-y-3 w-full">
-            <label className="text-sm font-black uppercase tracking-[0.5em] opacity-40 ml-4">Survey Title</label>
-            <div className="flex gap-4">
+        <div className="flex flex-col gap-6 mb-12">
+          <div className="space-y-3 w-full">
+            <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Survey Identity</label>
+            <div className="flex flex-col md:flex-row gap-4">
               <Input 
                 value={sessionTitle} 
                 onChange={(e) => setSessionTitle(e.target.value)}
-                placeholder="UNNAMED SURVEY..."
+                placeholder="SURVEY TITLE..."
                 className="text-xl font-black h-14 border-2 bg-card rounded-[1.25rem] px-8 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter flex-1"
+                aria-label="Survey Title"
               />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="h-14 px-8 rounded-[1.25rem] border-2 font-black uppercase text-xs tracking-widest gap-3 shadow-none">
-                    <Palette className="h-5 w-5" /> Vibe
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-64 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="end">
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Presentation Style</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button onClick={() => updateVibe('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Orange</Button>
-                    <Button onClick={() => updateVibe('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Red</Button>
-                    <Button onClick={() => updateVibe('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Acid</Button>
-                    <Button onClick={() => updateVibe('blue')} className="bg-[#0d99ff] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Blue</Button>
-                  </div>
-                  <div className="space-y-3 pt-3 border-t-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Custom Theme</p>
-                    <Input 
-                      type="color" 
-                      value={customColor || "#ff9312"}
-                      className="h-12 w-full rounded-[1rem] border-2 p-1 cursor-pointer"
-                      onChange={(e) => updateVibe('custom', e.target.value)}
-                    />
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <Button 
-                onClick={handleManualSave}
-                disabled={loading}
-                className="h-14 px-10 rounded-[1.25rem] bg-foreground text-background font-black uppercase tracking-widest text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shrink-0 shadow-none"
-              >
-                {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Save"}
-              </Button>
+              <div className="flex gap-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="h-14 px-6 rounded-[1.25rem] border-2 font-black uppercase text-xs tracking-widest gap-3 shadow-none flex-1 md:flex-none">
+                      <Palette className="h-5 w-5" /> Vibe
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground" align="end">
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Presentation Style</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button onClick={() => updateVibe('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Orange</Button>
+                      <Button onClick={() => updateVibe('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Red</Button>
+                      <Button onClick={() => updateVibe('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Acid</Button>
+                      <Button onClick={() => updateVibe('blue')} className="bg-[#0d99ff] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px]">Blue</Button>
+                    </div>
+                    <div className="space-y-3 pt-3 border-t-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Custom Theme</p>
+                      <Input 
+                        type="color" 
+                        value={customColor || "#ff9312"}
+                        className="h-12 w-full rounded-[1rem] border-2 p-1 cursor-pointer"
+                        onChange={(e) => updateVibe('custom', e.target.value)}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <Button 
+                  onClick={handleManualSave}
+                  disabled={loading}
+                  className="h-14 px-8 rounded-[1.25rem] bg-foreground text-background font-black uppercase tracking-widest text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all flex-1 md:flex-none shadow-none"
+                >
+                  {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Save"}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
