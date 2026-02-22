@@ -1,4 +1,3 @@
-
 export type PollType = 'multiple-choice' | 'open-text' | 'rating' | 'slider' | 'word-cloud';
 
 export interface PollQuestion {
@@ -6,7 +5,7 @@ export interface PollQuestion {
   type: PollType;
   question: string;
   options?: string[]; // For multiple choice
-  correctOptionIndex?: number; // For Quiz Mode
+  correctOptionIndices?: number[]; // For Quiz Mode (Multiple Correct Answers)
   timeLimit?: number; // In seconds, 0 = unlimited
   range?: { min: number; max: number; step: number }; // For slider
   createdAt: number;

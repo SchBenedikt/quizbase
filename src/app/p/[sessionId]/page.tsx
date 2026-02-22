@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, use, useEffect, useRef } from "react";
@@ -60,7 +59,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setRatingValue(0);
             setSliderValue(50);
             
-            // Sync timer
             if (qData.timeLimit && qData.timeLimit > 0) {
               setTimeLeft(qData.timeLimit);
               if (timerRef.current) clearInterval(timerRef.current);
@@ -126,7 +124,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
         <h1 className="text-3xl font-black uppercase tracking-tighter opacity-30">Session Not Found</h1>
-        <p className="text-sm font-bold opacity-60 mt-4 uppercase tracking-widest">Verify your session code.</p>
+        <p className="text-xs font-bold opacity-60 mt-4 uppercase tracking-widest">Verify your session code.</p>
         <Button onClick={() => window.location.href = '/join'} className="mt-12 bg-foreground text-background font-black rounded-[1.5rem] h-16 px-12 border-2 border-foreground">Return to Lobby</Button>
       </div>
     );
@@ -141,7 +139,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     borderColor: getContrastColor(customColor) + '22'
   } : {};
 
-  if (voted || timeLeft === 0) {
+  if (voted || (timeLeft === 0 && currentQuestion?.timeLimit)) {
     const qResults: Record<string, number> = {};
     const currentResponses = allResponses?.filter(r => r.questionId === currentQuestion?.id) || [];
     currentResponses.forEach(r => {
@@ -149,8 +147,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       if (val !== undefined) qResults[val] = (qResults[val] || 0) + 1;
     });
 
-    const isQuiz = currentQuestion?.type === 'multiple-choice' && currentQuestion.correctOptionIndex !== undefined;
-    const isCorrect = isQuiz && selection === currentQuestion.correctOptionIndex;
+    const isQuiz = currentQuestion?.type === 'multiple-choice' && currentQuestion.correctOptionIndices && currentQuestion.correctOptionIndices.length > 0;
+    const isCorrect = isQuiz && selection !== null && currentQuestion.correctOptionIndices?.includes(selection);
 
     return (
       <div 
@@ -168,8 +166,13 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 {isCorrect ? <CheckCircle2 className="h-12 w-12 text-white" /> : <XCircle className="h-12 w-12 text-white" />}
               </div>
               <h1 className="text-5xl font-black uppercase tracking-tighter">{isCorrect ? "Correct!" : "Nice Try!"}</h1>
-              {currentQuestion?.correctOptionIndex !== undefined && !isCorrect && (
-                <p className="font-bold opacity-60 uppercase tracking-widest">The answer was: {currentQuestion.options?.[currentQuestion.correctOptionIndex]}</p>
+              {isQuiz && !isCorrect && (
+                <div className="space-y-2">
+                  <p className="font-bold opacity-60 uppercase tracking-widest text-xs">Correct answer(s):</p>
+                  <p className="font-black uppercase text-xl">
+                    {currentQuestion.correctOptionIndices?.map(i => currentQuestion.options?.[i]).join(", ")}
+                  </p>
+                </div>
               )}
             </div>
           ) : (

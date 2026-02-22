@@ -79,6 +79,8 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         };
 
         if (q.options) qData.options = q.options;
+        if (q.correctOptionIndices) qData.correctOptionIndices = q.correctOptionIndices;
+        if (q.timeLimit !== undefined) qData.timeLimit = q.timeLimit;
         if (q.range) qData.range = q.range;
 
         batch.set(qRef, qData, { merge: true });
@@ -93,13 +95,13 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
 
   // Debounced Autosave
   useEffect(() => {
-    if (!initialQuestions) return; // Wait for initial data
+    if (!initialQuestions) return; 
 
     const timer = setTimeout(() => {
       if (currentQuestions.length > 0) {
         performSave(currentQuestions, sessionTitle);
       }
-    }, 2000); // 2 second debounce
+    }, 2000); 
 
     return () => clearTimeout(timer);
   }, [currentQuestions, sessionTitle, initialQuestions, performSave]);
@@ -131,27 +133,27 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
             <h1 className="text-5xl font-black uppercase tracking-tighter">Edit Survey</h1>
             {lastSaved && (
               <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 mt-1 flex items-center gap-2">
-                <CheckCircle2 className="h-3 w-3" /> Autosaved {new Date(lastSaved).toLocaleTimeString()}
+                <CheckCircle2 className="h-3 w-3 text-green-500" /> Autosaved {new Date(lastSaved).toLocaleTimeString()}
               </p>
             )}
           </div>
         </div>
         
-        <div className="flex flex-col md:flex-row items-end gap-6 mb-12">
+        <div className="flex flex-col md:flex-row items-end gap-6 mb-16">
           <div className="flex-1 space-y-4 w-full">
             <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Survey Title</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              className="text-3xl font-black h-20 border-2 bg-card rounded-[1.5rem] px-10 focus-visible:ring-0 uppercase shadow-none"
+              className="text-4xl font-black h-24 border-2 bg-card rounded-[1.5rem] px-12 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter"
             />
           </div>
           <Button 
             onClick={handleManualSave}
             disabled={loading}
-            className="h-20 px-12 rounded-[1.5rem] bg-foreground text-background font-black uppercase tracking-tighter text-xl border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shrink-0 shadow-none"
+            className="h-24 px-16 rounded-[1.5rem] bg-foreground text-background font-black uppercase tracking-widest text-xl border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shrink-0 shadow-none"
           >
-            {loading ? <Loader2 className="animate-spin h-6 w-6" /> : <><Save className="mr-3 h-6 w-6" /> Save Now</>}
+            {loading ? <Loader2 className="animate-spin h-6 w-6" /> : "Save Changes"}
           </Button>
         </div>
 
