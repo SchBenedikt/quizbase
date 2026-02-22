@@ -41,7 +41,7 @@ export default function Home() {
               Transform any room into an interactive experience. No apps, no registration. Just pure energy.
             </p>
             
-            <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-2xl">
+            <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-xl">
               <div className="flex-grow bg-[#4c2f05]/10 rounded-[1.5rem] px-8 h-24 flex items-center border-4 border-[#4c2f05] focus-within:bg-[#4c2f05]/20 transition-all relative overflow-hidden">
                 <Input 
                   value={joinCode}
@@ -59,7 +59,7 @@ export default function Home() {
           </div>
 
           {/* PORTRAIT HERO MOCKUP */}
-          <div className="relative group hidden lg:flex justify-end animate-in fade-in slide-in-from-right-10 duration-1000">
+          <div className="relative group hidden lg:flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000">
             <div className="relative w-[400px] h-[600px] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-8 shadow-[30px_30px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
               <div className="w-20 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10 shrink-0" />
               <div className="flex-1 space-y-8 overflow-hidden">
@@ -262,18 +262,19 @@ export default function Home() {
       </main>
 
       {/* FOOTER */}
-      <footer className="py-24 studio-container w-full flex flex-col md:flex-row items-center justify-between gap-12 font-black border-t-4 border-[#4c2f05]/10">
-        <div className="flex flex-col gap-4 text-center md:text-left">
-          <span className="text-3xl tracking-tighter uppercase leading-none">PopPulse*</span>
-          <p className="text-xs opacity-40 uppercase tracking-widest">&copy; {new Date().getFullYear()} Studio interaction</p>
-        </div>
-        <div className="flex gap-12 text-xs uppercase tracking-widest opacity-40">
-          <Link href="#" className="hover:text-[#4c2f05] transition-colors">Privacy Policy</Link>
-          <Link href="#" className="hover:text-[#4c2f05] transition-colors">Terms of Service</Link>
-          <Link href="#" className="hover:text-[#4c2f05] transition-colors">Status</Link>
+      <footer className="bg-[#f3f3f1] dark:bg-zinc-950 border-t-4 border-[#4c2f05]/10">
+        <div className="py-24 studio-container w-full flex flex-col md:flex-row items-center justify-between gap-12 font-black">
+          <div className="flex flex-col gap-4 text-center md:text-left">
+            <span className="text-3xl tracking-tighter uppercase leading-none text-[#4c2f05] dark:text-[#ff9312]">PopPulse*</span>
+            <p className="text-xs opacity-40 uppercase tracking-widest text-[#4c2f05] dark:text-white">&copy; {new Date().getFullYear()} Studio interaction</p>
+          </div>
+          <div className="flex gap-12 text-xs uppercase tracking-widest opacity-40 text-[#4c2f05] dark:text-white">
+            <Link href="#" className="hover:text-[#ff9312] transition-colors">Privacy Policy</Link>
+            <Link href="#" className="hover:text-[#ff9312] transition-colors">Terms of Service</Link>
+            <Link href="#" className="hover:text-[#ff9312] transition-colors">Status</Link>
+          </div>
         </div>
       </footer>
     </div>
   );
 }
-
