@@ -40,25 +40,25 @@ export default function Home() {
                 Transform any room into an interactive experience. No apps, no registration. Just pure energy.
               </p>
               
-              <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-md">
-                <div className="flex-grow bg-[#4c2f05]/10 rounded-[1.5rem] px-8 h-24 flex items-center border-4 border-[#4c2f05] focus-within:bg-[#4c2f05]/20 transition-all relative overflow-hidden">
+              <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-sm">
+                <div className="flex-grow bg-[#4c2f05]/10 rounded-[1.5rem] px-8 h-20 flex items-center border-4 border-[#4c2f05] focus-within:bg-[#4c2f05]/20 transition-all relative overflow-hidden">
                   <Input 
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                     placeholder="JOIN CODE" 
                     maxLength={6}
-                    className="border-none bg-transparent focus-visible:ring-0 text-6xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05] relative z-10"
+                    className="border-none bg-transparent focus-visible:ring-0 text-5xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05] relative z-10"
                     aria-label="Enter 6-digit session code"
                   />
                 </div>
-                <Button type="submit" disabled={joinCode.length < 6} className="h-24 px-10 rounded-[1.5rem] text-lg font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
+                <Button type="submit" disabled={joinCode.length < 6} className="h-20 px-10 rounded-[1.5rem] text-lg font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
                   JOIN NOW <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
                 </Button>
               </form>
             </div>
 
             {/* PORTRAIT HERO MOCKUP */}
-            <div className="relative group hidden lg:flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000">
+            <div className="relative group hidden lg:flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000 lg:-ml-16">
               <div className="relative w-[400px] h-[600px] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-8 shadow-[30px_30px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
                 <div className="w-20 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10 shrink-0" />
                 <div className="flex-1 space-y-8 overflow-hidden">

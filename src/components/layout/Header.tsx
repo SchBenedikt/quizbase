@@ -88,7 +88,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                 <Button 
                   onClick={handleSignOut} 
                   variant="ghost" 
-                  className="rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all hover:bg-destructive/10 hover:text-destructive"
+                  className="rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all hover:bg-foreground/10"
                 >
                   <LogOut className="h-3 w-3 mr-2" /> Logout
                 </Button>
