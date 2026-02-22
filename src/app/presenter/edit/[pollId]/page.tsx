@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion } from "@/app/types/poll";
-import { ArrowLeft, Loader2, Save, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
@@ -126,11 +126,11 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       <Header variant="minimal" />
       <div className="max-w-[1400px] mx-auto px-6 py-12 pb-40">
         <div className="flex items-center gap-6 mt-32 mb-12">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="rounded-[1.5rem] h-14 w-14 border-2">
-            <ArrowLeft className="h-6 w-6" />
+          <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="rounded-[1.25rem] h-12 w-12 border-2">
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-5xl font-black uppercase tracking-tighter">Edit Survey</h1>
+            <h1 className="text-4xl font-black uppercase tracking-tighter">Edit Survey</h1>
             {lastSaved && (
               <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 mt-1 flex items-center gap-2">
                 <CheckCircle2 className="h-3 w-3 text-green-500" /> Autosaved {new Date(lastSaved).toLocaleTimeString()}
@@ -139,21 +139,21 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
           </div>
         </div>
         
-        <div className="flex flex-col md:flex-row items-end gap-6 mb-16">
-          <div className="flex-1 space-y-4 w-full">
+        <div className="flex flex-col md:flex-row items-end gap-6 mb-12">
+          <div className="flex-1 space-y-3 w-full">
             <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Survey Title</label>
             <Input 
               value={sessionTitle} 
               onChange={(e) => setSessionTitle(e.target.value)}
-              className="text-4xl font-black h-24 border-2 bg-card rounded-[1.5rem] px-12 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter"
+              className="text-3xl font-black h-20 border-2 bg-card rounded-[1.25rem] px-8 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter"
             />
           </div>
           <Button 
             onClick={handleManualSave}
             disabled={loading}
-            className="h-24 px-16 rounded-[1.5rem] bg-foreground text-background font-black uppercase tracking-widest text-xl border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shrink-0 shadow-none"
+            className="h-14 px-10 rounded-[1.25rem] bg-foreground text-background font-black uppercase tracking-widest text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shrink-0 shadow-none"
           >
-            {loading ? <Loader2 className="animate-spin h-6 w-6" /> : "Save Changes"}
+            {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Save Changes"}
           </Button>
         </div>
 
