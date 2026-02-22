@@ -1,10 +1,10 @@
 
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Palette, Sparkles, Monitor } from "lucide-react";
+import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Palette, Sparkles, Monitor, Settings2, Eye, EyeOff } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession } from "@/app/types/poll";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
@@ -13,6 +13,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { aiOpenTextSummarizer } from "@/ai/flows/ai-open-text-summarizer";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
@@ -26,6 +28,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const code = session?.code || "---";
   const currentTheme = session?.theme || 'orange';
   const customColor = session?.customColor;
+  const showResults = session?.showResultsToParticipants ?? true;
 
   const questionsQuery = useMemoFirebase(() => {
     if (!session) return null;
@@ -41,6 +44,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   const [results, setResults] = useState<Record<string, number>>({});
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (allResponses && session?.currentQuestionId) {
@@ -62,6 +67,33 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   }, [session, questions, sessionRef]);
 
+  // Timer logic
+  useEffect(() => {
+    if (!session?.currentQuestionId || !questions) return;
+    const currentQ = questions.find(q => q.id === session.currentQuestionId);
+    
+    if (currentQ?.timeLimit && currentQ.timeLimit > 0) {
+      setTimeLeft(currentQ.timeLimit);
+      if (timerRef.current) clearInterval(timerRef.current);
+      
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev === null || prev <= 0) {
+            if (timerRef.current) clearInterval(timerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      setTimeLeft(null);
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [session?.currentQuestionId, questions]);
+
   const handleNext = () => {
     if (!questions || !session) return;
     const currentIdx = questions.findIndex(q => q.id === session.currentQuestionId);
@@ -81,6 +113,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const setTheme = (theme: string, customColor?: string) => {
     if (!sessionRef) return;
     updateDoc(sessionRef, { theme, customColor: customColor || null });
+  };
+
+  const toggleResultVisibility = () => {
+    if (!sessionRef) return;
+    updateDoc(sessionRef, { showResultsToParticipants: !showResults });
   };
 
   const handleSummarize = async () => {
@@ -142,12 +179,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           <h1 className="text-4xl font-black tracking-tighter truncate max-w-2xl uppercase">{title}</h1>
         </div>
         
-        <div className="flex items-center gap-16">
+        <div className="flex items-center gap-12">
+          {timeLeft !== null && (
+            <div className="flex items-center gap-4 bg-foreground text-background px-8 py-4 rounded-[1.5rem] border-2 border-foreground animate-pulse">
+              <Timer className="h-8 w-8" />
+              <span className="text-5xl font-black tabular-nums">{timeLeft}</span>
+            </div>
+          )}
           <div className="flex flex-col items-end">
             <p className="text-[10px] font-black uppercase tracking-widest opacity-50">JOIN CODE</p>
             <p className="text-6xl font-black tracking-tighter leading-none mt-1">{code}</p>
           </div>
-          <div className="flex items-center gap-6 bg-black/5 px-8 py-4 rounded-[1.5rem] border-2">
+          <div className="flex items-center gap-6 bg-black/5 px-8 py-4 rounded-[1.5rem] border-2 border-current/10">
             <Users className="h-8 w-8" />
             <span className="text-5xl font-black leading-none">{currentResponses.length}</span>
           </div>
@@ -206,7 +249,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           </Button>
         </div>
         
-        <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2">
+        <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2 border-current/10">
            <Popover>
              <PopoverTrigger asChild>
                 <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all">
@@ -231,9 +274,27 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                 </div>
              </PopoverContent>
            </Popover>
-           <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all">
-             <Timer className="h-5 w-5 mr-3" /> Timer
-           </Button>
+           
+           <Popover>
+             <PopoverTrigger asChild>
+               <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all">
+                 <Settings2 className="h-5 w-5 mr-3" /> Sync
+               </Button>
+             </PopoverTrigger>
+             <PopoverContent className="w-72 p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-6" align="center">
+                <div className="space-y-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Audience Controls</p>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="show-results" className="text-xs font-black uppercase">Live Results</Label>
+                    <Switch id="show-results" checked={showResults} onCheckedChange={toggleResultVisibility} />
+                  </div>
+                  <p className="text-[10px] opacity-40 uppercase leading-tight font-bold">
+                    When active, participants see real-time charts on their devices after submitting.
+                  </p>
+                </div>
+             </PopoverContent>
+           </Popover>
+
            <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all">
              <Monitor className="h-5 w-5 mr-3" /> Live
            </Button>

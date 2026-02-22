@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -5,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronUp, Map } from "lucide-react";
+import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronUp, Map, Timer, CheckCircle2 } from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
 import { PollQuestion, PollType } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 interface PollCreatorProps {
   onSave?: (questions: PollQuestion[]) => void;
@@ -23,6 +25,7 @@ export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCre
       type: 'multiple-choice',
       question: "WHAT IS OUR PRIMARY GOAL?",
       options: ["Growth", "Innovation", "Stability"],
+      timeLimit: 0,
       createdAt: Date.now()
     }
   ]);
@@ -45,6 +48,7 @@ export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCre
       type,
       question: "",
       options: type === 'multiple-choice' ? ["Option 1", "Option 2"] : undefined,
+      timeLimit: 0,
       createdAt: Date.now()
     };
     setQuestions([...questions, newQuestion]);
@@ -69,9 +73,8 @@ export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCre
 
   return (
     <div className="space-y-12 pb-48 presenter-ui">
-      {/* Interaction Control Bar */}
       <section className="space-y-6">
-        <div className="sticky top-24 z-30 bg-background/95 dark:bg-background/95 backdrop-blur-sm py-6 border-b-2 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 px-4 rounded-[1.5rem]">
+        <div className="sticky top-24 z-30 bg-background/95 dark:bg-background/95 backdrop-blur-sm py-6 border-b-2 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 px-4 rounded-[1.5rem] border-foreground/10">
           <div className="space-y-2">
             <h2 className="text-2xl font-black tracking-tighter uppercase flex items-center gap-3">
               <Map className="h-6 w-6 text-primary" /> Interaction Flow
@@ -91,15 +94,6 @@ export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCre
               </div>
             </div>
           </div>
-          {onSave && (
-            <Button 
-              type="button"
-              onClick={() => onSave(questions)} 
-              className="rounded-[1.25rem] h-14 px-10 font-black bg-primary text-primary-foreground hover:bg-primary/90 transition-all uppercase text-sm shadow-none border-2 border-primary shrink-0"
-            >
-              Update All
-            </Button>
-          )}
         </div>
 
         <div className="grid gap-8">
@@ -127,15 +121,29 @@ export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCre
 
                   <div className="flex-grow space-y-8">
                     <div className="flex items-center justify-between border-b-2 border-foreground/5 pb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-[0.75rem] text-primary">
-                          {q.type === 'multiple-choice' && <ListChecks className="h-5 w-5" />}
-                          {q.type === 'word-cloud' && <Cloud className="h-5 w-5" />}
-                          {q.type === 'open-text' && <MessageSquare className="h-5 w-5" />}
-                          {q.type === 'rating' && <Star className="h-5 w-5" />}
-                          {q.type === 'slider' && <SlidersHorizontal className="h-5 w-5" />}
+                      <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-primary/10 rounded-[0.75rem] text-primary">
+                            {q.type === 'multiple-choice' && <ListChecks className="h-5 w-5" />}
+                            {q.type === 'word-cloud' && <Cloud className="h-5 w-5" />}
+                            {q.type === 'open-text' && <MessageSquare className="h-5 w-5" />}
+                            {q.type === 'rating' && <Star className="h-5 w-5" />}
+                            {q.type === 'slider' && <SlidersHorizontal className="h-5 w-5" />}
+                          </div>
+                          <Label className="text-xs font-black uppercase tracking-[0.3em] opacity-40">{q.type.replace('-', ' ')}</Label>
                         </div>
-                        <Label className="text-xs font-black uppercase tracking-[0.3em] opacity-40">Interaction Type: {q.type.replace('-', ' ')}</Label>
+
+                        <div className="flex items-center gap-3 border-l-2 border-foreground/10 pl-6">
+                          <Timer className="h-4 w-4 opacity-40" />
+                          <Input 
+                            type="number"
+                            value={q.timeLimit || 0}
+                            onChange={(e) => updateQuestion(q.id, { timeLimit: parseInt(e.target.value) || 0 })}
+                            className="w-16 h-8 text-xs font-black text-center border-2 rounded-[0.5rem] p-0"
+                            placeholder="0"
+                          />
+                          <span className="text-[10px] font-black uppercase opacity-40">Sec</span>
+                        </div>
                       </div>
                       <Button 
                         variant="ghost" 
@@ -167,11 +175,22 @@ export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCre
 
                     {q.type === 'multiple-choice' && q.options && (
                       <div className="grid gap-4 pt-4 bg-muted/20 p-6 rounded-[1.25rem] border-2 border-dashed border-foreground/10">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Options & Correct Answer</span>
+                        </div>
                         {q.options.map((opt, oIdx) => (
                           <div key={oIdx} className="flex gap-3 items-center">
-                            <div className="h-12 w-12 bg-foreground/5 rounded-[0.75rem] flex items-center justify-center font-black text-xs text-foreground/30">
-                              {String.fromCharCode(65 + oIdx)}
-                            </div>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => updateQuestion(q.id, { correctOptionIndex: q.correctOptionIndex === oIdx ? undefined : oIdx })}
+                              className={cn(
+                                "h-12 w-12 rounded-[0.75rem] border-2 transition-all",
+                                q.correctOptionIndex === oIdx ? "bg-primary text-primary-foreground border-primary" : "bg-foreground/5 text-foreground/20 border-transparent hover:border-primary/20"
+                              )}
+                            >
+                              <CheckCircle2 className="h-5 w-5" />
+                            </Button>
                             <Input 
                               value={opt} 
                               onChange={(e) => {
@@ -179,12 +198,12 @@ export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCre
                                 newOpts[oIdx] = e.target.value;
                                 updateQuestion(q.id, { options: newOpts });
                               }}
-                              className="h-12 border-2 bg-card rounded-[1rem] px-6 font-bold text-sm shadow-none"
+                              className="h-12 border-2 bg-card rounded-[1rem] px-6 font-bold text-sm shadow-none flex-1"
                             />
                             {q.options!.length > 2 && (
                                <Button variant="ghost" size="icon" onClick={() => {
                                  const newOpts = q.options!.filter((_, i) => i !== oIdx);
-                                 updateQuestion(q.id, { options: newOpts });
+                                 updateQuestion(q.id, { options: newOpts, correctOptionIndex: q.correctOptionIndex === oIdx ? undefined : q.correctOptionIndex });
                                }} className="h-12 w-12 rounded-[1rem] hover:bg-destructive/5 hover:text-destructive">
                                  <Trash2 className="h-4 w-4" />
                                </Button>
@@ -208,10 +227,9 @@ export function PollCreator({ onSave, onChange, initialQuestions = [] }: PollCre
         </div>
       </section>
 
-      {/* Floating Toolbar */}
       <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-background dark:bg-card border-2 border-foreground/10 p-4 rounded-[2rem] flex items-center gap-3 z-50 shadow-none backdrop-blur-md">
         {[
-          { type: 'multiple-choice', icon: ListChecks, label: 'Poll' },
+          { type: 'multiple-choice', icon: ListChecks, label: 'Poll/Quiz' },
           { type: 'word-cloud', icon: Cloud, label: 'Cloud' },
           { type: 'open-text', icon: MessageSquare, label: 'Open' },
           { type: 'rating', icon: Star, label: 'Rate' },

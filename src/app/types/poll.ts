@@ -6,6 +6,8 @@ export interface PollQuestion {
   type: PollType;
   question: string;
   options?: string[]; // For multiple choice
+  correctOptionIndex?: number; // For Quiz Mode
+  timeLimit?: number; // In seconds, 0 = unlimited
   range?: { min: number; max: number; step: number }; // For slider
   createdAt: number;
 }
@@ -20,6 +22,7 @@ export interface PollSession {
   status: 'active' | 'ended';
   theme?: 'orange' | 'red' | 'green' | 'blue' | 'custom';
   customColor?: string; // Hex color code
+  showResultsToParticipants: boolean;
   createdAt: any;
 }
 

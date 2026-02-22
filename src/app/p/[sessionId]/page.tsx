@@ -1,16 +1,17 @@
 
 "use client";
 
-import { useState, use, useEffect } from "react";
+import { useState, use, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { Zap, Heart, Loader2, Star } from "lucide-react";
+import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle } from "lucide-react";
 import { PollQuestion, PollSession } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, collection, addDoc, serverTimestamp, getDoc, query, where, limit } from "firebase/firestore";
+import { ResultChart } from "@/components/poll/ResultChart";
 
 export default function ParticipantView({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
@@ -34,6 +35,15 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const [sliderValue, setSliderValue] = useState(50);
   const [ratingValue, setRatingValue] = useState(0);
   const [loading, setLoading] = useState(false);
+  
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const responsesQuery = useMemoFirebase(() => {
+    if (!session?.id) return null;
+    return collection(db, `sessions/${session.id}/responses`);
+  }, [db, session?.id]);
+  const { data: allResponses } = useCollection(responsesQuery);
 
   useEffect(() => {
     if (session?.currentQuestionId && session.userId && session.pollId) {
@@ -42,12 +52,24 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           const qRef = doc(db, `users/${session.userId}/surveys/${session.pollId}/questions/${session.currentQuestionId}`);
           const snap = await getDoc(qRef);
           if (snap.exists()) {
-            setCurrentQuestion({ ...snap.data(), id: snap.id } as PollQuestion);
+            const qData = { ...snap.data(), id: snap.id } as PollQuestion;
+            setCurrentQuestion(qData);
             setVoted(false);
             setSelection(null);
             setTextValue("");
             setRatingValue(0);
             setSliderValue(50);
+            
+            // Sync timer
+            if (qData.timeLimit && qData.timeLimit > 0) {
+              setTimeLeft(qData.timeLimit);
+              if (timerRef.current) clearInterval(timerRef.current);
+              timerRef.current = setInterval(() => {
+                setTimeLeft(prev => (prev === null || prev <= 0) ? 0 : prev - 1);
+              }, 1000);
+            } else {
+              setTimeLeft(null);
+            }
           }
         } catch (error) {
           console.error("Failed to fetch current question:", error);
@@ -58,7 +80,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   }, [session?.currentQuestionId, session?.userId, session?.pollId, db]);
 
   const handleSubmit = async () => {
-    if (!currentQuestion || !session) return;
+    if (!currentQuestion || !session || (timeLeft === 0 && currentQuestion.timeLimit)) return;
     setLoading(true);
     try {
       let value: any = "";
@@ -112,25 +134,65 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   const currentTheme = session.theme || 'orange';
   const customColor = session.customColor;
+  const showResults = session.showResultsToParticipants;
   const dynamicStyles = customColor ? {
     backgroundColor: customColor,
     color: getContrastColor(customColor),
     borderColor: getContrastColor(customColor) + '22'
   } : {};
 
-  if (voted) {
+  if (voted || timeLeft === 0) {
+    const qResults: Record<string, number> = {};
+    const currentResponses = allResponses?.filter(r => r.questionId === currentQuestion?.id) || [];
+    currentResponses.forEach(r => {
+      const val = r.value?.toString();
+      if (val !== undefined) qResults[val] = (qResults[val] || 0) + 1;
+    });
+
+    const isQuiz = currentQuestion?.type === 'multiple-choice' && currentQuestion.correctOptionIndex !== undefined;
+    const isCorrect = isQuiz && selection === currentQuestion.correctOptionIndex;
+
     return (
       <div 
-        className="min-h-screen flex flex-col items-center justify-center p-8 text-center space-y-10 animate-in fade-in duration-700 bg-background" 
+        className="min-h-screen flex flex-col p-8 bg-background transition-colors duration-700" 
         data-theme={currentTheme !== 'custom' ? currentTheme : undefined}
         style={dynamicStyles}
       >
-        <div className="bg-foreground p-14 rounded-[1.5rem] animate-float">
-          <Heart className="h-20 w-20 text-background fill-background" />
-        </div>
-        <div className="space-y-4">
-          <h1 className="text-5xl font-black uppercase tracking-tighter leading-none">Sync Confirmed!</h1>
-          <p className="font-bold text-xl max-w-xs mx-auto uppercase tracking-tight opacity-80">Stand by for the next signal...</p>
+        <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center text-center space-y-12">
+          {isQuiz ? (
+            <div className="space-y-6 animate-in zoom-in duration-500">
+              <div className={cn(
+                "w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-4",
+                isCorrect ? "bg-green-500 border-green-600" : "bg-red-500 border-red-600"
+              )}>
+                {isCorrect ? <CheckCircle2 className="h-12 w-12 text-white" /> : <XCircle className="h-12 w-12 text-white" />}
+              </div>
+              <h1 className="text-5xl font-black uppercase tracking-tighter">{isCorrect ? "Correct!" : "Nice Try!"}</h1>
+              {currentQuestion?.correctOptionIndex !== undefined && !isCorrect && (
+                <p className="font-bold opacity-60 uppercase tracking-widest">The answer was: {currentQuestion.options?.[currentQuestion.correctOptionIndex]}</p>
+              )}
+            </div>
+          ) : (
+            <div className="bg-foreground p-14 rounded-[1.5rem] animate-float">
+              <Heart className="h-20 w-20 text-background fill-background" />
+            </div>
+          )}
+
+          {!isQuiz && (
+            <div className="space-y-4">
+              <h1 className="text-5xl font-black uppercase tracking-tighter leading-none">Sync Confirmed!</h1>
+              <p className="font-bold text-xl max-w-xs mx-auto uppercase tracking-tight opacity-80">Stand by for the next signal...</p>
+            </div>
+          )}
+
+          {showResults && currentQuestion && (
+            <div className="w-full mt-12 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+               <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-6 opacity-40">Live Audience Pulse</p>
+               <div className="h-64 border-2 border-current/10 rounded-[1.5rem] p-6 bg-black/5">
+                 <ResultChart question={currentQuestion} results={qResults} allResponses={currentResponses} />
+               </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -160,9 +222,12 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             <Zap className="h-8 w-8 fill-current" />
             <span className="font-black text-2xl tracking-tighter uppercase">PopPulse*</span>
           </div>
-          <div className="px-6 py-2 border-2 border-current rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest">
-            Live
-          </div>
+          {timeLeft !== null && (
+            <div className="flex items-center gap-3 bg-foreground text-background px-6 py-2 rounded-[1rem] border-2 border-foreground">
+              <Timer className="h-4 w-4" />
+              <span className="text-xl font-black tabular-nums">{timeLeft}</span>
+            </div>
+          )}
         </div>
 
         <main className="space-y-12 flex-1">

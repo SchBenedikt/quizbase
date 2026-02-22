@@ -21,12 +21,12 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const pollsQuery = useMemoFirebase(() => {
+  const surveysQuery = useMemoFirebase(() => {
     if (!user) return null;
     return query(collection(db, `users/${user.uid}/surveys`), orderBy("createdAt", "desc"));
   }, [user, db]);
 
-  const { data: polls, isLoading: pollsLoading } = useCollection(pollsQuery);
+  const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -34,33 +34,34 @@ export default function DashboardPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleDeletePoll = (pollId: string) => {
+  const handleDeleteSurvey = (surveyId: string) => {
     if (!user) return;
-    const pollRef = doc(db, `users/${user.uid}/surveys/${pollId}`);
-    deleteDocumentNonBlocking(pollRef);
+    const surveyRef = doc(db, `users/${user.uid}/surveys/${surveyId}`);
+    deleteDocumentNonBlocking(surveyRef);
     toast({ title: "Survey Deleted", description: "The presentation has been removed." });
   };
 
-  const handleLaunchExisting = async (poll: any) => {
+  const handleLaunchExisting = async (survey: any) => {
     if (!user) return;
     setLoading(true);
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
     const sessionRef = doc(collection(db, "sessions"));
     
     try {
-      const qCol = collection(db, `users/${user.uid}/surveys/${poll.id}/questions`);
+      const qCol = collection(db, `users/${user.uid}/surveys/${survey.id}/questions`);
       const qSnap = await getDocs(query(qCol, orderBy("order", "asc")));
       const firstQId = qSnap.docs[0]?.id || null;
 
       await setDoc(sessionRef, {
         id: sessionRef.id,
-        pollId: poll.id,
+        pollId: survey.id,
         userId: user.uid,
         code,
         status: "active",
         currentQuestionId: firstQId,
         createdAt: serverTimestamp(),
-        theme: 'orange'
+        theme: 'orange',
+        showResultsToParticipants: true
       });
 
       router.push(`/presenter/${sessionRef.id}`);
@@ -72,10 +73,11 @@ export default function DashboardPage() {
   };
 
   const handleCreateNew = () => {
-    router.push("/dashboard/new");
+    const surveyId = Math.random().toString(36).substr(2, 9);
+    router.push(`/presenter/edit/${surveyId}`);
   };
 
-  const filteredPolls = polls?.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredSurveys = surveys?.filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (isUserLoading || !user) return null;
 
@@ -91,7 +93,7 @@ export default function DashboardPage() {
               placeholder="SEARCH YOUR SURVEYS..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-16 pl-16 pr-8 rounded-[1.5rem] border-2 bg-card focus-visible:ring-0 font-black text-lg uppercase tracking-tight"
+              className="h-16 pl-16 pr-8 rounded-[1.5rem] border-2 bg-card focus-visible:ring-0 font-black text-lg uppercase tracking-tight border-foreground/10"
             />
           </div>
           <Button 
@@ -103,25 +105,25 @@ export default function DashboardPage() {
           </Button>
         </div>
 
-        {pollsLoading ? (
+        {surveysLoading ? (
           <div className="py-40 text-center"><Loader2 className="h-12 w-12 animate-spin mx-auto opacity-10" /></div>
-        ) : !filteredPolls || filteredPolls.length === 0 ? (
-          <div className="py-40 text-center border-2 border-dashed rounded-[1.5rem] bg-muted/20 space-y-6">
+        ) : !filteredSurveys || filteredSurveys.length === 0 ? (
+          <div className="py-40 text-center border-2 border-dashed rounded-[1.5rem] bg-muted/20 space-y-6 border-foreground/10">
              <Sparkles className="h-12 w-12 mx-auto opacity-10" />
              <p className="text-xs font-black uppercase opacity-30 tracking-[0.5em]">No surveys found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredPolls.map((poll) => (
-              <div key={poll.id} className="bg-card p-8 rounded-[1.5rem] border-2 flex flex-col gap-6 group hover:border-primary transition-all h-full relative">
+            {filteredSurveys.map((survey) => (
+              <div key={survey.id} className="bg-card p-8 rounded-[1.5rem] border-2 border-foreground/10 flex flex-col gap-6 group hover:border-primary transition-all h-full relative">
                 <div className="flex items-start justify-between">
-                  <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center border-2 shrink-0 bg-muted group-hover:bg-primary/10 transition-colors">
+                  <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center border-2 border-foreground/10 shrink-0 bg-muted group-hover:bg-primary/10 transition-colors">
                      <BarChart3 className="h-5 w-5 text-primary" />
                   </div>
                   <Button 
                      variant="ghost" 
                      size="icon"
-                     onClick={() => handleDeletePoll(poll.id)}
+                     onClick={() => handleDeleteSurvey(survey.id)}
                      className="h-10 w-10 rounded-[0.75rem] hover:text-destructive hover:bg-destructive/5 transition-colors"
                    >
                      <Trash2 className="h-4 w-4" />
@@ -129,23 +131,23 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="flex-1 space-y-2">
-                  <p className="text-xl font-black tracking-tight uppercase leading-tight line-clamp-2 group-hover:text-primary transition-colors">{poll.title}</p>
+                  <p className="text-xl font-black tracking-tight uppercase leading-tight line-clamp-2 group-hover:text-primary transition-colors">{survey.title || "Untitled Survey"}</p>
                   <p className="text-sm font-black uppercase tracking-widest text-primary/60">
-                    {new Date(poll.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    {new Date(survey.createdAt?.seconds * 1000 || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 pt-6 border-t-2">
+                <div className="flex items-center gap-2 pt-6 border-t-2 border-foreground/10">
                    <Button 
                      variant="ghost" 
-                     onClick={() => handleLaunchExisting(poll)}
+                     onClick={() => handleLaunchExisting(survey)}
                      className="flex-1 h-12 rounded-[1rem] font-black uppercase text-xs tracking-widest hover:bg-foreground hover:text-background transition-all"
                    >
                      Launch
                    </Button>
                    <Button 
                      variant="ghost" 
-                     onClick={() => router.push(`/presenter/edit/${poll.id}`)}
+                     onClick={() => router.push(`/presenter/edit/${survey.id}`)}
                      className="h-12 w-12 rounded-[1rem] hover:bg-muted border-2 border-transparent hover:border-foreground/10 flex items-center justify-center"
                    >
                      <Edit2 className="h-4 w-4" />
