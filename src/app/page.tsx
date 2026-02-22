@@ -160,13 +160,13 @@ export default function Home() {
                 <span className="opacity-30">Pure Focus.</span>
               </h2>
               <p className="text-xl font-bold uppercase opacity-70 leading-tight max-w-lg">
-                Turn learning into a competitive pulse. Instant feedback, automated scoring, and high-octane leaderboards that keep the room locked in.
+                Turn learning into a competitive pulse. Instant feedback, automated scoring, and high-octane results that keep the room locked in.
               </p>
               <div className="flex gap-4">
                 <div className="bg-[#4c2f05] text-[#ff9312] p-8 rounded-[1.5rem] border-2 border-[#4c2f05] flex-1">
                    <Trophy className="h-10 w-10 mb-4" />
-                   <h4 className="font-black uppercase tracking-tighter">Leaderboards</h4>
-                   <p className="text-[10px] font-bold uppercase opacity-60">Real-time ranking</p>
+                   <h4 className="font-black uppercase tracking-tighter">Interactive</h4>
+                   <p className="text-[10px] font-bold uppercase opacity-60">Real-time sync</p>
                 </div>
                 <div className="bg-[#ff9312] text-[#4c2f05] p-8 rounded-[1.5rem] border-2 border-[#4c2f05] flex-1">
                    <CheckCircle2 className="h-10 w-10 mb-4" />
@@ -176,8 +176,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative group flex items-center justify-center min-h-[500px]">
-              {/* Main Quiz Options Card (Participant View) */}
+            <div className="relative group flex items-center justify-center min-h-[550px]">
+              {/* Main Quiz Options Card (Participant View) - Repositioned slightly */}
               <div className="relative w-80 bg-white rounded-[2rem] border-4 border-[#4c2f05] p-8 shadow-[20px_20px_0px_0px_#ff9312] rotate-3 transition-transform duration-700 z-0 space-y-6">
                  <div className="w-16 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-8" />
                  <h4 className="text-xl font-black uppercase tracking-tight text-center">Correct Answer?</h4>
@@ -200,25 +200,13 @@ export default function Home() {
                  </div>
               </div>
 
-              {/* Smaller Feedback Card Overlay */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 rounded-[2rem] bg-green-500 border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-transform duration-700 z-10 flex flex-col items-center justify-center text-center space-y-4">
+              {/* Smaller Feedback Card Overlay - Repositioned to be an OFFSET overlay instead of centered */}
+              <div className="absolute top-0 right-0 lg:-right-10 lg:top-10 w-64 rounded-[2rem] bg-green-500 border-4 border-[#4c2f05] p-8 shadow-[15px_15px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-transform duration-700 z-10 flex flex-col items-center justify-center text-center space-y-4">
                 <div className="w-16 h-16 rounded-[1.25rem] bg-white flex items-center justify-center border-4 border-[#4c2f05]">
                   <CheckCircle2 className="h-8 w-8 text-green-500" />
                 </div>
                 <h3 className="text-3xl font-black text-white uppercase tracking-tighter">CORRECT!</h3>
                 <p className="text-white/80 font-black uppercase text-[10px] tracking-widest">+100 POINTS</p>
-              </div>
-
-              {/* Leaderboard Glimpse Overlay */}
-              <div className="absolute -bottom-10 -right-10 w-56 bg-white rounded-[2rem] border-4 border-[#4c2f05] p-6 shadow-[10px_10px_0px_0px_#ff9312] rotate-12 z-20 space-y-3">
-                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest opacity-40">
-                  <span>Top 1</span>
-                  <Trophy className="h-3 w-3" />
-                </div>
-                <div className="h-10 bg-[#4c2f05] text-[#ff9312] rounded-[0.75rem] flex items-center justify-between px-4 font-black text-[10px] uppercase">
-                   <span>Studio_X</span>
-                   <span>1450</span>
-                </div>
               </div>
             </div>
           </div>
