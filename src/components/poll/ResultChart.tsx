@@ -153,8 +153,8 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
           ))}
         </div>
         <div className="text-center space-y-2">
-          <span className="text-8xl font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
-          <p className="text-4xl font-black opacity-20 uppercase tracking-[0.8em] mt-4">AVERAGE</p>
+          <span className="text-7xl font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
+          <p className="text-3xl font-black opacity-20 uppercase tracking-[0.8em] mt-4">AVERAGE</p>
         </div>
       </div>
     );
@@ -183,8 +183,8 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
           </div>
         )}
         <div className="text-center">
-          <span className="text-8xl font-black tracking-tighter leading-none">{average.toFixed(question.type === 'guess-number' ? 1 : 0)}</span>
-          <p className="text-5xl font-black opacity-20 uppercase tracking-[1em] mt-6">
+          <span className="text-7xl font-black tracking-tighter leading-none">{average.toFixed(question.type === 'guess-number' ? 1 : 0)}</span>
+          <p className="text-4xl font-black opacity-20 uppercase tracking-[1em] mt-6">
             {question.type === 'guess-number' ? 'PRECISION AVERAGE' : 'RESULT'}
           </p>
         </div>

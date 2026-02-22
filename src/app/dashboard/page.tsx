@@ -85,7 +85,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background flex flex-col font-body selection:bg-primary selection:text-primary-foreground">
       <Header variant="minimal" />
       
-      <main className="flex-1 studio-container px-6 py-32 space-y-10">
+      <main className="flex-1 studio-container py-32 space-y-10">
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 opacity-30" />
@@ -93,13 +93,13 @@ export default function DashboardPage() {
               placeholder="SEARCH YOUR SURVEYS..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-16 pl-16 pr-8 rounded-[1.5rem] border-2 bg-card focus-visible:ring-0 font-black text-lg uppercase tracking-tight border-foreground/10 w-full"
+              className="h-16 pl-16 pr-8 rounded-[1.5rem] border-2 bg-card focus-visible:ring-0 font-black text-lg uppercase tracking-tight border-foreground/10 w-full shadow-none"
             />
           </div>
           <Button 
             size="lg" 
             onClick={handleCreateNew}
-            className="h-16 px-10 rounded-[1.5rem] text-sm font-black bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-widest shrink-0 w-full md:w-auto"
+            className="h-16 px-10 rounded-[1.5rem] text-sm font-black bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-widest shrink-0 w-full md:w-auto shadow-none"
           >
             <Plus className="mr-3 h-5 w-5" /> NEW SURVEY
           </Button>
