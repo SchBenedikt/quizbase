@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, Users2, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2 } from "lucide-react";
+import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, Sparkles, ListOrdered, Hash, BrainCircuit, Palette, Monitor, Smartphone, Share2, BarChart3, MessageSquareText } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Header } from "@/components/layout/Header";
@@ -16,6 +16,7 @@ export default function Home() {
   const [joinCode, setJoinCode] = useState("");
   const router = useRouter();
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-poll');
+  const analyticsImage = PlaceHolderImages.find(img => img.id === 'feature-live');
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,13 +45,13 @@ export default function Home() {
             </p>
             
             <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6">
-              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-6 min-h-[7rem] flex items-center border-4 border-[#4c2f05] focus-within:bg-white/30 transition-all relative">
+              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-6 min-h-[7rem] flex items-center border-4 border-[#4c2f05] focus-within:bg-white/30 transition-all relative overflow-hidden">
                 <Input 
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="JOIN CODE" 
                   maxLength={6}
-                  className="border-none bg-transparent focus-visible:ring-0 text-7xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05]"
+                  className="border-none bg-transparent focus-visible:ring-0 text-7xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05] relative z-10"
                   aria-label="Enter 6-digit session code"
                 />
               </div>
@@ -79,7 +80,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* HOW IT WORKS / DEMO PREVIEW */}
+        {/* WORKFLOW DEMO: SCREEN TO HAND */}
         <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-hidden">
           <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
             <div className="relative">
@@ -139,8 +140,103 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ANALYTICS DEMO: DATA POWER */}
+        <section className="py-40 bg-[#f3f3f1] text-[#4c2f05]">
+          <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
+            <div className="order-2 lg:order-1 space-y-12">
+              <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
+                Real-Time <br />
+                Insights. <br />
+                <span className="opacity-30 italic">No Lag.</span>
+              </h2>
+              <p className="text-xl font-bold uppercase opacity-70 leading-tight max-w-lg">
+                Watch as your data comes to life. Our precision charts update with every response, giving you instant command over the room's energy.
+              </p>
+              <div className="flex gap-4">
+                <div className="bg-[#4c2f05] text-[#ff9312] p-8 rounded-[1.5rem] border-2 border-[#4c2f05] flex-1">
+                  <BarChart3 className="h-10 w-10 mb-4" />
+                  <h4 className="font-black uppercase tracking-tighter">Dynamic Graphs</h4>
+                  <p className="text-[10px] font-bold uppercase opacity-60">High-Precision visualization</p>
+                </div>
+                <div className="bg-[#ff9312] text-[#4c2f05] p-8 rounded-[1.5rem] border-2 border-[#4c2f05] flex-1">
+                  <Zap className="h-10 w-10 mb-4" />
+                  <h4 className="font-black uppercase tracking-tighter">Instant Sync</h4>
+                  <p className="text-[10px] font-bold uppercase opacity-60">Zero-latency transmission</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="order-1 lg:order-2 relative group">
+              <div className="relative rounded-[2rem] overflow-hidden border-4 border-[#4c2f05] bg-white p-1 shadow-[20px_20px_0px_0px_#ff9312] rotate-[2deg] group-hover:rotate-0 transition-transform duration-700">
+                <Image 
+                  src={analyticsImage?.imageUrl || "https://picsum.photos/seed/poppulse2/800/600"} 
+                  alt="Live data visualization dashboard"
+                  width={800}
+                  height={600}
+                  className="object-cover w-full h-full rounded-[1.5rem]"
+                  data-ai-hint="data visualization"
+                />
+                <div className="absolute top-6 left-6 bg-[#4c2f05] text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">
+                  Studio Live Feed
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* AI DEMO: INTELLIGENT FLOW */}
+        <section className="py-40 bg-[#ff9312] text-[#4c2f05] border-t-4 border-[#4c2f05]">
+          <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
+            <div className="relative">
+              {/* Mockup AI Suggestion Box */}
+              <div className="bg-[#4c2f05] rounded-[2rem] p-10 shadow-[20px_20px_0px_0px_rgba(76,47,5,0.3)] rotate-[-3deg] relative z-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <Sparkles className="h-6 w-6 text-[#ff9312]" />
+                  <span className="text-[10px] font-black text-[#ff9312] uppercase tracking-[0.4em]">AI Assistant active</span>
+                </div>
+                <div className="space-y-6">
+                  <div className="p-6 bg-white/10 rounded-[1rem] border-2 border-[#ff9312]/20">
+                    <p className="text-white font-bold opacity-40 text-xs uppercase mb-2">Original</p>
+                    <p className="text-[#ff9312] font-black uppercase tracking-tight">Do you like the new plan?</p>
+                  </div>
+                  <div className="p-6 bg-[#ff9312] rounded-[1rem] border-2 border-[#4c2f05]">
+                    <p className="text-[#4c2f05] font-bold opacity-60 text-xs uppercase mb-2">AI Refined</p>
+                    <p className="text-[#4c2f05] font-black uppercase tracking-tight">To what extent does the proposed strategy align with your 2024 goals?</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat Bubble Accent */}
+              <div className="absolute -top-12 -left-12 w-24 h-24 bg-[#4c2f05] rounded-[1.5rem] flex items-center justify-center border-4 border-[#ff9312] animate-bounce hidden md:flex">
+                <MessageSquareText className="h-10 w-10 text-[#ff9312]" />
+              </div>
+            </div>
+
+            <div className="space-y-12">
+              <h2 className="text-5xl md:text-7xl font-black leading-[0.8] uppercase tracking-tighter">
+                Refine with <br />
+                Intelligence. <br />
+                <span className="opacity-30">GenAI Ready.</span>
+              </h2>
+              <p className="text-xl font-bold uppercase opacity-70 leading-tight">
+                Don't settle for boring questions. Use our integrated AI to craft questions that spark engagement, maintain neutrality, and extract meaningful data.
+              </p>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <h4 className="text-lg font-black uppercase tracking-tighter">Question Suggester</h4>
+                  <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Perfect clarity and tone</p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-lg font-black uppercase tracking-tighter">Text Analysis</h4>
+                  <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Summarize 100s of responses</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* FEATURES GRID */}
-        <section id="features" className="py-40 bg-[#ff9312]">
+        <section id="features" className="py-40 bg-[#4c2f05] text-[#ff9312]">
           <div className="studio-container space-y-32">
             <div className="text-center space-y-6">
               <h2 className="text-5xl md:text-[8rem] font-black leading-[0.8] uppercase tracking-tighter">
@@ -161,7 +257,7 @@ export default function Home() {
                 { icon: ListChecks, title: "Live Quizzes", desc: "Instant feedback with automated scoring." },
                 { icon: Palette, title: "Custom Vibes", desc: "Tailor the studio atmosphere to your brand." }
               ].map((tool, i) => (
-                <article key={i} className="bg-[#4c2f05] text-[#ff9312] p-10 rounded-[2rem] border-4 border-[#4c2f05] space-y-6 transition-all hover:-translate-y-4 duration-300">
+                <article key={i} className="bg-[#4c2f05] text-[#ff9312] p-10 rounded-[2rem] border-4 border-[#ff9312]/20 space-y-6 transition-all hover:border-[#ff9312] hover:-translate-y-4 duration-300">
                   <div className="w-16 h-16 rounded-[1.5rem] bg-[#ff9312] text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]">
                     <tool.icon className="h-8 w-8" aria-hidden="true" />
                   </div>
@@ -173,50 +269,18 @@ export default function Home() {
           </div>
         </section>
 
-        {/* VIBE SHOWCASE */}
-        <section className="py-40 bg-[#f3f3f1] border-y-4 border-[#4c2f05]">
-          <div className="studio-container space-y-24">
-            <div className="max-w-3xl space-y-8">
-              <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85]">
-                Match The <br />
-                Atmosphere.
-              </h2>
-              <p className="text-xl font-bold uppercase opacity-70 leading-tight">
-                From high-octane stage energy to professional boardroom minimal, switch your studio vibe in a single click.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {[
-                { name: "Orange", color: "bg-[#ff9312]", label: "High Energy" },
-                { name: "Red", color: "bg-[#780c16]", label: "Intense" },
-                { name: "Green", color: "bg-[#d2e822]", label: "Acid Funk" },
-                { name: "Blue", color: "bg-[#0d99ff]", label: "Deep Pulse" }
-              ].map((vibe, i) => (
-                <div key={i} className="space-y-4">
-                  <div className={cn("aspect-square rounded-[2rem] border-4 border-[#4c2f05] transition-transform hover:scale-105", vibe.color)} />
-                  <div className="px-2">
-                    <h4 className="font-black uppercase tracking-tighter">{vibe.name}</h4>
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{vibe.label}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* FINAL CTA */}
-        <section className="py-60 text-center bg-[#4c2f05] text-[#ff9312]">
+        <section className="py-60 text-center bg-[#ff9312] text-[#4c2f05] border-t-4 border-[#4c2f05]">
           <div className="studio-container space-y-16">
             <h2 className="text-7xl md:text-[10rem] font-black uppercase tracking-tighter leading-[0.75]">
               Ready to <br />
               Launch?
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <Button size="lg" onClick={() => router.push('/login')} className="h-24 px-16 rounded-[1.5rem] text-2xl font-black bg-[#ff9312] text-[#4c2f05] border-4 border-[#ff9312] hover:bg-transparent hover:text-[#ff9312] transition-all shadow-none">
+              <Button size="lg" onClick={() => router.push('/login')} className="h-24 px-16 rounded-[1.5rem] text-2xl font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all shadow-none">
                 START DASHBOARD
               </Button>
-              <Button variant="outline" size="lg" onClick={() => router.push('/join')} className="h-24 px-16 rounded-[1.5rem] text-2xl font-black border-4 border-[#ff9312] text-[#ff9312] hover:bg-[#ff9312] hover:text-[#4c2f05] transition-all shadow-none">
+              <Button variant="outline" size="lg" onClick={() => router.push('/join')} className="h-24 px-16 rounded-[1.5rem] text-2xl font-black border-4 border-[#4c2f05] text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312] transition-all shadow-none">
                 JOIN SESSION
               </Button>
             </div>
