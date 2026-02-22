@@ -72,11 +72,8 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         updatedAt: serverTimestamp() 
       }, { merge: true });
 
-      const qCol = collection(db, `users/${user.uid}/surveys/${user.uid}/surveys/${resolvedParams.pollId}/questions`);
-      const batch = writeBatch(db);
-      
-      // Need correct path for questions
       const finalQCol = collection(db, `users/${user.uid}/surveys/${resolvedParams.pollId}/questions`);
+      const batch = writeBatch(db);
 
       for (let i = 0; i < questionsToSave.length; i++) {
         const q = questionsToSave[i];
