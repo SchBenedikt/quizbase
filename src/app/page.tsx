@@ -42,19 +42,19 @@ export default function Home() {
               Transform any room into an interactive experience. No apps, no registration. Just pure energy.
             </p>
             
-            <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6">
-              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 py-6 min-h-[7rem] flex items-center border-4 border-[#4c2f05] focus-within:bg-white/30 transition-all relative overflow-hidden">
+            <form onSubmit={handleJoin} className="flex flex-col sm:flex-row gap-4 pt-6 max-w-2xl">
+              <div className="flex-grow bg-white/20 rounded-[1.5rem] px-8 h-24 flex items-center border-4 border-[#4c2f05] focus-within:bg-white/30 transition-all relative overflow-hidden">
                 <Input 
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="JOIN CODE" 
                   maxLength={6}
-                  className="border-none bg-transparent focus-visible:ring-0 text-7xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05] relative z-10"
+                  className="border-none bg-transparent focus-visible:ring-0 text-6xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05] relative z-10"
                   aria-label="Enter 6-digit session code"
                 />
               </div>
-              <Button type="submit" disabled={joinCode.length < 6} className="h-[7rem] px-12 rounded-[1.5rem] text-xl font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
-                JOIN NOW <ArrowRight className="ml-3 h-8 w-8 group-hover:translate-x-2 transition-transform" />
+              <Button type="submit" disabled={joinCode.length < 6} className="h-24 px-10 rounded-[1.5rem] text-lg font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none">
+                JOIN NOW <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </Button>
             </form>
           </div>
@@ -271,27 +271,32 @@ export default function Home() {
         {/* AI DEMO: INTELLIGENT FLOW */}
         <section className="py-40 bg-[#ff9312] text-[#4c2f05] border-t-4 border-[#4c2f05]">
           <div className="studio-container grid lg:grid-cols-2 gap-32 items-center">
-            <div className="relative">
-              {/* Mockup AI Suggestion Box */}
-              <div className="bg-[#4c2f05] rounded-[2rem] p-10 shadow-[20px_20px_0px_0px_rgba(76,47,5,0.3)] rotate-[-3deg] relative z-10 group hover:rotate-0 transition-transform duration-700">
-                <div className="flex items-center gap-3 mb-6">
-                  <Sparkles className="h-6 w-6 text-[#ff9312]" />
-                  <span className="text-[10px] font-black text-[#ff9312] uppercase tracking-[0.4em]">AI Assistant active</span>
+            <div className="relative h-[500px] flex items-center justify-center">
+              {/* Main AI Card */}
+              <div className="w-full max-w-md bg-[#4c2f05] rounded-[2rem] border-4 border-white p-10 shadow-[20px_20px_0px_0px_rgba(76,47,5,0.2)] rotate-[-3deg] z-10 transition-transform group-hover:rotate-0 duration-700">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-3 bg-[#ff9312] rounded-[1rem] border-2 border-white">
+                    <Sparkles className="h-6 w-6 text-[#4c2f05]" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-black text-white uppercase tracking-tighter leading-none">Studio AI</h4>
+                    <p className="text-[10px] font-black text-[#ff9312] uppercase tracking-[0.4em] mt-1">Refinement Active</p>
+                  </div>
                 </div>
                 <div className="space-y-6">
-                  <div className="p-6 bg-white/10 rounded-[1rem] border-2 border-[#ff9312]/20">
-                    <p className="text-white font-bold opacity-40 text-xs uppercase mb-2">Original</p>
-                    <p className="text-[#ff9312] font-black uppercase tracking-tight">Do you like the new plan?</p>
+                  <div className="p-6 bg-white/5 rounded-[1.25rem] border-2 border-white/10 opacity-40">
+                    <p className="text-white font-black uppercase text-[10px] tracking-widest mb-2">Draft Question</p>
+                    <p className="text-white font-bold text-lg leading-tight">DO YOU LIKE THE NEW PLAN?</p>
                   </div>
-                  <div className="p-6 bg-[#ff9312] rounded-[1rem] border-2 border-[#4c2f05] animate-in slide-in-from-bottom-4 duration-1000">
-                    <p className="text-[#4c2f05] font-bold opacity-60 text-xs uppercase mb-2">AI Refined</p>
-                    <p className="text-[#4c2f05] font-black uppercase tracking-tight">To what extent does the proposed strategy align with your 2024 goals?</p>
+                  <div className="p-6 bg-white rounded-[1.25rem] border-4 border-[#ff9312] transform translate-x-4 -translate-y-2">
+                    <p className="text-[#4c2f05] font-black uppercase text-[10px] tracking-widest mb-2">AI Optimization</p>
+                    <p className="text-[#4c2f05] font-black text-xl leading-tight">TO WHAT EXTENT DOES THE PROPOSED STRATEGY ALIGN WITH YOUR 2024 GOALS?</p>
                   </div>
                 </div>
               </div>
 
               {/* Chat Bubble Accent */}
-              <div className="absolute -top-12 -left-12 w-24 h-24 bg-[#4c2f05] rounded-[1.5rem] flex items-center justify-center border-4 border-[#ff9312] animate-bounce hidden md:flex">
+              <div className="absolute -top-12 -left-12 w-24 h-24 bg-[#4c2f05] rounded-[2.5rem] flex items-center justify-center border-4 border-[#ff9312] animate-bounce hidden md:flex z-20">
                 <MessageSquareText className="h-10 w-10 text-[#ff9312]" />
               </div>
             </div>
@@ -305,14 +310,20 @@ export default function Home() {
               <p className="text-xl font-bold uppercase opacity-70 leading-tight">
                 Don't settle for boring questions. Use our integrated AI to craft questions that spark engagement, maintain neutrality, and extract meaningful data.
               </p>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <h4 className="text-lg font-black uppercase tracking-tighter">Question Suggester</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Perfect clarity and tone</p>
+              <div className="grid grid-cols-2 gap-8 pt-8">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-[1rem] bg-[#ff9312] text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]">
+                    <Sparkles className="h-6 w-6" />
+                  </div>
+                  <h4 className="text-lg font-black uppercase tracking-tighter">Refinement</h4>
+                  <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider leading-tight">Perfect clarity and professional tone</p>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="text-lg font-black uppercase tracking-tighter">Text Analysis</h4>
-                  <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Summarize 100s of responses</p>
+                <div className="space-y-3">
+                  <div className="w-12 h-12 rounded-[1rem] bg-[#ff9312] text-[#4c2f05] flex items-center justify-center border-2 border-[#4c2f05]">
+                    <BrainCircuit className="h-6 w-6" />
+                  </div>
+                  <h4 className="text-lg font-black uppercase tracking-tighter">Analysis</h4>
+                  <p className="text-[10px] font-bold uppercase opacity-50 tracking-wider leading-tight">Summarize 100s of responses instantly</p>
                 </div>
               </div>
             </div>
