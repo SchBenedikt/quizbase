@@ -30,10 +30,10 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center w-full">
             <div className="space-y-12 animate-in fade-in slide-in-from-left-10 duration-1000">
               <header className="space-y-4">
-                <h1 className="text-6xl md:text-8xl lg:text-[9.5rem] font-black leading-[0.75] tracking-tighter uppercase">
-                  Pure. <br />
+                <h1 className="text-6xl md:text-8xl lg:text-[11rem] font-black leading-[0.75] tracking-tighter uppercase">
+                  Pop. <br />
                   Pulse. <br />
-                  <span className="opacity-30 italic">Energy.</span>
+                  <span className="opacity-30 italic">*</span>
                 </h1>
               </header>
               <p className="text-xl md:text-2xl font-bold max-w-xl leading-tight uppercase tracking-tight">
@@ -58,7 +58,7 @@ export default function Home() {
             </div>
 
             {/* PORTRAIT HERO MOCKUP */}
-            <div className="relative group flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000 lg:-ml-32 py-10">
+            <div className="relative group flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000 lg:-ml-32 py-10 px-4">
               <div className="relative w-full max-w-[400px] aspect-[4/6] bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-6 sm:p-8 shadow-[20px_20px_0px_0px_#4c2f05] lg:shadow-[30px_30px_0px_0px_#4c2f05] transform rotate-3 transition-all group-hover:rotate-0 duration-700 flex flex-col">
                 <div className="w-20 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10 shrink-0" />
                 <div className="flex-1 space-y-6 sm:space-y-8 overflow-hidden">
