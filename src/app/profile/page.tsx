@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Save, User, Mail, Shield, Smartphone, Eye, Moon, Sun, Monitor } from "lucide-react";
+import { ArrowLeft, Save, User, Mail, Eye, Moon, Sun, Monitor } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { updateProfile } from "firebase/auth";
@@ -96,9 +96,6 @@ export default function ProfilePage() {
             <TabsTrigger value="identity" className="flex-1 py-4 rounded-[1.5rem] font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <User className="w-4 h-4 mr-2" /> Identity
             </TabsTrigger>
-            <TabsTrigger value="security" className="flex-1 py-4 rounded-[1.5rem] font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Shield className="w-4 h-4 mr-2" /> Security
-            </TabsTrigger>
             <TabsTrigger value="preferences" className="flex-1 py-4 rounded-[1.5rem] font-black uppercase text-xs data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Eye className="w-4 h-4 mr-2" /> Interface
             </TabsTrigger>
@@ -145,23 +142,6 @@ export default function ProfilePage() {
                 </form>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="security" className="mt-0">
-            <div className="grid md:grid-cols-2 gap-6">
-              {[
-                { icon: Shield, title: "Auth Check", desc: "Two-step verification for presenter dashboard." },
-                { icon: Smartphone, title: "Terminal Sync", desc: "Manage active presenter devices." },
-              ].map((item, i) => (
-                <Card key={i} className="border-2 rounded-[1.5rem] p-8 space-y-4 bg-card shadow-none">
-                  <item.icon className="h-8 w-8 text-primary" />
-                  <item.icon className="h-8 w-8 text-primary" />
-                  <h3 className="text-xl font-black uppercase tracking-tight">{item.title}</h3>
-                  <p className="text-sm font-bold opacity-60 uppercase leading-tight">{item.desc}</p>
-                  <Button variant="outline" className="w-full rounded-[1rem] h-12 border-2 font-black uppercase text-xs tracking-widest shadow-none">Configure</Button>
-                </Card>
-              ))}
-            </div>
           </TabsContent>
 
           <TabsContent value="preferences" className="mt-0">
