@@ -49,7 +49,7 @@ export default function Home() {
                   <span className="opacity-30 italic">*</span>
                 </h1>
               </header>
-              <p className="text-2xl md:text-3xl font-bold max-w-sm leading-tight uppercase tracking-tight">
+              <p className="text-2xl md:text-3xl font-bold max-w-sm leading-tight tracking-tight">
                 Transform any room into a living interaction studio. Zero barriers. Absolute energy.
               </p>
               
@@ -97,11 +97,11 @@ export default function Home() {
                 <div className="mt-8 pt-6 border-t-2 border-[#4c2f05]/10 flex justify-between items-center opacity-40">
                     <div className="flex items-center gap-3">
                         <Users className="h-4 w-4" />
-                        <span className="text-[10px] font-black uppercase">256 Present</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">256 Present</span>
                     </div>
                     <div className="flex items-center gap-3">
                         <Timer className="h-4 w-4" />
-                        <span className="text-[10px] font-black uppercase">15s Remaining</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">15s Remaining</span>
                     </div>
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                       <h4 className="text-3xl font-black uppercase tracking-tighter leading-none">{step.title}</h4>
-                      <p className="font-bold opacity-60 uppercase text-[14px] tracking-widest leading-snug">{step.desc}</p>
+                      <p className="font-bold opacity-60 text-[16px] leading-snug">{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -196,7 +196,7 @@ export default function Home() {
                   Command the <br />
                   Grand Stage.
                 </h2>
-                <p className="text-2xl font-bold opacity-70 uppercase leading-tight max-w-sm">
+                <p className="text-2xl font-bold opacity-70 leading-tight max-w-sm">
                    Absolute visual clarity for thousands. Designed for the high-resolution boardrooms and grand stages.
                 </p>
              </div>
@@ -247,7 +247,7 @@ export default function Home() {
                   Architect. <br />
                   <span className="opacity-30">Zero Friction.</span>
                 </h2>
-                <p className="text-2xl font-bold opacity-70 uppercase leading-tight max-w-sm">
+                <p className="text-2xl font-bold opacity-70 leading-tight max-w-sm">
                    A surgical, frameless interface for high-stakes survey creation. Build complex interactions in minutes.
                 </p>
              </div>
@@ -328,7 +328,7 @@ export default function Home() {
                   Sentiment. <br />
                   <span className="opacity-30">In Motion.</span>
                 </h2>
-                <p className="text-2xl font-bold opacity-70 uppercase leading-tight max-w-sm">
+                <p className="text-2xl font-bold opacity-70 leading-tight max-w-sm">
                    Visualize the collective thought of thousands in high-fidelity word clouds and sentiment streams.
                 </p>
              </div>
@@ -344,7 +344,7 @@ export default function Home() {
                    Ideas. <br />
                    <span className="opacity-30">Live.</span>
                  </h2>
-                 <p className="text-2xl font-bold opacity-70 uppercase leading-tight max-w-sm">
+                 <p className="text-2xl font-bold opacity-70 leading-tight max-w-sm">
                     Let the audience reshape the data. Real-time ranking and voting for high-stakes decision making.
                  </p>
               </div>
