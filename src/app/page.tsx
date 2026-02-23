@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Zap, ArrowRight, Cloud, ListChecks, SlidersHorizontal, MessageSquare, Star, Ruler, Activity, Users, Timer, Monitor, Share2, Smartphone, ListOrdered, Hash } from "lucide-react";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
@@ -69,9 +70,8 @@ export default function Home() {
               </form>
             </div>
 
-            {/* EXPANDED HERO MOCKUP: THE BROADCAST STUDIO */}
+            {/* EXPANDED HERO MOCKUP */}
             <div className="relative group flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000 py-20 px-4">
-              {/* Desktop Display Mockup - The Broadcaster */}
               <div className="relative w-full max-w-[650px] aspect-video bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-10 shadow-[35px_35px_0px_0px_#4c2f05] transform -rotate-3 transition-all group-hover:rotate-0 duration-700 hidden md:flex flex-col z-0">
                 <div className="flex items-center justify-between mb-10 pb-6 border-b-2 border-[#4c2f05]/10">
                    <div className="flex items-center gap-4">
@@ -106,7 +106,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Mobile Phone Mockup Overlay - The Participant */}
+              {/* Mobile Mockup Overlay */}
               <div className="relative md:absolute md:-bottom-16 md:-right-8 w-full max-w-[320px] aspect-[4/7] bg-white rounded-[3rem] border-4 border-[#4c2f05] p-10 shadow-[20px_20px_0px_0px_#4c2f05] transform rotate-6 transition-all group-hover:rotate-3 duration-700 flex flex-col z-20">
                 <div className="w-24 h-2 bg-[#4c2f05]/10 rounded-full mx-auto mb-12 shrink-0" />
                 <div className="flex-1 space-y-10 overflow-hidden">
@@ -137,7 +137,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* WORKFLOW DEMO - FROM SCREEN TO HAND */}
+        {/* WORKFLOW DEMO */}
         <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-x-clip">
           <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative px-6 flex justify-center lg:justify-start">
@@ -188,7 +188,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* GRAND STAGE DISPLAY - BROADCAST UI */}
+        {/* GRAND STAGE DISPLAY */}
         <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip">
           <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
              <div className="space-y-12 px-4">
@@ -238,7 +238,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* STUDIO ARCHITECT - ZERO FRICTION EDITOR */}
+        {/* STUDIO ARCHITECT */}
         <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip border-t-2 border-foreground/5">
           <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
              <div className="space-y-12 px-4">
@@ -253,7 +253,6 @@ export default function Home() {
              </div>
 
              <div className="relative group px-4">
-                {/* Editor Surface - Frameless Layered System */}
                 <div className="bg-white rounded-[3rem] border-4 border-[#4c2f05] p-16 shadow-[45px_45px_0px_0px_rgba(76,47,5,0.05)] rotate-2 group-hover:rotate-0 transition-transform duration-700 relative overflow-hidden">
                    <div className="space-y-16">
                       <div className="space-y-8">
@@ -272,7 +271,6 @@ export default function Home() {
                    </div>
                 </div>
 
-                {/* Floating Command Palette */}
                 <div className="absolute -top-20 -right-8 bg-[#4c2f05] p-12 rounded-[2.5rem] border-4 border-[#ff9312] shadow-[25px_25px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-all duration-700 z-20">
                    <div className="grid grid-cols-2 gap-6">
                       {[Cloud, ListChecks, SlidersHorizontal, MessageSquare, Star, Ruler, ListOrdered, Hash].map((Icon, i) => (
@@ -299,7 +297,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AUDIENCE PULSE - WORD CLOUDS & SENTIMENT */}
+        {/* AUDIENCE SENTIMENT */}
         <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-x-clip">
           <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
              <div className="space-y-12 px-4 order-2 lg:order-1">
@@ -337,7 +335,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* PRIORITY RANKING - LIVE COLLECTIVE FEEDBACK */}
+        {/* PRIORITY RANKING */}
         <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip border-t-2 border-foreground/5">
            <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
               <div className="space-y-12 px-4">
@@ -404,19 +402,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="bg-[#f3f3f1] dark:bg-zinc-950 border-t-4 border-[#4c2f05]/10">
-        <div className="py-24 studio-container flex flex-col md:flex-row items-center justify-between gap-20 font-black px-4">
-          <div className="flex flex-col gap-6 text-center md:text-left">
-            <span className="text-5xl tracking-tighter uppercase leading-none text-[#4c2f05] dark:text-[#ff9312]">PopPulse*</span>
-            <p className="text-[14px] opacity-40 uppercase tracking-[0.4em] text-[#4c2f05] dark:text-white">&copy; {new Date().getFullYear()} Studio interaction</p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-16 text-[14px] uppercase tracking-[0.4em] opacity-40 text-[#4c2f05] dark:text-white">
-            <Link href="/legal" className="hover:text-[#ff9312] transition-colors">Legal Notice</Link>
-            <Link href="/privacy" className="hover:text-[#ff9312] transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-[#ff9312] transition-colors">Contact</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
