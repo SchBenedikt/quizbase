@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -22,8 +21,8 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
     {
       id: Math.random().toString(36).substr(2, 9),
       type: 'multiple-choice',
-      question: "WHAT IS OUR PRIMARY GOAL?",
-      options: ["Growth", "Innovation", "Stability"],
+      question: "What is our primary focus for next quarter?",
+      options: ["Growth", "Stability", "Innovation"],
       correctOptionIndices: [],
       timeLimit: 0,
       createdAt: Date.now()
@@ -77,7 +76,6 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
     const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
     if (targetIdx < 0 || targetIdx >= newQuestions.length) return;
     
-    // Swap
     const temp = newQuestions[idx];
     newQuestions[idx] = newQuestions[targetIdx];
     newQuestions[targetIdx] = temp;
@@ -98,7 +96,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
   };
 
   return (
-    <div className="space-y-6 pb-64 presenter-ui max-w-[1400px] mx-auto">
+    <div className="space-y-6 pb-64 presenter-ui max-w-[1200px] mx-auto">
       <div className="space-y-4">
         {questions.map((q, idx) => {
           const isCollapsed = collapsedIds.has(q.id);
@@ -106,74 +104,74 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
             <Card 
               key={q.id} 
               className={cn(
-                "border-2 rounded-[1.5rem] bg-card overflow-hidden transition-all hover:border-primary/20 shadow-none group",
+                "border-2 rounded-[1.25rem] bg-card overflow-hidden transition-all hover:border-primary/20 shadow-sm group",
                 isCollapsed && "hover:bg-muted/30"
               )}
             >
               <CardContent className="p-0">
                 <div className="flex">
-                  <div className="w-16 flex flex-col items-center py-6 bg-muted/20 border-r-2 border-foreground/5 shrink-0 gap-4">
-                    <div className="text-xl font-black opacity-20">{idx + 1}</div>
+                  <div className="w-14 flex flex-col items-center py-6 bg-muted/20 border-r-2 border-foreground/5 shrink-0 gap-4">
+                    <div className="text-lg font-black opacity-20">{idx + 1}</div>
                     <div className="flex flex-col gap-1">
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => moveQuestion(idx, 'up')}
                         disabled={idx === 0}
-                        className="h-8 w-8 rounded-[0.5rem] hover:bg-primary/10 transition-colors disabled:opacity-5"
+                        className="h-7 w-7 rounded-[0.4rem] hover:bg-primary/10 disabled:opacity-5"
                       >
-                        <ArrowUp className="h-4 w-4" />
+                        <ArrowUp className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => moveQuestion(idx, 'down')}
                         disabled={idx === questions.length - 1}
-                        className="h-8 w-8 rounded-[0.5rem] hover:bg-primary/10 transition-colors disabled:opacity-5"
+                        className="h-7 w-7 rounded-[0.4rem] hover:bg-primary/10 disabled:opacity-5"
                       >
-                        <ArrowDown className="h-4 w-4" />
+                        <ArrowDown className="h-3.5 w-3.5" />
                       </Button>
                     </div>
-                    <GripVertical className="h-5 w-5 opacity-10 mt-auto" />
+                    <GripVertical className="h-4 w-4 opacity-10 mt-auto" />
                   </div>
 
                   <div className="flex-1 p-6 sm:p-8">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-5">
                       <div className="flex items-center gap-4">
                         <Button 
                           variant="ghost" 
                           size="icon" 
                           onClick={() => toggleCollapse(q.id)}
-                          className="h-10 w-10 rounded-[0.75rem]"
+                          className="h-9 w-9 rounded-[0.6rem]"
                         >
-                          {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         </Button>
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-primary/10 rounded-[0.75rem] text-primary">
-                            {q.type === 'multiple-choice' && <ListChecks className="h-5 w-5" />}
-                            {q.type === 'word-cloud' && <Cloud className="h-5 w-5" />}
-                            {q.type === 'open-text' && <MessageSquare className="h-5 w-5" />}
-                            {q.type === 'rating' && <Star className="h-5 w-5" />}
-                            {q.type === 'slider' && <SlidersHorizontal className="h-5 w-5" />}
-                            {q.type === 'guess-number' && <Hash className="h-5 w-5" />}
-                            {q.type === 'ranking' && <ListOrdered className="h-5 w-5" />}
-                            {q.type === 'scale' && <Ruler className="h-5 w-5" />}
+                          <div className="p-2 bg-primary/10 rounded-[0.6rem] text-primary">
+                            {q.type === 'multiple-choice' && <ListChecks className="h-4 w-4" />}
+                            {q.type === 'word-cloud' && <Cloud className="h-4 w-4" />}
+                            {q.type === 'open-text' && <MessageSquare className="h-4 w-4" />}
+                            {q.type === 'rating' && <Star className="h-4 w-4" />}
+                            {q.type === 'slider' && <SlidersHorizontal className="h-4 w-4" />}
+                            {q.type === 'guess-number' && <Hash className="h-4 w-4" />}
+                            {q.type === 'ranking' && <ListOrdered className="h-4 w-4" />}
+                            {q.type === 'scale' && <Ruler className="h-4 w-4" />}
                           </div>
-                          <span className="text-xs font-black uppercase tracking-widest opacity-40">{q.type.replace('-', ' ')}</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">{q.type.replace('-', ' ')}</span>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2">
                         {!isCollapsed && (
-                          <div className="flex items-center gap-3 mr-4">
-                            <Timer className="h-4 w-4 opacity-20" />
+                          <div className="flex items-center gap-2.5 mr-4">
+                            <Timer className="h-3.5 w-3.5 opacity-20" />
                             <Input 
                               type="number"
                               value={q.timeLimit || 0}
                               onChange={(e) => updateQuestion(q.id, { timeLimit: parseInt(e.target.value) || 0 })}
-                              className="w-14 h-8 text-xs font-black text-center border-2 rounded-[0.5rem] p-0 bg-transparent"
+                              className="w-12 h-7 text-[10px] font-black text-center border-2 rounded-[0.4rem] p-0 bg-transparent"
                             />
-                            <span className="text-[10px] font-black uppercase opacity-40">sec</span>
+                            <span className="text-[9px] font-black uppercase opacity-40">sec</span>
                           </div>
                         )}
                         <Button 
@@ -181,7 +179,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                           size="icon" 
                           onClick={() => removeQuestion(q.id)} 
                           disabled={questions.length <= 1}
-                          className="h-10 w-10 rounded-[0.75rem] hover:bg-destructive/5 hover:text-destructive text-foreground/20"
+                          className="h-9 w-9 rounded-[0.6rem] hover:bg-destructive/5 hover:text-destructive text-foreground/20"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -190,19 +188,19 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
 
                     <div className="relative">
                       {isCollapsed ? (
-                        <p className="text-xl font-black uppercase tracking-tighter truncate opacity-60">
-                          {q.question || "No question text"}
+                        <p className="text-lg font-bold tracking-tight truncate opacity-60">
+                          {q.question || "No question text draft"}
                         </p>
                       ) : (
                         <div className="space-y-8">
                           <div className="relative">
                             <Input 
                               value={q.question} 
-                              onChange={(e) => updateQuestion(q.id, { question: e.target.value.toUpperCase() })}
-                              placeholder="TYPE YOUR QUESTION HERE..."
-                              className="text-2xl font-black h-20 border-2 bg-muted/10 rounded-[1.25rem] pl-8 pr-16 focus-visible:ring-1 border-foreground/10 uppercase tracking-tighter"
+                              onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
+                              placeholder="Type your question draft..."
+                              className="text-xl font-bold h-16 border-2 bg-muted/5 rounded-[1rem] pl-6 pr-14 focus-visible:ring-1 border-foreground/5 tracking-tight"
                             />
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
                               <AIQuestionRefiner 
                                 currentQuestion={q.question} 
                                 onSelect={(refined) => updateQuestion(q.id, { question: refined })}
@@ -212,9 +210,9 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
 
                           {(q.type === 'multiple-choice' || q.type === 'ranking') && q.options && (
                             <div className="space-y-4 pt-2">
-                              <div className="flex items-center justify-between px-2">
-                                <Label className="text-xs font-black uppercase tracking-widest opacity-40">Options {q.type === 'multiple-choice' && "& Correct Answers"}</Label>
-                                {q.type === 'multiple-choice' && <span className="text-[10px] font-black uppercase opacity-30 italic">Toggle correct answers</span>}
+                              <div className="flex items-center justify-between px-1">
+                                <Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Options {q.type === 'multiple-choice' && "& Correct Answers"}</Label>
+                                {q.type === 'multiple-choice' && <span className="text-[9px] font-bold opacity-30 italic">Toggle correct answers</span>}
                               </div>
                               <div className="grid gap-3">
                                 {q.options.map((opt, oIdx) => (
@@ -225,13 +223,13 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                         size="icon"
                                         onClick={() => toggleCorrectAnswer(q.id, oIdx)}
                                         className={cn(
-                                          "h-12 w-12 rounded-[0.75rem] border-2 transition-all shrink-0",
+                                          "h-10 w-10 rounded-[0.6rem] border-2 transition-all shrink-0",
                                           q.correctOptionIndices?.includes(oIdx) 
                                             ? "bg-primary text-primary-foreground border-primary" 
                                             : "bg-foreground/5 text-foreground/10 border-transparent hover:border-primary/20"
                                         )}
                                       >
-                                        <CheckCircle2 className="h-5 w-5" />
+                                        <CheckCircle2 className="h-4 w-4" />
                                       </Button>
                                     )}
                                     <Input 
@@ -241,7 +239,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                         newOpts[oIdx] = e.target.value;
                                         updateQuestion(q.id, { options: newOpts });
                                       }}
-                                      className="h-12 border-2 bg-card rounded-[0.75rem] px-6 font-bold text-base focus-visible:ring-0 flex-1 border-foreground/10"
+                                      className="h-11 border-2 bg-card rounded-[0.6rem] px-5 font-medium text-sm focus-visible:ring-0 flex-1 border-foreground/5"
                                     />
                                     {q.options!.length > 2 && (
                                       <Button 
@@ -254,9 +252,9 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                             .map(i => i > oIdx ? i - 1 : i);
                                           updateQuestion(q.id, { options: newOpts, correctOptionIndices: newIndices });
                                         }} 
-                                        className="h-12 w-12 rounded-[0.75rem] hover:bg-destructive/5 hover:text-destructive opacity-0 group-hover/opt:opacity-100 transition-opacity"
+                                        className="h-10 w-10 rounded-[0.6rem] hover:bg-destructive/5 hover:text-destructive opacity-0 group-hover/opt:opacity-100 transition-opacity"
                                       >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="h-3.5 w-3.5" />
                                       </Button>
                                     )}
                                   </div>
@@ -264,43 +262,43 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                               </div>
                               <Button 
                                 variant="outline" 
-                                onClick={() => updateQuestion(q.id, { options: [...q.options!, `OPTION ${q.options!.length + 1}`] })} 
-                                className="w-full rounded-[1rem] border-dashed border-2 h-12 text-[10px] font-black uppercase tracking-widest mt-2 hover:bg-primary/5 hover:border-primary transition-all shadow-none"
+                                onClick={() => updateQuestion(q.id, { options: [...q.options!, `New Option`] })} 
+                                className="w-full rounded-[0.75rem] border-dashed border-2 h-11 text-[9px] font-black uppercase tracking-widest mt-2 hover:bg-primary/5 hover:border-primary transition-all shadow-none"
                               >
-                                <Plus className="mr-2 h-4 w-4" /> Add Option
+                                <Plus className="mr-2 h-3.5 w-3.5" /> Add Option
                               </Button>
                             </div>
                           )}
 
                           {(q.type === 'slider' || q.type === 'guess-number' || q.type === 'scale') && q.range && (
                             <div className="space-y-6 pt-2">
-                               <Label className="text-xs font-black uppercase tracking-widest opacity-40">Numeric Parameters</Label>
+                               <Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Numeric Parameters</Label>
                                <div className="grid grid-cols-3 gap-6">
                                  <div className="space-y-2">
-                                   <span className="text-[10px] font-black uppercase opacity-30">Min Value</span>
+                                   <span className="text-[9px] font-black uppercase opacity-30">Min</span>
                                    <Input 
                                      type="number"
                                      value={q.range.min}
                                      onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, min: parseInt(e.target.value) || 0 } })}
-                                     className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                     className="h-10 border-2 rounded-[0.6rem] font-bold text-sm"
                                    />
                                  </div>
                                  <div className="space-y-2">
-                                   <span className="text-[10px] font-black uppercase opacity-30">Max Value</span>
+                                   <span className="text-[9px] font-black uppercase opacity-30">Max</span>
                                    <Input 
                                      type="number"
                                      value={q.range.max}
                                      onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, max: parseInt(e.target.value) || 100 } })}
-                                     className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                     className="h-10 border-2 rounded-[0.6rem] font-bold text-sm"
                                    />
                                  </div>
                                  <div className="space-y-2">
-                                   <span className="text-[10px] font-black uppercase opacity-30">Step</span>
+                                   <span className="text-[9px] font-black uppercase opacity-30">Step</span>
                                    <Input 
                                      type="number"
                                      value={q.range.step}
                                      onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, step: parseInt(e.target.value) || 1 } })}
-                                     className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                     className="h-10 border-2 rounded-[0.6rem] font-bold text-sm"
                                    />
                                  </div>
                                </div>
@@ -308,19 +306,19 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                {q.type === 'scale' && q.labels && (
                                  <div className="grid grid-cols-2 gap-6">
                                    <div className="space-y-2">
-                                     <span className="text-[10px] font-black uppercase opacity-30">Min Label</span>
+                                     <span className="text-[9px] font-black uppercase opacity-30">Lower Label</span>
                                      <Input 
                                        value={q.labels.min}
                                        onChange={(e) => updateQuestion(q.id, { labels: { ...q.labels!, min: e.target.value } })}
-                                       className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                       className="h-10 border-2 rounded-[0.6rem] font-bold text-sm"
                                      />
                                    </div>
                                    <div className="space-y-2">
-                                     <span className="text-[10px] font-black uppercase opacity-30">Max Label</span>
+                                     <span className="text-[9px] font-black uppercase opacity-30">Upper Label</span>
                                      <Input 
                                        value={q.labels.max}
                                        onChange={(e) => updateQuestion(q.id, { labels: { ...q.labels!, max: e.target.value } })}
-                                       className="h-12 border-2 rounded-[0.75rem] font-bold"
+                                       className="h-10 border-2 rounded-[0.6rem] font-bold text-sm"
                                      />
                                    </div>
                                  </div>
@@ -338,7 +336,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
         })}
       </div>
 
-      <div className="fixed bottom-12 left-1/2 -translate-x-1/2 bg-background/90 dark:bg-card/90 border-2 border-foreground/10 p-3 rounded-[2rem] flex items-center gap-2 z-50 backdrop-blur-md">
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-background/90 dark:bg-card/90 border-2 border-foreground/5 p-2.5 rounded-[1.5rem] flex items-center gap-1.5 z-50 backdrop-blur-md shadow-2xl">
         {[
           { type: 'multiple-choice', icon: ListChecks, label: 'Quiz' },
           { type: 'ranking', icon: ListOrdered, label: 'Rank' },
@@ -352,9 +350,9 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
           <Button 
             key={tool.type}
             onClick={() => addQuestion(tool.type as PollType)} 
-            className="h-12 px-5 gap-3 bg-transparent hover:bg-primary hover:text-primary-foreground text-foreground border-2 border-transparent font-black uppercase text-[10px] tracking-widest transition-all shadow-none rounded-[1.5rem]"
+            className="h-10 px-4 gap-2.5 bg-transparent hover:bg-primary hover:text-primary-foreground text-foreground border-2 border-transparent font-black uppercase text-[9px] tracking-widest transition-all shadow-none rounded-[1rem]"
           >
-            <tool.icon className="h-5 w-5" /> <span className="hidden sm:inline">{tool.label}</span>
+            <tool.icon className="h-4 w-4" /> <span className="hidden md:inline">{tool.label}</span>
           </Button>
         ))}
       </div>

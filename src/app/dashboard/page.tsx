@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar } from "lucide-react";
+import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, query, orderBy, getDocs, serverTimestamp } from "firebase/firestore";
@@ -90,49 +90,55 @@ export default function DashboardPage() {
   if (isUserLoading || !user) return null;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-body selection:bg-primary selection:text-primary-foreground">
+    <div className="min-h-screen bg-[#f8f8f7] dark:bg-background flex flex-col font-body selection:bg-primary selection:text-primary-foreground">
       <Header variant="minimal" />
       
-      <main className="flex-1 studio-container py-32 space-y-10">
-        <div className="flex flex-col md:flex-row items-center gap-4">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 opacity-30" />
-            <Input 
-              placeholder="SEARCH YOUR SURVEYS..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-16 pl-16 pr-8 rounded-[1.5rem] border-2 bg-card focus-visible:ring-0 font-black text-lg uppercase tracking-tight border-foreground/10 w-full shadow-none"
-            />
+      <main className="flex-1 studio-container py-32 space-y-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black uppercase tracking-tight">Library</h1>
+            <p className="text-sm font-medium opacity-40">Manage your high-stakes interactions.</p>
           </div>
-          <Button 
-            size="lg" 
-            onClick={handleCreateNew}
-            className="h-16 px-10 rounded-[1.5rem] text-sm font-black bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-widest shrink-0 w-full md:w-auto shadow-none"
-          >
-            <Plus className="mr-3 h-5 w-5" /> NEW SURVEY
-          </Button>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 opacity-30" />
+              <Input 
+                placeholder="Search surveys..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-12 pl-11 pr-4 rounded-[1rem] border-2 bg-card focus-visible:ring-1 font-bold text-sm border-foreground/5 w-full shadow-none"
+              />
+            </div>
+            <Button 
+              onClick={handleCreateNew}
+              className="h-12 px-8 rounded-[1rem] text-xs font-black bg-primary text-primary-foreground border-2 border-primary hover:bg-transparent hover:text-primary transition-all uppercase tracking-widest shrink-0 w-full sm:w-auto shadow-none"
+            >
+              <Plus className="mr-2 h-4 w-4" /> New Survey
+            </Button>
+          </div>
         </div>
 
         {surveysLoading ? (
-          <div className="py-40 text-center"><Loader2 className="h-12 w-12 animate-spin mx-auto opacity-10" /></div>
+          <div className="py-40 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto opacity-10" /></div>
         ) : !filteredSurveys || filteredSurveys.length === 0 ? (
-          <div className="py-40 text-center border-2 border-dashed rounded-[1.5rem] bg-muted/20 space-y-6 border-foreground/10">
-             <Sparkles className="h-12 w-12 mx-auto opacity-10" />
-             <p className="text-xs font-black uppercase opacity-30 tracking-[0.5em]">No surveys found</p>
+          <div className="py-40 text-center border-2 border-dashed rounded-[2rem] bg-card/50 space-y-4 border-foreground/5">
+             <Sparkles className="h-10 w-10 mx-auto opacity-10" />
+             <p className="text-xs font-black uppercase opacity-20 tracking-[0.3em]">No surveys found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredSurveys.map((survey) => (
-              <article key={survey.id} className="bg-card p-6 rounded-[1.5rem] border-2 border-foreground/10 flex flex-col gap-5 group hover:border-primary transition-all h-full relative">
+              <article key={survey.id} className="bg-card p-6 rounded-[1.5rem] border-2 border-foreground/5 flex flex-col gap-6 group hover:border-primary/30 transition-all h-full relative shadow-sm">
                 <div className="flex items-start justify-between">
-                  <div className="w-10 h-10 rounded-[0.75rem] flex items-center justify-center border-2 border-foreground/10 shrink-0 bg-muted group-hover:bg-primary/10 transition-colors">
+                  <div className="w-10 h-10 rounded-[0.75rem] flex items-center justify-center border-2 border-foreground/5 shrink-0 bg-muted/50 group-hover:bg-primary/10 transition-colors">
                      <BarChart3 className="h-4 w-4 text-primary" />
                   </div>
                   <Button 
                      variant="ghost" 
                      size="icon"
                      onClick={() => handleDeleteSurvey(survey.id)}
-                     className="h-9 w-9 rounded-[0.75rem] hover:text-destructive hover:bg-destructive/5 transition-colors"
+                     className="h-8 w-8 rounded-[0.5rem] hover:text-destructive hover:bg-destructive/5 transition-colors opacity-0 group-hover:opacity-100"
                      aria-label={`Delete ${survey.title || "Untitled Survey"}`}
                    >
                      <Trash2 className="h-4 w-4" />
@@ -140,30 +146,30 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="flex-1 space-y-2">
-                  <h3 className="text-lg font-black tracking-tight uppercase leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-                    {survey.title || "Untitled Survey"}
+                  <h3 className="text-lg font-bold tracking-tight leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                    {survey.title || "Untitled Presentation"}
                   </h3>
-                  <div className="flex items-center gap-2 text-primary">
-                    <Calendar className="h-4 w-4" />
-                    <time className="text-sm font-black uppercase tracking-wider">
-                      {mounted && survey.createdAt ? new Date(survey.createdAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "---"}
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Calendar className="h-3.5 w-3.5" />
+                    <time className="text-[10px] font-bold uppercase tracking-wider">
+                      {mounted && survey.createdAt ? new Date(survey.createdAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Draft"}
                     </time>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-5 border-t-2 border-foreground/10">
+                <div className="flex items-center gap-3 pt-4 border-t border-foreground/5">
                    <Button 
-                     variant="ghost" 
+                     variant="default"
                      onClick={() => handleLaunchExisting(survey)}
                      disabled={loading}
-                     className="flex-1 h-11 rounded-[1rem] font-black uppercase text-[10px] tracking-widest hover:bg-foreground hover:text-background transition-all"
+                     className="flex-1 h-10 rounded-[0.75rem] font-black uppercase text-[10px] tracking-widest shadow-none"
                    >
-                     Launch
+                     <Play className="mr-2 h-3 w-3 fill-current" /> Launch
                    </Button>
                    <Button 
-                     variant="ghost" 
+                     variant="outline" 
                      onClick={() => router.push(`/presenter/edit/${survey.id}`)}
-                     className="h-11 w-11 rounded-[1rem] hover:bg-muted border-2 border-transparent hover:border-foreground/10 flex items-center justify-center"
+                     className="h-10 w-10 rounded-[0.75rem] border-2 border-foreground/5 flex items-center justify-center shadow-none p-0"
                      aria-label={`Edit ${survey.title || "Untitled Survey"}`}
                    >
                      <Edit2 className="h-3.5 w-3.5" />

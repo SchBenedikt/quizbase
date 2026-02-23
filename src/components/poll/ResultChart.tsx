@@ -20,7 +20,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
     if (question.type === 'multiple-choice') {
       data = question.options.map((opt, idx) => ({
-        name: opt.toUpperCase(),
+        name: opt,
         value: results[idx] || 0
       }));
     } else {
@@ -37,34 +37,34 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
       });
 
       data = question.options.map((opt, idx) => ({
-        name: opt.toUpperCase(),
+        name: opt,
         value: allResponses.length > 0 ? optionScores[idx] / allResponses.length : 0
       })).sort((a, b) => b.value - a.value);
     }
 
     return (
-      <div className="h-full w-full max-w-[1400px] animate-in fade-in duration-1000 flex items-center px-12">
-        <ResponsiveContainer width="100%" height="90%">
-          <BarChart data={data} layout="vertical" margin={{ left: 60, right: 100, top: 0, bottom: 0 }}>
+      <div className="h-full w-full max-w-[1200px] animate-in fade-in duration-1000 flex items-center px-8">
+        <ResponsiveContainer width="100%" height="80%">
+          <BarChart data={data} layout="vertical" margin={{ left: 40, right: 100, top: 0, bottom: 0 }}>
             <XAxis type="number" hide />
             <YAxis 
               dataKey="name" 
               type="category" 
-              width={280} 
+              width={220} 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: 'currentColor', fontSize: 24, fontWeight: 900, fontFamily: 'Bricolage Grotesque' }}
+              tick={{ fill: 'currentColor', fontSize: 18, fontWeight: 700, fontFamily: 'Bricolage Grotesque' }}
             />
             <Tooltip 
-              cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+              cursor={{ fill: 'rgba(0,0,0,0.03)' }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className="bg-foreground p-8 rounded-[1.5rem] border-2 border-background shadow-none">
-                      <p className="font-black text-background text-5xl leading-none">
+                    <div className="bg-foreground p-6 rounded-[1rem] border-2 border-background shadow-none">
+                      <p className="font-black text-background text-3xl leading-none">
                         {payload[0].value.toFixed(1)}
-                        <span className="text-[10px] uppercase tracking-[0.4em] opacity-40 ml-4 block mt-2">
-                          {question.type === 'multiple-choice' ? 'TOTAL VOTES' : 'AVG SCORE'}
+                        <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 ml-3 block mt-1.5">
+                          {question.type === 'multiple-choice' ? 'Total Responses' : 'Average Priority'}
                         </span>
                       </p>
                     </div>
@@ -75,12 +75,12 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
             />
             <Bar 
               dataKey="value" 
-              radius={[0, 40, 40, 0]} 
-              barSize={120}
+              radius={[0, 20, 20, 0]} 
+              barSize={60}
               animationDuration={1500}
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={chartColor} fillOpacity={1 - (index * 0.1)} />
+                <Cell key={`cell-${index}`} fill={chartColor} fillOpacity={1 - (index * 0.15)} />
               ))}
             </Bar>
           </BarChart>
@@ -94,17 +94,17 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const sorted = entries.sort((a, b) => b[1] - a[1]);
 
     return (
-      <div className="h-full w-full flex flex-wrap items-center justify-center gap-16 p-20 overflow-hidden">
+      <div className="h-full w-full flex flex-wrap items-center justify-center gap-10 p-12 overflow-hidden">
         {entries.length === 0 ? (
-          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] animate-pulse">Waiting for responses...</p>
+          <p className="text-3xl font-bold opacity-10 tracking-widest animate-pulse">Awaiting pulse feedback...</p>
         ) : (
           sorted.map(([word, count], i) => (
             <span 
               key={i} 
-              className="font-black uppercase tracking-tighter transition-all hover:scale-125 cursor-default animate-in zoom-in duration-1000"
+              className="font-bold tracking-tight transition-all hover:scale-110 cursor-default animate-in zoom-in duration-700"
               style={{ 
-                fontSize: `${Math.min(180, 48 + count * 24)}px`, 
-                opacity: 0.8 + (count / Math.max(...entries.map(e => e[1]))) * 0.2
+                fontSize: `${Math.min(120, 32 + count * 16)}px`, 
+                opacity: 0.7 + (count / Math.max(...entries.map(e => e[1]))) * 0.3
               }}
             >
               {word}
@@ -117,15 +117,15 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
 
   if (question.type === 'open-text') {
     return (
-      <div className="h-full w-full max-w-[1400px] flex flex-col items-center">
+      <div className="h-full w-full max-w-[1200px] flex flex-col items-center">
         {allResponses.length === 0 ? (
-          <p className="text-5xl font-black uppercase opacity-10 tracking-[0.8em] my-auto animate-pulse">No responses yet...</p>
+          <p className="text-3xl font-bold opacity-10 tracking-widest my-auto animate-pulse">Stand by for signals...</p>
         ) : (
-          <ScrollArea className="h-full w-full pr-12">
-            <div className="grid gap-12 py-12 px-8">
+          <ScrollArea className="h-full w-full pr-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-8 px-4">
               {allResponses.map((res, i) => (
-                <div key={i} className="bg-foreground text-background p-16 rounded-[1.5rem] border-2 border-foreground animate-in slide-in-from-bottom-20 duration-1000">
-                  <p className="text-4xl lg:text-5xl font-black uppercase tracking-tighter leading-[0.9]">{res.value}</p>
+                <div key={i} className="bg-foreground text-background p-8 rounded-[1.25rem] border-2 border-foreground animate-in slide-in-from-bottom-10 duration-700">
+                  <p className="text-xl font-bold tracking-tight leading-snug">"{res.value}"</p>
                 </div>
               ))}
             </div>
@@ -140,21 +140,21 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const avg = total > 0 ? allResponses.reduce((acc, r) => acc + Number(r.value), 0) / total : 0;
 
     return (
-      <div className="h-full w-full max-w-5xl flex flex-col items-center justify-center space-y-12">
-        <div className="flex gap-4">
+      <div className="h-full w-full max-w-4xl flex flex-col items-center justify-center space-y-10">
+        <div className="flex gap-3">
           {[1, 2, 3, 4, 5].map((s) => (
             <Star 
               key={s} 
               className={cn(
-                "h-24 w-24 transition-all duration-1000",
+                "h-16 w-16 transition-all duration-1000",
                 s <= Math.round(avg) ? "fill-current" : "opacity-10"
               )} 
             />
           ))}
         </div>
-        <div className="text-center space-y-2">
-          <span className="text-7xl font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
-          <p className="text-3xl font-black opacity-20 uppercase tracking-[0.8em] mt-4">AVERAGE</p>
+        <div className="text-center space-y-1">
+          <span className="text-6xl font-black tracking-tighter leading-none">{avg.toFixed(1)}</span>
+          <p className="text-xl font-bold opacity-30 uppercase tracking-[0.4em] mt-3">Studio Average</p>
         </div>
       </div>
     );
@@ -168,24 +168,24 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const percentage = ((average - min) / (max - min)) * 100;
 
     return (
-      <div className="h-full w-full max-w-[1400px] flex flex-col items-center justify-center space-y-24">
+      <div className="h-full w-full max-w-[1000px] flex flex-col items-center justify-center space-y-16">
         {(question.type === 'slider' || question.type === 'scale') && (
-          <div className="relative h-24 w-full bg-black/5 rounded-[1.5rem] border-2 border-current flex items-center px-12 overflow-hidden">
+          <div className="relative h-16 w-full bg-black/5 rounded-[1.25rem] border-2 border-current flex items-center px-10 overflow-hidden">
              <div 
                className="absolute left-0 h-full bg-current transition-all duration-1500 ease-out"
                style={{ width: `${Math.max(0, Math.min(100, percentage))}%` }}
              />
-             <div className="relative z-10 w-full flex justify-between font-black text-2xl mix-blend-difference text-white uppercase tracking-[0.4em]">
+             <div className="relative z-10 w-full flex justify-between font-bold text-lg mix-blend-difference text-white uppercase tracking-[0.2em]">
                <span>{question.labels?.min || min}</span>
-               <span className="opacity-40">{question.type === 'scale' ? 'SYNC SCALE' : 'INTENSITY'}</span>
+               <span className="opacity-40">{question.type === 'scale' ? 'Consensus' : 'Intensity'}</span>
                <span>{question.labels?.max || max}</span>
              </div>
           </div>
         )}
         <div className="text-center">
-          <span className="text-7xl font-black tracking-tighter leading-none">{average.toFixed(question.type === 'guess-number' ? 1 : 0)}</span>
-          <p className="text-4xl font-black opacity-20 uppercase tracking-[1em] mt-6">
-            {question.type === 'guess-number' ? 'PRECISION AVERAGE' : 'RESULT'}
+          <span className="text-6xl font-black tracking-tighter leading-none">{average.toFixed(question.type === 'guess-number' ? 1 : 0)}</span>
+          <p className="text-2xl font-bold opacity-30 uppercase tracking-[0.5em] mt-4">
+            {question.type === 'guess-number' ? 'Precision Avg' : 'Collective Result'}
           </p>
         </div>
       </div>
@@ -193,8 +193,8 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
   }
 
   return (
-    <div className="bg-transparent p-20 rounded-[1.5rem] text-center border-2 border-dashed border-current/10">
-      <p className="text-3xl font-black uppercase opacity-10 tracking-[0.6em] animate-pulse">CONNECTING...</p>
+    <div className="bg-transparent p-16 rounded-[1.5rem] text-center border-2 border-dashed border-current/10">
+      <p className="text-2xl font-bold opacity-10 tracking-[0.4em] animate-pulse">CONNECTING TO PULSE...</p>
     </div>
   );
 }
