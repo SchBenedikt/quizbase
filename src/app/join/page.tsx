@@ -36,9 +36,6 @@ export default function JoinPage() {
             <h1 className="text-6xl md:text-7xl font-black tracking-tighter uppercase leading-none text-foreground">
               Portal.
             </h1>
-            <p className="text-xs md:text-sm font-bold opacity-40 uppercase tracking-widest leading-tight">
-              Synchronize with the high-stakes pulse.
-            </p>
           </div>
         </header>
 
@@ -84,10 +81,6 @@ export default function JoinPage() {
             </div>
           </CardContent>
         </Card>
-        
-        <footer className="text-center opacity-30 mt-4">
-          <p className="text-[8px] font-black uppercase tracking-[0.4em]">No Registration Required. Instant Participation.</p>
-        </footer>
       </div>
     </div>
   );
