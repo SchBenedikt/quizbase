@@ -13,11 +13,23 @@ export default function Home() {
   const [joinCode, setJoinCode] = useState("");
   const router = useRouter();
 
+  // Interactive Mockup States
+  const [heroSelected, setHeroSelected] = useState<number | null>(null);
+  const [stageVotes, setStageVotes] = useState([90, 40, 70, 55]);
+  const [activeTool, setActiveTool] = useState<number | null>(null);
+  const [rankScores, setRankScores] = useState([85, 45, 65]);
+
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     if (joinCode.length >= 6) {
       router.push(`/p/${joinCode.toUpperCase()}`);
     }
+  };
+
+  const handleStageVote = (idx: number) => {
+    const newVotes = [...stageVotes];
+    newVotes[idx] = Math.min(100, newVotes[idx] + 5);
+    setStageVotes(newVotes);
   };
 
   return (
@@ -77,9 +89,9 @@ export default function Home() {
                 <div className="flex-1 flex flex-col items-center justify-center text-center space-y-8">
                    <h3 className="text-3xl font-black uppercase tracking-tight leading-none max-w-md">What is our primary goal?</h3>
                    <div className="w-full h-48 flex items-end gap-5 px-10 bg-[#4c2f05]/5 rounded-[1.5rem] border-2 border-dashed border-[#4c2f05]/10 py-6">
-                     <div className="bg-[#ff9312] w-full h-[85%] rounded-t-[1rem] border-2 border-[#4c2f05]" />
-                     <div className="bg-[#ff9312]/30 w-full h-[45%] rounded-t-[1rem] border-2 border-[#4c2f05]/10" />
-                     <div className="bg-[#ff9312]/60 w-full h-[65%] rounded-t-[1rem] border-2 border-[#4c2f05]/20" />
+                     <div className="bg-[#ff9312] w-full rounded-t-[1rem] border-2 border-[#4c2f05] transition-all duration-500" style={{ height: heroSelected === 0 ? '95%' : '85%' }} />
+                     <div className="bg-[#ff9312]/30 w-full rounded-t-[1rem] border-2 border-[#4c2f05]/10 transition-all duration-500" style={{ height: heroSelected === 1 ? '55%' : '45%' }} />
+                     <div className="bg-[#ff9312]/60 w-full rounded-t-[1rem] border-2 border-[#4c2f05]/20 transition-all duration-500" style={{ height: heroSelected === 2 ? '75%' : '65%' }} />
                    </div>
                 </div>
                 <div className="mt-8 pt-6 border-t-2 border-[#4c2f05]/10 flex justify-between items-center opacity-40">
@@ -104,15 +116,20 @@ export default function Home() {
                   </div>
                   <h3 className="text-2xl font-black uppercase leading-tight tracking-tighter">Your choice?</h3>
                   <div className="space-y-4">
-                    <div className="h-16 bg-[#ff9312] rounded-[1.25rem] border-2 border-[#4c2f05] flex items-center px-6 transition-transform hover:scale-[1.02] cursor-pointer">
-                      <span className="font-black text-[12px] uppercase">Innovation</span>
-                    </div>
-                    <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
-                      <span className="font-black text-[12px] uppercase opacity-40">Growth</span>
-                    </div>
-                    <div className="h-16 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-dashed border-[#4c2f05]/20 flex items-center px-6">
-                      <span className="font-black text-[12px] uppercase opacity-40">Stability</span>
-                    </div>
+                    {['Innovation', 'Growth', 'Stability'].map((opt, i) => (
+                      <div 
+                        key={opt}
+                        onClick={() => setHeroSelected(i)}
+                        className={cn(
+                          "h-16 rounded-[1.25rem] border-2 flex items-center px-6 transition-all cursor-pointer active:scale-95",
+                          heroSelected === i 
+                            ? "bg-[#ff9312] border-[#4c2f05] translate-x-1" 
+                            : "bg-[#4c2f05]/5 border-dashed border-[#4c2f05]/20 hover:bg-[#4c2f05]/10"
+                        )}
+                      >
+                        <span className={cn("font-black text-[12px] uppercase", heroSelected === i ? "opacity-100" : "opacity-40")}>{opt}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -136,9 +153,9 @@ export default function Home() {
                    <span className="text-[12px] font-black uppercase tracking-widest text-[#4c2f05] opacity-40">Sync Active</span>
                 </div>
               </div>
-              <div className="absolute -bottom-12 -right-6 w-56 bg-white rounded-[3rem] border-4 border-[#4c2f05] p-10 shadow-[20px_20px_0px_0px_#ff9312] rotate-[5deg] z-20 hidden sm:block">
+              <div className="absolute -bottom-12 -right-6 w-56 bg-white rounded-[3rem] border-4 border-[#4c2f05] p-10 shadow-[20px_20px_0px_0px_#ff9312] rotate-[5deg] z-20 hidden sm:block group/bounce">
                 <div className="w-24 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10" />
-                <div className="h-14 bg-[#4c2f05] rounded-[1.25rem] flex items-center justify-center animate-bounce duration-1000">
+                <div className="h-14 bg-[#4c2f05] rounded-[1.25rem] flex items-center justify-center animate-bounce group-hover/bounce:animate-none group-active/bounce:scale-95 transition-transform">
                   <span className="text-white font-black text-sm uppercase">Option A</span>
                 </div>
               </div>
@@ -202,11 +219,19 @@ export default function Home() {
                    <div className="space-y-12">
                       <h4 className="text-3xl font-black text-white uppercase tracking-tight leading-tight">How likely are you to recommend?</h4>
                       <div className="h-56 flex items-end gap-8 pt-12 px-10 bg-white/5 rounded-[2rem] border-2 border-dashed border-white/10">
-                         <div className="bg-[#ff9312] w-full h-[90%] rounded-t-[1.5rem]" />
-                         <div className="bg-[#ff9312]/30 w-full h-[40%] rounded-t-[1.5rem]" />
-                         <div className="bg-[#ff9312]/60 w-full h-[70%] rounded-t-[1.5rem]" />
-                         <div className="bg-[#ff9312]/40 w-full h-[55%] rounded-t-[1.5rem]" />
+                         {stageVotes.map((v, i) => (
+                           <div 
+                            key={i} 
+                            onClick={() => handleStageVote(i)}
+                            className={cn(
+                              "w-full rounded-t-[1.5rem] transition-all duration-700 cursor-pointer active:scale-95",
+                              i === 0 ? "bg-[#ff9312]" : i === 1 ? "bg-[#ff9312]/30" : i === 2 ? "bg-[#ff9312]/60" : "bg-[#ff9312]/40"
+                            )} 
+                            style={{ height: `${v}%` }} 
+                           />
+                         ))}
                       </div>
+                      <p className="text-[10px] text-white opacity-20 uppercase text-center font-black tracking-widest">Click bars to simulate voting</p>
                    </div>
                 </div>
              </div>
@@ -251,8 +276,17 @@ export default function Home() {
                 <div className="absolute -top-20 -right-8 bg-[#4c2f05] p-12 rounded-[2.5rem] border-4 border-[#ff9312] shadow-[25px_25px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-all duration-700 z-20">
                    <div className="grid grid-cols-2 gap-6">
                       {[Cloud, ListChecks, SlidersHorizontal, MessageSquare, Star, Ruler, ListOrdered, Hash].map((Icon, i) => (
-                         <div key={i} className="w-16 h-16 bg-white/10 rounded-[1.5rem] flex items-center justify-center border-2 border-white/5 hover:bg-[#ff9312] hover:text-[#4c2f05] transition-colors cursor-pointer group/tool">
-                            <Icon className="h-8 w-8 text-white group-hover/tool:scale-110 transition-transform" />
+                         <div 
+                          key={i} 
+                          onClick={() => setActiveTool(i)}
+                          className={cn(
+                            "w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-2 transition-all cursor-pointer group/tool active:scale-90",
+                            activeTool === i 
+                              ? "bg-[#ff9312] border-[#4c2f05] text-[#4c2f05]" 
+                              : "bg-white/10 border-white/5 hover:bg-white/20 text-white"
+                          )}
+                        >
+                            <Icon className={cn("h-8 w-8 transition-transform", activeTool === i ? "scale-110" : "group-hover/tool:scale-110")} />
                          </div>
                       ))}
                    </div>
@@ -278,7 +312,13 @@ export default function Home() {
                      { text: "SYMBOLS", size: "text-3xl", rotate: "-rotate-12", opacity: "opacity-40" },
                      { text: "DYNAMIC", size: "text-5xl", rotate: "rotate-1", opacity: "opacity-80" }
                    ].map((word, i) => (
-                     <span key={i} className={cn("font-black uppercase tracking-tighter transition-all group-hover:scale-110 duration-700 cursor-default", word.size, word.rotate, word.opacity)}>
+                     <span 
+                        key={i} 
+                        className={cn(
+                          "font-black uppercase tracking-tighter transition-all duration-700 cursor-default hover:text-white hover:scale-125", 
+                          word.size, word.rotate, word.opacity
+                        )}
+                      >
                        {word.text}
                      </span>
                    ))}
@@ -314,24 +354,32 @@ export default function Home() {
                  <div className="bg-white rounded-[3rem] border-4 border-[#4c2f05] p-16 shadow-[40px_40px_0px_0px_rgba(76,47,5,0.05)] rotate-[-2deg] group-hover:rotate-0 transition-transform duration-700">
                     <div className="space-y-8">
                        {[
-                         { title: "INNOVATIVE GROWTH", score: 85, color: "bg-[#ff9312]" },
-                         { title: "STABILITY FIRST", score: 45, color: "bg-[#4c2f05]/20" },
-                         { title: "USER EXPERIENCE", score: 65, color: "bg-[#ff9312]/60" }
+                         { title: "INNOVATIVE GROWTH", color: "bg-[#ff9312]" },
+                         { title: "STABILITY FIRST", color: "bg-[#4c2f05]/20" },
+                         { title: "USER EXPERIENCE", color: "bg-[#ff9312]/60" }
                        ].map((item, i) => (
                          <div key={i} className="space-y-4">
                             <div className="flex justify-between items-center">
                                <span className="text-xl font-black uppercase tracking-tighter">{item.title}</span>
-                               <span className="text-[14px] font-black opacity-40 uppercase tracking-widest">{item.score}% SYNC</span>
+                               <span className="text-[14px] font-black opacity-40 uppercase tracking-widest">{rankScores[i]}% SYNC</span>
                             </div>
-                            <div className="h-14 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-[#4c2f05]/10 overflow-hidden relative">
+                            <div 
+                              className="h-14 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-[#4c2f05]/10 overflow-hidden relative cursor-pointer group/bar"
+                              onClick={() => {
+                                const newScores = [...rankScores];
+                                newScores[i] = Math.min(100, newScores[i] + 5);
+                                setRankScores(newScores);
+                              }}
+                            >
                                <div 
-                                 className={cn("absolute left-0 h-full transition-all duration-1000", item.color)} 
-                                 style={{ width: `${item.score}%` }}
+                                 className={cn("absolute left-0 h-full transition-all duration-1000 group-active/bar:opacity-80", item.color)} 
+                                 style={{ width: `${rankScores[i]}%` }}
                                />
                             </div>
                          </div>
                        ))}
                     </div>
+                    <p className="text-[10px] opacity-20 uppercase font-black text-center mt-10 tracking-[0.4em]">Touch bars to increase priority</p>
                  </div>
               </div>
            </div>
