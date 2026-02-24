@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle, ArrowUp, ArrowDown, User, ShieldAlert, Clock } from "lucide-react";
+import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle, ArrowUp, ArrowDown, User, ShieldAlert, Clock, Trophy } from "lucide-react";
 import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useDoc, useMemoFirebase, useUser } from "@/firebase";
-import { doc, collection, serverTimestamp, getDoc, query, where, limit, setDoc } from "firebase/firestore";
+import { doc, collection, serverTimestamp, getDoc, query, where, limit, setDoc, updateDoc, increment } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
@@ -60,14 +60,12 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   }, [db, session?.id]);
   const { data: allResponses } = useCollection(responsesQuery);
 
-  // Auto-login if not authenticated
   useEffect(() => {
     if (!isUserLoading && !user && auth) {
       initiateAnonymousSignIn(auth);
     }
   }, [user, isUserLoading, auth]);
 
-  // Handle Participant presence
   useEffect(() => {
     if (session?.id && user?.uid && !isSettingNickname) {
       const pRef = doc(db, `sessions/${session.id}/participants/${user.uid}`);
@@ -75,6 +73,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         id: user.uid,
         nickname: nickname || "Anonymous",
         status: 'active',
+        score: participantData?.score || 0,
         joinedAt: serverTimestamp()
       }, { merge: true });
     }
@@ -96,7 +95,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setSliderValue(qData.range?.min || 50);
             setRanking(qData.options ? qData.options.map((_, i) => i) : []);
             
-            // Manage Timer
             if (timerRef.current) {
               clearInterval(timerRef.current);
               timerRef.current = null;
@@ -131,7 +129,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     setLoading(true);
     
     let value: any = "";
-    if (currentQuestion.type === 'multiple-choice') value = selection;
+    let isCorrect = false;
+
+    if (currentQuestion.type === 'multiple-choice') {
+      value = selection;
+      if (currentQuestion.correctOptionIndices && selection !== null) {
+        isCorrect = currentQuestion.correctOptionIndices.includes(selection);
+      }
+    }
     if (currentQuestion.type === 'word-cloud') value = textValue.trim().toUpperCase();
     if (currentQuestion.type === 'open-text') value = textValue.trim();
     if (currentQuestion.type === 'slider' || currentQuestion.type === 'scale') value = sliderValue;
@@ -147,6 +152,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       userId: user?.uid || 'anon', 
       createdAt: serverTimestamp(),
     });
+
+    if (isCorrect && participantRef) {
+      updateDoc(participantRef, { score: increment(1000) });
+    }
     
     setVoted(true);
     setLoading(false);
@@ -183,7 +192,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
         <h1 className="text-3xl font-black uppercase tracking-tighter opacity-30">Session Not Found</h1>
-        <p className="text-xs font-bold opacity-60 mt-4 uppercase tracking-widest">Verify your session code.</p>
         <Button onClick={() => window.location.href = '/join'} className="mt-12 bg-foreground text-background font-black rounded-[1.5rem] h-16 px-12 border-2 border-foreground">Return to Lobby</Button>
       </div>
     );
@@ -209,37 +217,26 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     borderColor: finalFg + '33'
   };
 
-  // Kicked State
   if (participantData?.status === 'kicked') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background space-y-8">
-        <div className="w-24 h-24 rounded-[2rem] bg-destructive/10 flex items-center justify-center">
-          <ShieldAlert className="h-12 w-12 text-destructive" />
-        </div>
-        <h1 className="text-5xl font-black uppercase tracking-tighter">Disconnected</h1>
-        <p className="text-sm font-bold opacity-60 uppercase tracking-widest max-w-xs mx-auto">
-          You have been removed from this session by the host.
-        </p>
-        <Button onClick={() => window.location.href = '/join'} variant="outline" className="h-14 rounded-[1rem] font-black uppercase tracking-widest px-10">Return to Lobby</Button>
+        <ShieldAlert className="h-12 w-12 text-destructive" />
+        <h1 className="text-5xl font-black uppercase">Disconnected</h1>
+        <Button onClick={() => window.location.href = '/join'} variant="outline" className="h-14 rounded-[1rem] font-black uppercase px-10">Return to Lobby</Button>
       </div>
     );
   }
 
-  // Nickname Prompt
   if (isSettingNickname) {
     return (
       <div className="min-h-screen flex flex-col p-8 transition-colors duration-700 font-body" style={dynamicStyles}>
         <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center space-y-12">
            <header className="text-center space-y-6">
-             <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto border-4 animate-in zoom-in duration-700" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+             <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto border-4" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
                 <User className="h-12 w-12" />
              </div>
-             <div className="space-y-2">
-               <h1 className="text-6xl font-black uppercase tracking-tighter">Identify.</h1>
-               <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">Choose a nickname or proceed as guest</p>
-             </div>
+             <h1 className="text-6xl font-black uppercase tracking-tighter">Identify.</h1>
            </header>
-
            <div className="w-full space-y-6">
              <Input 
                 value={nickname}
@@ -251,7 +248,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
              />
              <Button 
                 onClick={() => setIsSettingNickname(false)}
-                className="w-full h-28 text-3xl font-black rounded-[2rem] border-4 uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95"
+                className="w-full h-28 text-3xl font-black rounded-[2rem] border-4 uppercase tracking-tighter transition-all"
                 style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
              >
                Enter Studio <Zap className="ml-4 h-8 w-8 fill-current" />
@@ -274,21 +271,17 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     const isCorrect = isQuiz && selection !== null && currentQuestion.correctOptionIndices?.includes(selection);
 
     return (
-      <div 
-        className="min-h-screen flex flex-col p-8 transition-colors duration-700" 
-        style={dynamicStyles}
-      >
+      <div className="min-h-screen flex flex-col p-8 transition-colors duration-700" style={dynamicStyles}>
         <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center text-center space-y-12">
           {timeLeft === 0 && !voted ? (
-            <div className="space-y-6 animate-in zoom-in duration-500">
+            <div className="space-y-6">
                <div className="w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-4 bg-amber-500 border-amber-600">
                  <Clock className="h-12 w-12 text-white" />
                </div>
                <h1 className="text-5xl font-black uppercase tracking-tighter">Time's Up!</h1>
-               <p className="font-bold text-xl max-w-xs mx-auto uppercase tracking-tight opacity-80">You didn't submit in time.</p>
             </div>
           ) : isQuiz ? (
-            <div className="space-y-6 animate-in zoom-in duration-500">
+            <div className="space-y-6">
               <div className={cn(
                 "w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-4",
                 isCorrect ? "bg-green-500 border-green-600" : "bg-red-500 border-red-600"
@@ -296,14 +289,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 {isCorrect ? <CheckCircle2 className="h-12 w-12 text-white" /> : <XCircle className="h-12 w-12 text-white" />}
               </div>
               <h1 className="text-5xl font-black uppercase tracking-tighter">{isCorrect ? "Correct!" : "Nice Try!"}</h1>
-              {isQuiz && !isCorrect && (
-                <div className="space-y-2">
-                  <p className="font-bold opacity-60 uppercase tracking-widest text-xs">Correct answer(s):</p>
-                  <p className="font-black uppercase text-xl">
-                    {currentQuestion.correctOptionIndices?.map(i => currentQuestion.options?.[i]).join(", ")}
-                  </p>
-                </div>
-              )}
+              <div className="bg-black/10 px-8 py-4 rounded-[1rem] inline-flex items-center gap-4">
+                 <Trophy className="h-6 w-6 text-yellow-500" />
+                 <span className="text-3xl font-black tabular-nums">{participantData?.score || 0}</span>
+              </div>
             </div>
           ) : (
             <div className="p-14 rounded-[1.5rem] animate-float" style={{ backgroundColor: finalFg, color: finalBg }}>
@@ -311,15 +300,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             </div>
           )}
 
-          {!isQuiz && timeLeft !== 0 && (
-            <div className="space-y-4">
-              <h1 className="text-5xl font-black uppercase tracking-tighter leading-none">Sync Confirmed!</h1>
-              <p className="font-bold text-xl max-w-xs mx-auto uppercase tracking-tight opacity-80">Stand by for the next signal...</p>
-            </div>
-          )}
-
           {showResults && currentQuestion && (
-            <div className="w-full mt-12 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+            <div className="w-full mt-12">
                <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-6 opacity-40">Live Audience Pulse</p>
                <div className="h-64 border-2 rounded-[1.5rem] p-6 bg-black/5" style={{ borderColor: finalFg + '33' }}>
                  <ResultChart question={currentQuestion} results={qResults} allResponses={currentResponses} />
@@ -333,32 +315,32 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (!currentQuestion) {
     return (
-      <div 
-        className="min-h-screen flex flex-col items-center justify-center p-8 text-center" 
-        style={dynamicStyles}
-      >
+      <div className="min-h-screen flex items-center justify-center p-8 text-center" style={dynamicStyles}>
         <p className="text-3xl font-black uppercase opacity-30 tracking-widest">Waiting for Presenter...</p>
       </div>
     );
   }
 
   return (
-    <div 
-      className="min-h-screen flex flex-col p-8 font-body transition-colors duration-700" 
-      style={dynamicStyles}
-    >
+    <div className="min-h-screen flex flex-col p-8 font-body transition-colors duration-700" style={dynamicStyles}>
       <div className="max-w-lg mx-auto w-full flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-3">
             <Zap className="h-8 w-8 fill-current" />
             <span className="font-black text-2xl tracking-tighter uppercase">PopPulse*</span>
           </div>
-          {timeLeft !== null && (
-            <div className="flex items-center gap-3 px-6 py-2 rounded-[1rem] border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-              <Timer className="h-4 w-4" />
-              <span className="text-xl font-black tabular-nums">{timeLeft}</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-[1rem] bg-black/10">
+              <Trophy className="h-4 w-4 text-yellow-500" />
+              <span className="font-black tabular-nums">{participantData?.score || 0}</span>
             </div>
-          )}
+            {timeLeft !== null && (
+              <div className="flex items-center gap-3 px-6 py-2 rounded-[1rem] border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                <Timer className="h-4 w-4" />
+                <span className="text-xl font-black tabular-nums">{timeLeft}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <main className="space-y-12 flex-1">
@@ -381,9 +363,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
                   onClick={() => setSelection(idx)}
                 >
-                  <div className={cn(
-                    "w-12 h-12 rounded-[1rem] flex items-center justify-center mr-6 shrink-0 transition-colors border-2 text-lg font-black",
-                  )} style={{ 
+                  <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center mr-6 shrink-0 transition-colors border-2 text-lg font-black" style={{ 
                     backgroundColor: selection === idx ? finalBg : finalFg, 
                     color: selection === idx ? finalFg : finalBg,
                     borderColor: selection === idx ? finalBg : finalFg
@@ -392,45 +372,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   </div>
                   <span className="truncate uppercase">{opt}</span>
                 </Button>
-              ))}
-            </div>
-          )}
-
-          {currentQuestion.type === 'ranking' && (
-            <div className="grid gap-3">
-              {ranking.map((optIdx, i) => (
-                <div 
-                  key={optIdx} 
-                  className="flex items-center gap-4 p-4 rounded-[1.5rem] border-2 bg-black/5 transition-all"
-                  style={{ borderColor: finalFg + '33' }}
-                >
-                  <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center font-black text-xl shrink-0" style={{ backgroundColor: finalFg, color: finalBg }}>
-                    {i + 1}
-                  </div>
-                  <span className="flex-1 font-black uppercase text-lg truncate">
-                    {currentQuestion.options![optIdx]}
-                  </span>
-                  <div className="flex flex-col gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => moveRank(i, 'up')}
-                      disabled={i === 0}
-                      className="h-10 w-10 rounded-[0.75rem] hover:bg-black/10"
-                    >
-                      <ArrowUp className="h-5 w-5" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => moveRank(i, 'down')}
-                      disabled={i === ranking.length - 1}
-                      className="h-10 w-10 rounded-[0.75rem] hover:bg-black/10"
-                    >
-                      <ArrowDown className="h-5 w-5" />
-                    </Button>
-                  </div>
-                </div>
               ))}
             </div>
           )}
@@ -458,69 +399,25 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
           {(currentQuestion.type === 'word-cloud' || currentQuestion.type === 'open-text' || currentQuestion.type === 'guess-number') && (
             <div className="space-y-6">
-              {currentQuestion.type === 'word-cloud' ? (
-                <Input 
-                  placeholder="One word..."
-                  value={textValue}
-                  onChange={(e) => setTextValue(e.target.value)}
-                  maxLength={20}
-                  className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20"
-                  style={{ borderColor: finalFg + '33', color: finalFg }}
-                />
-              ) : currentQuestion.type === 'guess-number' ? (
-                <Input 
-                  type="number"
-                  placeholder="Your guess..."
-                  value={textValue}
-                  onChange={(e) => setTextValue(e.target.value)}
-                  className="h-24 text-4xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 text-center"
-                  style={{ borderColor: finalFg + '33', color: finalFg }}
-                />
-              ) : (
-                <Textarea 
-                  placeholder="Your thoughts..."
-                  value={textValue}
-                  onChange={(e) => setTextValue(e.target.value)}
-                  className="min-h-[250px] text-2xl font-black p-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20 leading-tight"
-                  style={{ borderColor: finalFg + '33', color: finalFg }}
-                />
-              )}
-            </div>
-          )}
-
-          {(currentQuestion.type === 'slider' || currentQuestion.type === 'scale') && currentQuestion.range && (
-            <div className="space-y-12 py-12 bg-black/5 rounded-[1.5rem] border-2 px-10" style={{ borderColor: finalFg + '10' }}>
-              <div className="text-center">
-                <span className="text-9xl font-black tracking-tighter leading-none">{sliderValue}</span>
-              </div>
-              <Slider 
-                value={[sliderValue]}
-                onValueChange={(v) => setSliderValue(v[0])}
-                min={currentQuestion.range.min}
-                max={currentQuestion.range.max}
-                step={currentQuestion.range.step}
-                className="py-6"
+              <Input 
+                value={textValue}
+                onChange={(e) => setTextValue(e.target.value)}
+                placeholder="YOUR RESPONSE..."
+                className="h-24 text-3xl font-black px-10 rounded-[1.5rem] border-2 bg-black/5 focus-visible:ring-0 uppercase placeholder:opacity-20"
+                style={{ borderColor: finalFg + '33', color: finalFg }}
               />
-              <div className="flex justify-between font-black text-[10px] uppercase tracking-widest opacity-40 px-4">
-                <span>{currentQuestion.labels?.min || currentQuestion.range.min}</span>
-                <span>{currentQuestion.labels?.max || currentQuestion.range.max}</span>
-              </div>
             </div>
           )}
 
           <Button 
             disabled={loading || (selection === null && !textValue && ratingValue === 0 && currentQuestion.type !== 'slider' && currentQuestion.type !== 'scale' && currentQuestion.type !== 'ranking')}
             onClick={handleSubmit}
-            className="w-full h-24 text-3xl font-black rounded-[1.5rem] hover:opacity-90 transition-all mt-8 uppercase tracking-tighter border-2"
+            className="w-full h-24 text-3xl font-black rounded-[1.5rem] mt-8 uppercase tracking-tighter border-2 shadow-xl active:scale-95"
             style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
           >
             {loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}
           </Button>
         </main>
-
-        <footer className="mt-20 pt-12 text-center opacity-40 border-t-2" style={{ borderColor: finalFg + '10' }}>
-          <p className="text-[10px] font-black uppercase tracking-widest">Instant Sync Active</p>
-        </footer>
       </div>
     </div>
   );

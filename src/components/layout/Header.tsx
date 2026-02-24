@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -6,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
-import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard } from "lucide-react";
+import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Globe } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -58,56 +59,55 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
           
           {/* Navigation */}
           <div className="flex items-center gap-4">
-            {user && (
-              <div className="flex items-center gap-1 bg-foreground/5 p-1 rounded-[1.25rem] border-2 border-foreground/5">
-                <Button 
-                  variant="ghost" 
-                  asChild 
-                  className={cn(
-                    "rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all",
-                    pathname === '/dashboard' ? "bg-foreground text-background" : "hover:bg-foreground/10"
-                  )}
-                >
-                  <Link href="/dashboard">
-                    <LayoutDashboard className="h-3 w-3 mr-2" /> Dashboard
-                  </Link>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  asChild 
-                  className={cn(
-                    "rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all",
-                    pathname === '/profile' ? "bg-foreground text-background" : "hover:bg-foreground/10"
-                  )}
-                >
-                  <Link href="/profile">
-                    <Settings className="h-3 w-3 mr-2" /> Settings
-                  </Link>
-                </Button>
-                <Button 
-                  onClick={handleSignOut} 
-                  variant="ghost" 
-                  className="rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all hover:bg-foreground/10"
-                >
-                  <LogOut className="h-3 w-3 mr-2" /> Logout
-                </Button>
-              </div>
-            )}
+            <div className="flex items-center gap-1 bg-foreground/5 p-1 rounded-[1.25rem] border-2 border-foreground/5">
+              <Button 
+                variant="ghost" 
+                asChild 
+                className={cn(
+                  "rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all",
+                  pathname === '/discover' ? "bg-foreground text-background" : "hover:bg-foreground/10"
+                )}
+              >
+                <Link href="/discover">
+                  <Globe className="h-3 w-3 mr-2" /> Discover
+                </Link>
+              </Button>
 
-            <div className="flex items-center gap-2">
-              {mounted && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={toggleTheme}
-                  className="rounded-[1rem] h-11 w-11 border-2 border-foreground/10 hover:bg-foreground/5 transition-all shadow-none"
-                  aria-label="Toggle theme"
-                >
-                  {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                </Button>
-              )}
-
-              {!user && (
+              {user ? (
+                <>
+                  <Button 
+                    variant="ghost" 
+                    asChild 
+                    className={cn(
+                      "rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all",
+                      pathname === '/dashboard' ? "bg-foreground text-background" : "hover:bg-foreground/10"
+                    )}
+                  >
+                    <Link href="/dashboard">
+                      <LayoutDashboard className="h-3 w-3 mr-2" /> Dashboard
+                    </Link>
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    asChild 
+                    className={cn(
+                      "rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all",
+                      pathname === '/profile' ? "bg-foreground text-background" : "hover:bg-foreground/10"
+                    )}
+                  >
+                    <Link href="/profile">
+                      <Settings className="h-3 w-3 mr-2" /> Settings
+                    </Link>
+                  </Button>
+                  <Button 
+                    onClick={handleSignOut} 
+                    variant="ghost" 
+                    className="rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all hover:bg-foreground/10"
+                  >
+                    <LogOut className="h-3 w-3 mr-2" /> Logout
+                  </Button>
+                </>
+              ) : (
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" asChild className="rounded-[1.25rem] px-6 h-11 font-black uppercase text-xs tracking-widest hover:bg-foreground/5 shadow-none">
                     <Link href="/login">Login</Link>
@@ -118,6 +118,18 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                 </div>
               )}
             </div>
+
+            {mounted && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleTheme}
+                className="rounded-[1rem] h-11 w-11 border-2 border-foreground/10 hover:bg-foreground/5 transition-all shadow-none"
+                aria-label="Toggle theme"
+              >
+                {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </Button>
+            )}
           </div>
         </nav>
       </div>

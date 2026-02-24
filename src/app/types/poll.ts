@@ -31,6 +31,7 @@ export interface PollParticipant {
   id: string;
   nickname?: string;
   status: 'active' | 'kicked';
+  score: number;
   joinedAt: any;
 }
 
@@ -41,4 +42,15 @@ export interface PollResponse {
   value: string | number | string[]; // string[] for ranking
   userId: string;
   createdAt: any;
+}
+
+export interface Survey {
+  id: string;
+  userId: string;
+  title: string;
+  isPublic?: boolean;
+  theme?: string;
+  customColor?: string;
+  createdAt: any;
+  updatedAt?: any;
 }

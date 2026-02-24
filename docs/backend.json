@@ -21,6 +21,7 @@
         "id": { "type": "string" },
         "userId": { "type": "string" },
         "title": { "type": "string" },
+        "isPublic": { "type": "boolean", "default": false },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "userId", "title", "createdAt"]
@@ -64,6 +65,7 @@
         "id": { "type": "string" },
         "nickname": { "type": "string" },
         "status": { "type": "string", "enum": ["active", "kicked"] },
+        "score": { "type": "number", "default": 0 },
         "joinedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "status", "joinedAt"]

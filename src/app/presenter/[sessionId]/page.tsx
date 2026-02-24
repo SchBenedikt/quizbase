@@ -4,7 +4,7 @@
 import { useState, useEffect, use, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Sparkles, Monitor, Settings2, Activity, UserMinus, QrCode } from "lucide-react";
+import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Sparkles, Monitor, Settings2, Activity, UserMinus, QrCode, Trophy } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
@@ -48,13 +48,14 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   const participantsQuery = useMemoFirebase(() => {
     if (!resolvedParams.sessionId) return null;
-    return collection(db, `sessions/${resolvedParams.sessionId}/participants`);
+    return query(collection(db, `sessions/${resolvedParams.sessionId}/participants`), orderBy("score", "desc"));
   }, [db, resolvedParams.sessionId]);
   const { data: participants } = useCollection<PollParticipant>(participantsQuery);
 
   const [results, setResults] = useState<Record<string, number>>({});
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [isQRVisible, setIsQRVisible] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -82,7 +83,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     if (!session?.currentQuestionId || !questions) return;
     const currentQ = questions.find(q => q.id === session.currentQuestionId);
     
-    // Clear existing timer
+    setShowLeaderboard(false);
+
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
@@ -90,7 +92,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
     if (currentQ?.timeLimit && currentQ.timeLimit > 0) {
       setTimeLeft(currentQ.timeLimit);
-      
       timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
           if (prev === null || prev <= 1) {
@@ -128,7 +129,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const handleKick = (participantId: string) => {
     const pRef = doc(db, `sessions/${resolvedParams.sessionId}/participants/${participantId}`);
     updateDocumentNonBlocking(pRef, { status: 'kicked' });
-    toast({ title: "Participant Removed", description: "The user has been kicked from the session." });
   };
 
   const toggleResultVisibility = () => {
@@ -139,17 +139,12 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const handleSummarize = async () => {
     if (!allResponses || !session?.currentQuestionId) return;
     const currentResponses = allResponses.filter(r => r.questionId === session.currentQuestionId).map(r => r.value.toString());
-    if (currentResponses.length < 3) {
-      toast({ title: "Insufficient Data", description: "Waiting for more responses before AI analysis." });
-      return;
-    }
+    if (currentResponses.length < 3) return;
 
     setIsSummarizing(true);
     try {
       const { summary } = await aiOpenTextSummarizer({ responses: currentResponses });
       toast({ title: "AI Insights", description: summary });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Error", description: "Summarization failed." });
     } finally {
       setIsSummarizing(false);
     }
@@ -191,9 +186,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   const currentIdx = questions.findIndex(q => q.id === session?.currentQuestionId);
   const q = questions[currentIdx] || questions[0];
-  if (!q) return null;
-  const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
   const activeParticipants = participants?.filter(p => p.status === 'active') || [];
+  const topParticipants = activeParticipants.slice(0, 5);
   const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/join` : '';
 
   return (
@@ -237,32 +231,26 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                 </div>
               </div>
               <ScrollArea className="h-80">
-                {activeParticipants.length === 0 ? (
-                  <div className="p-12 text-center opacity-20">
-                    <p className="text-[10px] font-black uppercase tracking-widest">No signals detected</p>
-                  </div>
-                ) : (
-                  <div className="p-2 space-y-1">
-                    {activeParticipants.map(p => (
-                      <div 
-                        key={p.id} 
-                        className="flex items-center justify-between p-4 rounded-[1rem] transition-colors group"
-                        style={{ borderBottom: `1px solid ${finalBg}10` }}
+                <div className="p-2 space-y-1">
+                  {activeParticipants.map(p => (
+                    <div 
+                      key={p.id} 
+                      className="flex items-center justify-between p-4 rounded-[1rem] transition-colors group"
+                      style={{ borderBottom: `1px solid ${finalBg}10` }}
+                    >
+                      <span className="text-sm font-bold uppercase truncate pr-4">{p.nickname || "Anonymous"}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleKick(p.id)}
+                        className="h-8 w-8 rounded-[0.5rem] opacity-0 group-hover:opacity-100 transition-opacity"
+                        style={{ color: finalBg }}
                       >
-                        <span className="text-sm font-bold uppercase truncate pr-4">{p.nickname || "Anonymous"}</span>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          onClick={() => handleKick(p.id)}
-                          className="h-8 w-8 rounded-[0.5rem] opacity-0 group-hover:opacity-100 transition-opacity"
-                          style={{ color: finalBg }}
-                        >
-                          <UserMinus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                        <UserMinus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </ScrollArea>
             </PopoverContent>
           </Popover>
@@ -271,32 +259,67 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
       <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center relative overflow-hidden">
         <div className="w-full max-w-[1600px] h-full flex flex-col gap-10">
-          <div className="text-center shrink-0 space-y-8">
-             <div className="inline-flex items-center gap-8 px-14 py-6 rounded-full text-4xl font-black uppercase tracking-[0.4em] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
-               <Activity className="h-10 w-10" /> Step {currentIdx + 1} of {questions.length}
-             </div>
-             <h2 className="text-5xl md:text-8xl font-black leading-[0.95] tracking-tight max-w-6xl mx-auto uppercase">
-               {q.question}
-             </h2>
-          </div>
+          {!showLeaderboard ? (
+            <>
+              <div className="text-center shrink-0 space-y-8">
+                <div className="inline-flex items-center gap-8 px-14 py-6 rounded-full text-4xl font-black uppercase tracking-[0.4em] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
+                  <Activity className="h-10 w-10" /> Step {currentIdx + 1} of {questions.length}
+                </div>
+                <h2 className="text-5xl md:text-8xl font-black leading-[0.95] tracking-tight max-w-6xl mx-auto uppercase">
+                  {q.question}
+                </h2>
+              </div>
 
-          <div className="flex-1 min-h-0 w-full relative">
-            <Card className="h-full border-4 rounded-[2.5rem] bg-black/5 p-12 flex items-center justify-center overflow-hidden shadow-none" style={{ borderColor: finalFg + '08' }}>
-               <ResultChart question={q} results={results} allResponses={currentResponses} />
-            </Card>
-            
-            {q.type === 'open-text' && currentResponses.length > 0 && (
-              <Button 
-                onClick={handleSummarize}
-                disabled={isSummarizing}
-                className="absolute top-8 right-8 h-12 px-8 rounded-[1rem] font-black uppercase text-[10px] border-2 transition-all gap-3 shadow-xl"
-                style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
-              >
-                {isSummarizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                Analyze Signal
-              </Button>
-            )}
-          </div>
+              <div className="flex-1 min-h-0 w-full relative">
+                <Card className="h-full border-4 rounded-[2.5rem] bg-black/5 p-12 flex items-center justify-center overflow-hidden shadow-none" style={{ borderColor: finalFg + '08' }}>
+                  <ResultChart question={q} results={results} allResponses={allResponses?.filter(r => r.questionId === q.id) || []} />
+                </Card>
+                
+                {q.type === 'open-text' && (allResponses?.filter(r => r.questionId === q.id).length || 0) > 0 && (
+                  <Button 
+                    onClick={handleSummarize}
+                    disabled={isSummarizing}
+                    className="absolute top-8 right-8 h-12 px-8 rounded-[1rem] font-black uppercase text-[10px] border-2 transition-all gap-3 shadow-xl"
+                    style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
+                  >
+                    {isSummarizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                    Analyze Signal
+                  </Button>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center space-y-16 animate-in zoom-in duration-700">
+               <div className="text-center space-y-6">
+                 <div className="w-24 h-24 rounded-[1.5rem] bg-yellow-400 flex items-center justify-center mx-auto border-4 border-yellow-600 shadow-xl">
+                   <Trophy className="h-12 w-12 text-yellow-900" />
+                 </div>
+                 <h2 className="text-7xl font-black uppercase tracking-tighter">Leaderboard.</h2>
+                 <p className="text-xs font-black uppercase tracking-[0.5em] opacity-40">The high-stakes pulse leaders</p>
+               </div>
+
+               <div className="w-full max-w-3xl space-y-4">
+                 {topParticipants.map((p, i) => (
+                   <div 
+                    key={p.id} 
+                    className="flex items-center gap-6 p-6 rounded-[2rem] border-4 animate-in slide-in-from-right duration-500"
+                    style={{ 
+                      backgroundColor: i === 0 ? finalFg : finalFg + '10', 
+                      color: i === 0 ? finalBg : finalFg,
+                      borderColor: i === 0 ? finalFg : finalFg + '10',
+                      transitionDelay: `${i * 100}ms`
+                    }}
+                   >
+                     <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center font-black text-2xl bg-black/10">
+                       {i + 1}
+                     </div>
+                     <span className="flex-1 text-3xl font-black uppercase truncate">{p.nickname || "Anonymous"}</span>
+                     <span className="text-4xl font-black tracking-tight tabular-nums">{p.score || 0}</span>
+                   </div>
+                 ))}
+               </div>
+            </div>
+          )}
         </div>
       </main>
 
@@ -321,6 +344,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             style={{ borderColor: finalFg + '20', color: finalFg }}
           >
             <ChevronRight className="h-7 w-7" />
+          </Button>
+          
+          <Button 
+            variant="outline"
+            onClick={() => setShowLeaderboard(!showLeaderboard)}
+            className={cn(
+              "h-14 px-8 rounded-[1.25rem] border-2 font-black uppercase text-xs tracking-widest gap-3 transition-all",
+              showLeaderboard ? "bg-yellow-400 text-yellow-900 border-yellow-500" : "bg-black/5"
+            )}
+            style={!showLeaderboard ? { borderColor: finalFg + '20', color: finalFg } : {}}
+          >
+            <Trophy className="h-5 w-5" /> {showLeaderboard ? "Back to Result" : "Leaderboard"}
           </Button>
         </div>
         
@@ -352,9 +387,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                     className="data-[state=checked]:bg-primary"
                   />
                 </div>
-                <p className="text-[10px] opacity-40 uppercase leading-tight font-bold">
-                  When active, participants will see aggregated data after transmitting.
-                </p>
               </div>
               <div className="pt-4 border-t-2" style={{ borderColor: finalBg + '20' }}>
                 <div className="grid gap-3">
@@ -387,7 +419,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             <DialogTitle className="text-4xl font-black uppercase tracking-tighter leading-none">Join the Pulse</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-8">
-            <div className="bg-white p-6 rounded-[2rem] border-[8px] border-current shadow-2xl animate-in zoom-in-50 duration-700">
+            <div className="bg-white p-6 rounded-[2rem] border-[8px] border-current shadow-2xl">
               <QRCodeSVG value={joinUrl} size={280} level="H" includeMargin={false} />
             </div>
             <div className="space-y-3">

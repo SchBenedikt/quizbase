@@ -1,17 +1,19 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play } from "lucide-react";
+import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Globe, Lock } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, query, orderBy, getDocs, serverTimestamp } from "firebase/firestore";
+import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc } from "firebase/firestore";
 import { deleteDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -41,6 +43,16 @@ export default function DashboardPage() {
     const surveyRef = doc(db, `users/${user.uid}/surveys/${surveyId}`);
     deleteDocumentNonBlocking(surveyRef);
     toast({ title: "Survey Deleted", description: "The presentation has been removed." });
+  };
+
+  const togglePublic = (surveyId: string, currentStatus: boolean) => {
+    if (!user) return;
+    const surveyRef = doc(db, `users/${user.uid}/surveys/${surveyId}`);
+    updateDoc(surveyRef, { isPublic: !currentStatus });
+    toast({ 
+      title: !currentStatus ? "Published to Library" : "Moved to Private", 
+      description: !currentStatus ? "Anyone can now discover this survey." : "Only you can see this survey now." 
+    });
   };
 
   const handleLaunchExisting = async (survey: any) => {
@@ -131,8 +143,19 @@ export default function DashboardPage() {
             {filteredSurveys.map((survey) => (
               <article key={survey.id} className="bg-card p-6 rounded-[1.5rem] border-2 border-foreground/5 flex flex-col gap-6 group hover:border-primary/30 transition-all h-full relative shadow-sm">
                 <div className="flex items-start justify-between">
-                  <div className="w-10 h-10 rounded-[0.75rem] flex items-center justify-center border-2 border-foreground/5 shrink-0 bg-muted/50 group-hover:bg-primary/10 transition-colors">
-                     <BarChart3 className="h-4 w-4 text-primary" />
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-[0.75rem] flex items-center justify-center border-2 border-foreground/5 shrink-0 bg-muted/50 group-hover:bg-primary/10 transition-colors">
+                       <BarChart3 className="h-4 w-4 text-primary" />
+                    </div>
+                    <Button 
+                       variant="ghost" 
+                       size="icon"
+                       onClick={() => togglePublic(survey.id, !!survey.isPublic)}
+                       className={cn("h-8 w-8 rounded-[0.5rem] transition-colors", survey.isPublic ? "text-primary" : "text-muted-foreground")}
+                       title={survey.isPublic ? "Publicly Discoverable" : "Private"}
+                     >
+                       {survey.isPublic ? <Globe className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                     </Button>
                   </div>
                   <Button 
                      variant="ghost" 

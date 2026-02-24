@@ -3,14 +3,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * PopPulse* Security Rules
-     * 
-     * Presenters own their profiles and surveys.
-     * Participants can join sessions and submit responses.
-     * Session owners can see all responses in their sessions.
-     */
-
     function isSignedIn() {
       return request.auth != null;
     }
@@ -27,8 +19,6 @@ service cloud.firestore {
       return request.resource.data[fieldName] == resource.data[fieldName];
     }
 
-    // --- COLLECTION RULES ---
-
     match /users/{userId} {
       allow get, list: if isOwner(userId);
       allow create: if isOwner(userId) && request.resource.data.id == userId;
@@ -37,14 +27,15 @@ service cloud.firestore {
     }
 
     match /users/{userId}/surveys/{surveyId} {
-      allow get, list: if isOwner(userId);
+      allow get: if isOwner(userId) || resource.data.isPublic == true;
+      allow list: if isOwner(userId) || resource.data.isPublic == true;
       allow create: if isOwner(userId) && request.resource.data.userId == userId;
       allow update: if isExistingOwner(userId) && isUnchanged('userId');
       allow delete: if isExistingOwner(userId);
 
       match /questions/{questionId} {
         allow get: if true;
-        allow list: if isOwner(userId);
+        allow list: if isOwner(userId) || get(/databases/$(database)/documents/users/$(userId)/surveys/$(surveyId)).data.isPublic == true;
         allow create, update, delete: if isOwner(userId);
       }
     }
@@ -64,8 +55,6 @@ service cloud.firestore {
       }
 
       match /responses/{responseId} {
-        // Allow the session creator to list all responses
-        // ALSO allow participants to list responses if results are public
         allow list: if (isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid) ||
                       (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true);
         
@@ -75,6 +64,11 @@ service cloud.firestore {
         allow create: if get(/databases/$(database)/documents/sessions/$(sessionId)).data.status == 'active';
         allow update, delete: if false;
       }
+    }
+    
+    // Support Discovery
+    match /{path=**}/surveys/{surveyId} {
+      allow read: if resource.data.isPublic == true;
     }
   }
 }
