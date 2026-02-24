@@ -310,11 +310,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
         
         <div className="flex items-center gap-12">
-          <div className="flex items-center gap-4 opacity-40">
-             <Zap className="h-6 w-6 fill-current" />
-             <span className="font-black text-[11px] uppercase tracking-[0.3em]">Studio Presenter</span>
-          </div>
-
           <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '08' }}>
              <Popover>
                <PopoverTrigger asChild>
