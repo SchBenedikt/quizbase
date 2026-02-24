@@ -62,10 +62,6 @@ export default function DashboardPage() {
     const sessionRef = doc(collection(db, "sessions"));
     
     try {
-      const qCol = collection(db, `users/${user.uid}/surveys/${survey.id}/questions`);
-      const qSnap = await getDocs(query(qCol, orderBy("order", "asc")));
-      const firstQId = qSnap.docs[0]?.id || null;
-
       const sessionData = {
         id: sessionRef.id,
         pollId: survey.id,
@@ -73,7 +69,8 @@ export default function DashboardPage() {
         title: survey.title || "Untitled Presentation",
         code,
         status: "active",
-        currentQuestionId: firstQId,
+        currentQuestionId: "lobby", // Start in Lobby
+        isStarted: false,
         createdAt: serverTimestamp(),
         theme: survey.theme || 'orange',
         customColor: survey.customColor || null,
@@ -149,7 +146,7 @@ export default function DashboardPage() {
                     </div>
                     <Button 
                        variant="ghost" 
-                       size="icon"
+                       size="icon" 
                        onClick={() => togglePublic(survey.id, !!survey.isPublic)}
                        className={cn("h-8 w-8 rounded-[0.5rem] transition-colors", survey.isPublic ? "text-primary" : "text-muted-foreground")}
                        title={survey.isPublic ? "Publicly Discoverable" : "Private"}
@@ -159,7 +156,7 @@ export default function DashboardPage() {
                   </div>
                   <Button 
                      variant="ghost" 
-                     size="icon"
+                     size="icon" 
                      onClick={() => handleDeleteSurvey(survey.id)}
                      className="h-8 w-8 rounded-[0.5rem] hover:text-destructive hover:bg-destructive/5 transition-colors opacity-0 group-hover:opacity-100"
                      aria-label={`Delete ${survey.title || "Untitled Survey"}`}

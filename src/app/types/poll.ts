@@ -19,8 +19,9 @@ export interface PollSession {
   title: string;
   userId: string;
   pollId: string;
-  currentQuestionId: string | null;
+  currentQuestionId: string | 'lobby' | 'podium' | null;
   status: 'active' | 'ended';
+  isStarted?: boolean;
   theme?: 'orange' | 'red' | 'green' | 'blue' | 'custom' | 'minimal-light' | 'minimal-dark';
   customColor?: string; // Hex color code
   showResultsToParticipants: boolean;
