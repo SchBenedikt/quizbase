@@ -220,7 +220,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               </button>
             </PopoverTrigger>
             <PopoverContent 
-              className="w-80 p-0 rounded-[2rem] border-2 shadow-2xl" 
+              className="w-80 p-0 rounded-[2rem] border-2 shadow-2xl overflow-hidden" 
               align="end"
               style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
             >
@@ -243,7 +243,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                         variant="ghost" 
                         size="icon" 
                         onClick={() => handleKick(p.id)}
-                        className="h-8 w-8 rounded-[0.5rem] opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="h-8 w-8 rounded-[0.5rem] transition-colors hover:bg-black/20"
                         style={{ color: finalBg }}
                       >
                         <UserMinus className="h-4 w-4" />
@@ -261,17 +261,17 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         <div className="w-full max-w-[1600px] h-full flex flex-col gap-10">
           {!showLeaderboard ? (
             <>
-              <div className="text-center shrink-0 space-y-8">
-                <div className="inline-flex items-center gap-8 px-14 py-6 rounded-full text-4xl font-black uppercase tracking-[0.4em] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
-                  <Activity className="h-10 w-10" /> Step {currentIdx + 1} of {questions.length}
+              <div className="text-center shrink-0 space-y-10">
+                <div className="inline-flex items-center gap-10 px-20 py-10 rounded-[2.5rem] text-7xl font-black uppercase tracking-[0.2em] shadow-2xl animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
+                  Step {currentIdx + 1} of {questions.length}
                 </div>
-                <h2 className="text-5xl md:text-8xl font-black leading-[0.95] tracking-tight max-w-6xl mx-auto uppercase">
+                <h2 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter max-w-6xl mx-auto uppercase">
                   {q.question}
                 </h2>
               </div>
 
               <div className="flex-1 min-h-0 w-full relative">
-                <Card className="h-full border-4 rounded-[2.5rem] bg-black/5 p-12 flex items-center justify-center overflow-hidden shadow-none" style={{ borderColor: finalFg + '08' }}>
+                <Card className="h-full border-4 rounded-[3rem] bg-black/5 p-12 flex items-center justify-center overflow-hidden shadow-none" style={{ borderColor: finalFg + '08' }}>
                   <ResultChart question={q} results={results} allResponses={allResponses?.filter(r => r.questionId === q.id) || []} />
                 </Card>
                 
@@ -350,7 +350,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
             variant="outline"
             onClick={() => setShowLeaderboard(!showLeaderboard)}
             className={cn(
-              "h-14 px-8 rounded-[1.25rem] border-2 font-black uppercase text-xs tracking-widest gap-3 transition-all",
+              "h-14 px-8 rounded-[1.25rem] border-2 font-black uppercase text-xs tracking-widest gap-3 transition-all shadow-none",
               showLeaderboard ? "bg-yellow-400 text-yellow-900 border-yellow-500" : "bg-black/5"
             )}
             style={!showLeaderboard ? { borderColor: finalFg + '20', color: finalFg } : {}}
@@ -372,7 +372,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               </Button>
             </PopoverTrigger>
             <PopoverContent 
-              className="w-80 p-8 rounded-[2rem] border-2 flex flex-col gap-6 shadow-2xl" 
+              className="w-80 p-8 rounded-[2rem] border-2 flex flex-col gap-6 shadow-2xl overflow-hidden" 
               align="end"
               style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
             >
@@ -402,7 +402,13 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                     variant="outline" 
                     className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest shadow-none"
                     style={{ backgroundColor: finalBg + '10', borderColor: finalBg + '20', color: finalBg }}
-                    onClick={() => document.documentElement.requestFullscreen()}
+                    onClick={() => {
+                      if (document.fullscreenElement) {
+                        document.exitFullscreen();
+                      } else {
+                        document.documentElement.requestFullscreen();
+                      }
+                    }}
                   >
                     <Monitor className="h-4 w-4 mr-2" /> Fullscreen Display
                   </Button>
@@ -414,13 +420,13 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       </footer>
 
       <Dialog open={isQRVisible} onOpenChange={setIsQRVisible}>
-        <DialogContent className="max-w-xl p-8 rounded-[2rem] border-4 text-center overflow-hidden max-h-[90vh] overflow-y-auto" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+        <DialogContent className="max-w-xl p-8 rounded-[3rem] border-4 text-center overflow-hidden max-h-[90vh]" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
           <DialogHeader className="mb-8">
             <DialogTitle className="text-4xl font-black uppercase tracking-tighter leading-none">Join the Pulse</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col items-center gap-8">
-            <div className="bg-white p-6 rounded-[2rem] border-[8px] border-current shadow-2xl">
-              <QRCodeSVG value={joinUrl} size={280} level="H" includeMargin={false} />
+            <div className="bg-white p-6 rounded-[2.5rem] border-[8px] border-current shadow-2xl">
+              <QRCodeSVG value={joinUrl} size={240} level="H" includeMargin={false} />
             </div>
             <div className="space-y-3">
               <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Scan to broadcast your signal</p>

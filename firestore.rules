@@ -35,38 +35,35 @@ service cloud.firestore {
 
       match /questions/{questionId} {
         allow get: if true;
-        allow list: if isOwner(userId) || get(/databases/$(database)/documents/users/$(userId)/surveys/$(surveyId)).data.isPublic == true;
+        allow list: if true;
         allow create, update, delete: if isOwner(userId);
       }
     }
 
     match /sessions/{sessionId} {
       allow get: if true;
-      allow list: if isSignedIn();
+      allow list: if true;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update: if isExistingOwner(resource.data.userId) && isUnchanged('userId');
       allow delete: if isExistingOwner(resource.data.userId);
 
       match /participants/{userId} {
         allow get: if true;
+        allow list: if true;
         allow create: if isSignedIn() && request.auth.uid == userId;
         allow update: if (isSignedIn() && request.auth.uid == userId) || isOwner(get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId);
-        allow list: if isOwner(get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId);
       }
 
       match /responses/{responseId} {
-        allow list: if (isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid) ||
-                      (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true);
-        
-        allow get: if (isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid) ||
-                     (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true);
+        allow list, get: if (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true) ||
+                         (isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid);
         
         allow create: if get(/databases/$(database)/documents/sessions/$(sessionId)).data.status == 'active';
         allow update, delete: if false;
       }
     }
     
-    // Support Discovery
+    // Support Global Discovery (Collection Group)
     match /{path=**}/surveys/{surveyId} {
       allow read: if resource.data.isPublic == true;
     }
