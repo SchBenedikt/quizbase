@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
@@ -118,8 +119,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   };
 
   const handleKick = (participantId: string) => {
-    const participantRef = doc(db, `sessions/${resolvedParams.sessionId}/participants/${participantId}`);
-    updateDocumentNonBlocking(participantRef, { status: 'kicked' });
+    const pRef = doc(db, `sessions/${resolvedParams.sessionId}/participants/${participantId}`);
+    updateDocumentNonBlocking(pRef, { status: 'kicked' });
     toast({ title: "Participant Removed", description: "The user has been kicked from the session." });
   };
 
@@ -216,11 +217,15 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                 <span className="text-3xl font-black leading-none">{activeParticipants.length}</span>
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-0 rounded-[2rem] border-2 bg-background shadow-2xl" align="end">
-              <div className="p-6 border-b-2 flex items-center justify-between">
+            <PopoverContent 
+              className="w-80 p-0 rounded-[2rem] border-2 shadow-2xl" 
+              align="end"
+              style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
+            >
+              <div className="p-6 border-b-2 flex items-center justify-between" style={{ borderColor: finalBg + '20' }}>
                 <p className="text-xs font-black uppercase tracking-widest opacity-40">Live Participants</p>
-                <div className="h-6 px-3 bg-primary/10 rounded-full flex items-center">
-                  <span className="text-[10px] font-black text-primary">{activeParticipants.length} Active</span>
+                <div className="h-6 px-3 rounded-full flex items-center" style={{ backgroundColor: finalBg + '20' }}>
+                  <span className="text-[10px] font-black">{activeParticipants.length} Active</span>
                 </div>
               </div>
               <ScrollArea className="h-80">
@@ -231,13 +236,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                 ) : (
                   <div className="p-2 space-y-1">
                     {activeParticipants.map(p => (
-                      <div key={p.id} className="flex items-center justify-between p-4 rounded-[1rem] hover:bg-muted transition-colors group">
+                      <div 
+                        key={p.id} 
+                        className="flex items-center justify-between p-4 rounded-[1rem] transition-colors group"
+                        style={{ borderBottom: `1px solid ${finalBg}10` }}
+                      >
                         <span className="text-sm font-bold uppercase truncate pr-4">{p.nickname || "Anonymous"}</span>
                         <Button 
                           variant="ghost" 
                           size="icon" 
                           onClick={() => handleKick(p.id)}
-                          className="h-8 w-8 rounded-[0.5rem] text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-8 w-8 rounded-[0.5rem] opacity-0 group-hover:opacity-100 transition-opacity"
+                          style={{ color: finalBg }}
                         >
                           <UserMinus className="h-4 w-4" />
                         </Button>
@@ -253,11 +263,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
       <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center relative overflow-hidden">
         <div className="w-full max-w-[1600px] h-full flex flex-col gap-10">
-          <div className="text-center shrink-0 space-y-6">
-             <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-base font-black uppercase tracking-[0.3em] shadow-sm" style={{ backgroundColor: finalFg + '15', color: finalFg }}>
-               <Activity className="h-5 w-5" /> Step {currentIdx + 1} of {questions.length}
+          <div className="text-center shrink-0 space-y-8">
+             <div className="inline-flex items-center gap-4 px-8 py-3 rounded-full text-xl font-black uppercase tracking-[0.4em] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
+               <Activity className="h-6 w-6" /> Step {currentIdx + 1} of {questions.length}
              </div>
-             <h2 className="text-5xl md:text-7xl font-black leading-[1.0] tracking-tight max-w-6xl mx-auto uppercase">
+             <h2 className="text-5xl md:text-8xl font-black leading-[0.95] tracking-tight max-w-6xl mx-auto uppercase">
                {q.question}
              </h2>
           </div>
@@ -310,41 +320,49 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
         
         <div className="flex items-center gap-12">
-          <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '08' }}>
-             <Popover>
-               <PopoverTrigger asChild>
-                 <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="h-12 w-12 rounded-[1rem] hover:bg-black/10 transition-all shadow-none" 
-                  style={{ color: finalFg }}
-                 >
-                   <Settings2 className="h-6 w-6" />
-                 </Button>
-               </PopoverTrigger>
-               <PopoverContent className="w-80 p-8 rounded-[2rem] border-2 bg-background flex flex-col gap-6 text-foreground shadow-2xl" align="end">
-                  <div className="space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Settings</p>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="show-results" className="text-xs font-bold uppercase tracking-tight">Live Feedback Stream</Label>
-                      <Switch id="show-results" checked={showResults} onCheckedChange={toggleResultVisibility} />
-                    </div>
-                    <p className="text-[10px] opacity-40 uppercase leading-tight font-bold">
-                      When active, participants will see aggregated data after transmitting.
-                    </p>
-                  </div>
-                  <div className="pt-4 border-t-2">
-                    <Button 
-                      variant="outline" 
-                      className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest"
-                      onClick={() => document.documentElement.requestFullscreen()}
-                    >
-                      <Monitor className="h-4 w-4 mr-2" /> Fullscreen Display
-                    </Button>
-                  </div>
-               </PopoverContent>
-             </Popover>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="h-14 w-14 rounded-[1.25rem] border-2 bg-black/5 transition-all hover:bg-black/10 shadow-none" 
+                style={{ color: finalFg, borderColor: finalFg + '10' }}
+              >
+                <Settings2 className="h-7 w-7" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent 
+              className="w-80 p-8 rounded-[2rem] border-2 flex flex-col gap-6 shadow-2xl" 
+              align="end"
+              style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
+            >
+              <div className="space-y-4">
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Settings</p>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="show-results" className="text-xs font-black uppercase tracking-tight">Live Feedback Stream</Label>
+                  <Switch 
+                    id="show-results" 
+                    checked={showResults} 
+                    onCheckedChange={toggleResultVisibility} 
+                    className="data-[state=checked]:bg-primary"
+                  />
+                </div>
+                <p className="text-[10px] opacity-40 uppercase leading-tight font-bold">
+                  When active, participants will see aggregated data after transmitting.
+                </p>
+              </div>
+              <div className="pt-4 border-t-2" style={{ borderColor: finalBg + '20' }}>
+                <Button 
+                  variant="outline" 
+                  className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest shadow-none"
+                  style={{ backgroundColor: finalBg + '10', borderColor: finalBg + '20', color: finalBg }}
+                  onClick={() => document.documentElement.requestFullscreen()}
+                >
+                  <Monitor className="h-4 w-4 mr-2" /> Fullscreen Display
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </footer>
     </div>

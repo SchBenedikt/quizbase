@@ -218,12 +218,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     return (
       <div className="min-h-screen flex flex-col p-8 transition-colors duration-700 font-body" style={dynamicStyles}>
         <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center space-y-12">
-           <header className="text-center space-y-4">
-             <div className="w-20 h-20 rounded-[1.5rem] bg-white/10 flex items-center justify-center mx-auto border-2" style={{ borderColor: finalFg + '33' }}>
-                <User className="h-10 w-10" />
+           <header className="text-center space-y-6">
+             <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto border-4 animate-in zoom-in duration-700" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                <User className="h-12 w-12" />
              </div>
-             <h1 className="text-5xl font-black uppercase tracking-tighter">Identify.</h1>
-             <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Choose a nickname or proceed as guest</p>
+             <div className="space-y-2">
+               <h1 className="text-6xl font-black uppercase tracking-tighter">Identify.</h1>
+               <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">Choose a nickname or proceed as guest</p>
+             </div>
            </header>
 
            <div className="w-full space-y-6">
@@ -232,15 +234,15 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="YOUR NICKNAME..."
                 maxLength={20}
-                className="h-24 text-4xl font-black text-center rounded-[1.5rem] border-4 bg-black/5 focus-visible:ring-0 placeholder:opacity-10 uppercase tracking-tighter"
+                className="h-28 text-5xl font-black text-center rounded-[2rem] border-4 bg-black/10 focus-visible:ring-0 placeholder:opacity-10 uppercase tracking-tighter"
                 style={{ borderColor: finalFg, color: finalFg }}
              />
              <Button 
                 onClick={() => setIsSettingNickname(false)}
-                className="w-full h-24 text-2xl font-black rounded-[1.5rem] border-4 uppercase tracking-tighter transition-all"
+                className="w-full h-28 text-3xl font-black rounded-[2rem] border-4 uppercase tracking-tighter transition-all hover:scale-[1.02] active:scale-95"
                 style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
              >
-               Enter Studio <Zap className="ml-4 h-6 w-6 fill-current" />
+               Enter Studio <Zap className="ml-4 h-8 w-8 fill-current" />
              </Button>
            </div>
         </div>
