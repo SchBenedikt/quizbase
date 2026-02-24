@@ -118,14 +118,14 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
               )}
             >
               <CardContent className="p-0">
-                <div className={cn("flex flex-col lg:flex-row")}>
-                  {/* Left Controls - Reordering and Index */}
+                <div className="flex h-full">
+                  {/* Left Sidebar - Reordering and Index */}
                   <div className={cn(
-                    "w-full lg:w-16 flex lg:flex-col items-center justify-between lg:justify-start p-4 bg-muted/20 border-b-2 lg:border-b-0 lg:border-r-2 border-foreground/5 shrink-0 gap-4",
-                    isCollapsed && "lg:py-6"
+                    "w-16 flex flex-col items-center bg-muted/20 border-r-2 border-foreground/5 shrink-0 gap-4",
+                    isCollapsed ? "py-4" : "py-8"
                   )}>
                     <div className="text-2xl font-black opacity-20">{idx + 1}</div>
-                    <div className="flex lg:flex-col gap-2">
+                    <div className="flex flex-col gap-2">
                       <Button 
                         variant="ghost" 
                         size="icon" 
@@ -148,37 +148,37 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                   </div>
 
                   {/* Main Content Area */}
-                  <div className={cn("flex-1 flex flex-col justify-center", isCollapsed ? "p-6 space-y-4" : "p-8 sm:p-12 space-y-10")}>
+                  <div className={cn("flex-1 flex flex-col justify-center", isCollapsed ? "p-4 space-y-4" : "p-8 sm:p-12 space-y-10")}>
                     <header className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
                         <Button 
                           variant="ghost" 
                           size="icon" 
                           onClick={() => toggleCollapse(q.id)}
-                          className="h-12 w-12 rounded-[1rem] border-2 border-foreground/5"
+                          className="h-10 w-10 sm:h-12 sm:w-12 rounded-[1rem] border-2 border-foreground/5"
                         >
-                          {isCollapsed ? <ChevronRight className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
+                          {isCollapsed ? <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" /> : <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6" />}
                         </Button>
                         <div className="flex items-center gap-4">
                           <div className={cn(
                             "flex items-center justify-center bg-primary text-primary-foreground rounded-[1rem] shadow-lg",
-                            isCollapsed ? "w-10 h-10" : "w-12 h-12"
+                            isCollapsed ? "w-8 h-8 sm:w-10 sm:h-10" : "w-12 h-12"
                           )}>
-                            {q.type === 'multiple-choice' && <ListChecks className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
-                            {q.type === 'word-cloud' && <Cloud className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
-                            {q.type === 'open-text' && <MessageSquare className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
-                            {q.type === 'rating' && <Star className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
-                            {q.type === 'slider' && <SlidersHorizontal className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
-                            {q.type === 'guess-number' && <Hash className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
-                            {q.type === 'ranking' && <ListOrdered className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
-                            {q.type === 'scale' && <Ruler className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'multiple-choice' && <ListChecks className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
+                            {q.type === 'word-cloud' && <Cloud className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
+                            {q.type === 'open-text' && <MessageSquare className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
+                            {q.type === 'rating' && <Star className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
+                            {q.type === 'slider' && <SlidersHorizontal className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
+                            {q.type === 'guess-number' && <Hash className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
+                            {q.type === 'ranking' && <ListOrdered className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
+                            {q.type === 'scale' && <Ruler className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
                           </div>
                           <div className="flex flex-col">
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 leading-none mb-1">Question Type</span>
-                            <span className={cn("font-black uppercase tracking-tight leading-none", isCollapsed ? "text-lg" : "text-xl")}>{q.type.replace('-', ' ')}</span>
+                            <span className={cn("font-black uppercase tracking-tight leading-none", isCollapsed ? "text-base sm:text-lg" : "text-xl")}>{q.type.replace('-', ' ')}</span>
                           </div>
                           {isCollapsed && q.question && (
-                            <div className="ml-4 border-l-2 border-foreground/5 pl-4 truncate max-w-md">
+                            <div className="ml-4 border-l-2 border-foreground/5 pl-4 truncate max-w-md hidden md:block">
                               <span className="text-sm font-bold uppercase tracking-tight opacity-60">{q.question}</span>
                             </div>
                           )}
@@ -191,7 +191,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                           size="icon" 
                           onClick={() => removeQuestion(q.id)} 
                           disabled={questions.length <= 1}
-                          className="h-12 w-12 rounded-[1rem] hover:bg-destructive/10 hover:text-destructive border-2 border-transparent hover:border-destructive/20 text-foreground/20"
+                          className="h-10 w-10 sm:h-12 sm:w-12 rounded-[1rem] hover:bg-destructive/10 hover:text-destructive border-2 border-transparent hover:border-destructive/20 text-foreground/20"
                         >
                           <Trash2 className="h-5 w-5" />
                         </Button>
