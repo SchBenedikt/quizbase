@@ -77,9 +77,12 @@ export function useCollection<T = any>(
       (error: FirestoreError) => {
         let path: string = "/";
         try {
-          path = memoizedTargetRefOrQuery.type === 'collection'
-            ? (memoizedTargetRefOrQuery as CollectionReference).path
-            : (memoizedTargetRefOrQuery as unknown as InternalQuery)._query.path.canonicalString() || "/";
+          if ('path' in memoizedTargetRefOrQuery) {
+            path = memoizedTargetRefOrQuery.path;
+          } else {
+            const q = memoizedTargetRefOrQuery as any;
+            path = q._query?.path?.canonicalString() || q.path || "/";
+          }
         } catch (e) {
           // Fallback if path extraction fails for complex queries
         }

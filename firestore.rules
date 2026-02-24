@@ -51,14 +51,16 @@ service cloud.firestore {
         allow get: if true;
         allow list: if true;
         allow create: if isSignedIn() && request.auth.uid == userId;
-        allow update: if (isSignedIn() && request.auth.uid == userId) || isOwner(get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId);
+        allow update: if (isSignedIn() && request.auth.uid == userId) || (resource != null && isOwner(get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId));
       }
 
       match /responses/{responseId} {
-        allow list, get: if (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true) ||
+        // Explicitly allow listing if results are public or requester is owner
+        allow list: if (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true) ||
                          (isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid);
         
-        allow create: if get(/databases/$(database)/documents/sessions/$(sessionId)).data.status == 'active';
+        allow get: if true;
+        allow create: if true; // Let participants vote
         allow update, delete: if false;
       }
     }
