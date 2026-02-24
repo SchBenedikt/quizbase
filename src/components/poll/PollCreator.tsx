@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,10 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical, Hash, ListOrdered, Ruler, ArrowUp, ArrowDown } from "lucide-react";
+import { 
+  Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, 
+  Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical, 
+  Hash, ListOrdered, Ruler, ArrowUp, ArrowDown, Zap, Image as ImageIcon 
+} from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
 import { PollQuestion, PollType } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 interface PollCreatorProps {
   onSave?: (questions: PollQuestion[]) => void;
@@ -25,6 +31,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
       options: ["Growth", "Stability", "Innovation"],
       correctOptionIndices: [],
       timeLimit: 0,
+      isDoublePoints: false,
       createdAt: Date.now()
     }
   ]);
@@ -57,6 +64,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
       labels: type === 'scale' ? { min: "Disagree", max: "Agree" } : undefined,
       correctOptionIndices: [],
       timeLimit: 0,
+      isDoublePoints: false,
       createdAt: Date.now()
     };
     setQuestions([...questions, newQuestion]);
@@ -105,7 +113,8 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
               key={q.id} 
               className={cn(
                 "border-2 rounded-[1.25rem] bg-card overflow-hidden transition-all hover:border-primary/20 shadow-sm group",
-                isCollapsed && "hover:bg-muted/30"
+                isCollapsed && "hover:bg-muted/30",
+                q.isDoublePoints && "ring-2 ring-primary ring-offset-2"
               )}
             >
               <CardContent className="p-0">
@@ -158,20 +167,33 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                             {q.type === 'scale' && <Ruler className="h-4 w-4" />}
                           </div>
                           <span className="text-[10px] font-black uppercase tracking-widest opacity-40">{q.type.replace('-', ' ')}</span>
+                          {q.isDoublePoints && (
+                            <Zap className="h-4 w-4 text-primary fill-current animate-pulse" />
+                          )}
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-6">
                         {!isCollapsed && (
-                          <div className="flex items-center gap-2.5 mr-4">
-                            <Timer className="h-3.5 w-3.5 opacity-20" />
-                            <Input 
-                              type="number"
-                              value={q.timeLimit || 0}
-                              onChange={(e) => updateQuestion(q.id, { timeLimit: parseInt(e.target.value) || 0 })}
-                              className="w-12 h-7 text-[10px] font-black text-center border-2 rounded-[0.4rem] p-0 bg-transparent"
-                            />
-                            <span className="text-[9px] font-black uppercase opacity-40">sec</span>
+                          <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-3">
+                              <Zap className="h-3.5 w-3.5 text-primary" />
+                              <Switch 
+                                checked={q.isDoublePoints} 
+                                onCheckedChange={(val) => updateQuestion(q.id, { isDoublePoints: val })} 
+                              />
+                              <span className="text-[9px] font-black uppercase opacity-40">2X Points</span>
+                            </div>
+                            <div className="flex items-center gap-2.5">
+                              <Timer className="h-3.5 w-3.5 opacity-20" />
+                              <Input 
+                                type="number"
+                                value={q.timeLimit || 0}
+                                onChange={(e) => updateQuestion(q.id, { timeLimit: parseInt(e.target.value) || 0 })}
+                                className="w-12 h-7 text-[10px] font-black text-center border-2 rounded-[0.4rem] p-0 bg-transparent"
+                              />
+                              <span className="text-[9px] font-black uppercase opacity-40">sec</span>
+                            </div>
                           </div>
                         )}
                         <Button 
@@ -193,18 +215,43 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                         </p>
                       ) : (
                         <div className="space-y-8">
-                          <div className="relative">
-                            <Input 
-                              value={q.question} 
-                              onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
-                              placeholder="Type your question draft..."
-                              className="text-xl font-bold h-16 border-2 bg-muted/5 rounded-[1rem] pl-6 pr-14 focus-visible:ring-1 border-foreground/5 tracking-tight"
-                            />
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                              <AIQuestionRefiner 
-                                currentQuestion={q.question} 
-                                onSelect={(refined) => updateQuestion(q.id, { question: refined })}
-                              />
+                          <div className="grid md:grid-cols-[1fr,240px] gap-8">
+                            <div className="space-y-4">
+                              <div className="relative">
+                                <Input 
+                                  value={q.question} 
+                                  onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
+                                  placeholder="Type your question draft..."
+                                  className="text-xl font-bold h-16 border-2 bg-muted/5 rounded-[1rem] pl-6 pr-14 focus-visible:ring-1 border-foreground/5 tracking-tight"
+                                />
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                  <AIQuestionRefiner 
+                                    currentQuestion={q.question} 
+                                    onSelect={(refined) => updateQuestion(q.id, { question: refined })}
+                                  />
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-3">
+                                <div className="relative flex-1">
+                                  <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 opacity-20" />
+                                  <Input 
+                                    value={q.imageHint || ""} 
+                                    onChange={(e) => updateQuestion(q.id, { imageHint: e.target.value, imageUrl: e.target.value ? `https://picsum.photos/seed/${Math.random()}/800/600` : "" })}
+                                    placeholder="Visual Context (e.g. 'Modern Office')..."
+                                    className="h-10 pl-11 rounded-[0.75rem] text-xs"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="aspect-video bg-muted/30 rounded-[1rem] border-2 border-dashed border-foreground/5 flex flex-col items-center justify-center gap-2 overflow-hidden relative">
+                              {q.imageHint ? (
+                                <img src={`https://picsum.photos/seed/${q.imageHint}/800/600`} alt="Preview" className="w-full h-full object-cover opacity-50" />
+                              ) : (
+                                <ImageIcon className="h-8 w-8 opacity-10" />
+                              )}
+                              <span className="text-[9px] font-black uppercase tracking-widest opacity-20 absolute bottom-3">Stage Visual Preview</span>
                             </div>
                           </div>
 

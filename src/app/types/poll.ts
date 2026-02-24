@@ -10,6 +10,9 @@ export interface PollQuestion {
   timeLimit?: number; // In seconds, 0 = unlimited
   range?: { min: number; max: number; step: number }; // For slider, guess-number, scale
   labels?: { min: string; max: string }; // For scales
+  isDoublePoints?: boolean; // Strategic weighting
+  imageUrl?: string; // Anchor visual for the question
+  imageHint?: string; // Hint for AI search
   createdAt: number;
 }
 
@@ -33,6 +36,7 @@ export interface PollParticipant {
   nickname?: string;
   status: 'active' | 'kicked';
   score: number;
+  streak: number; // Current correct answer streak
   joinedAt: any;
 }
 

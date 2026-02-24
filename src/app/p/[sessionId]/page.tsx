@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useDoc, useMemoFirebase, useUser } from "@/firebase";
 import { doc, collection, serverTimestamp, getDoc, query, where, limit, setDoc, updateDoc, increment } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
-import { ResultChart } from "@/components/poll/ResultChart";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import { useAuth } from "@/firebase/provider";
 
@@ -48,15 +47,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const [nickname, setNickname] = useState("");
   const [isSettingNickname, setIsSettingNickname] = useState(true);
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
+  const [pointsEarned, setPointsEarned] = useState<number>(0);
   
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const responsesQuery = useMemoFirebase(() => {
-    if (!session?.id) return null;
-    return collection(db, `sessions/${session.id}/responses`);
-  }, [db, session?.id]);
-  const { data: allResponses } = useCollection(responsesQuery);
 
   useEffect(() => {
     if (!isUserLoading && !user && auth) {
@@ -72,6 +66,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         nickname: nickname || "Anonymous",
         status: 'active',
         score: participantData?.score || 0,
+        streak: participantData?.streak || 0,
         joinedAt: serverTimestamp()
       }, { merge: true });
     }
@@ -92,6 +87,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setRatingValue(0);
             setSliderValue(qData.range?.min || 50);
             setLastCorrect(null);
+            setPointsEarned(0);
             
             if (timerRef.current) {
               clearInterval(timerRef.current);
@@ -137,7 +133,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         isCorrect = currentQuestion.correctOptionIndices.includes(selection);
       }
     }
-    // ... other types
     if (currentQuestion.type === 'word-cloud') value = textValue.trim().toUpperCase();
     if (currentQuestion.type === 'open-text') value = textValue.trim();
     if (currentQuestion.type === 'slider' || currentQuestion.type === 'scale') value = sliderValue;
@@ -153,12 +148,24 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       createdAt: serverTimestamp(),
     });
 
-    if (isCorrect && participantRef) {
-      // Speed bonus: 500 base + 500 * (timeLeft / totalTime)
-      const baseScore = 500;
-      const timeBonus = (currentQuestion.timeLimit && timeLeft) ? Math.round((timeLeft / currentQuestion.timeLimit) * 500) : 0;
-      const totalPoints = baseScore + timeBonus;
-      updateDoc(participantRef, { score: increment(totalPoints) });
+    if (participantRef) {
+      if (isCorrect) {
+        const baseScore = 500;
+        const timeBonus = (currentQuestion.timeLimit && timeLeft) ? Math.round((timeLeft / currentQuestion.timeLimit) * 500) : 0;
+        const multiplier = currentQuestion.isDoublePoints ? 2 : 1;
+        const currentStreak = participantData?.streak || 0;
+        const streakBonus = Math.min(currentStreak * 100, 500);
+        
+        const totalPoints = (baseScore + timeBonus) * multiplier + streakBonus;
+        
+        updateDoc(participantRef, { 
+          score: increment(totalPoints),
+          streak: increment(1)
+        });
+        setPointsEarned(totalPoints);
+      } else if (currentQuestion.type === 'multiple-choice') {
+        updateDoc(participantRef, { streak: 0 });
+      }
     }
     
     setLastCorrect(isCorrect);
@@ -274,10 +281,17 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 {lastCorrect ? <CheckCircle2 className="h-12 w-12 text-white" /> : <XCircle className="h-12 w-12 text-white" />}
               </div>
               <h1 className="text-5xl font-black uppercase tracking-tighter">{lastCorrect ? "Correct!" : "Nice Try!"}</h1>
-              <div className="bg-black/10 px-8 py-4 rounded-[1rem] inline-flex items-center gap-4">
-                 <Trophy className="h-6 w-6 text-yellow-500" />
-                 <span className="text-3xl font-black tabular-nums">{participantData?.score || 0}</span>
-              </div>
+              {lastCorrect && (
+                <div className="bg-black/10 px-8 py-4 rounded-[1rem] flex flex-col items-center gap-2">
+                   <div className="flex items-center gap-4">
+                     <Trophy className="h-6 w-6 text-yellow-500" />
+                     <span className="text-4xl font-black tabular-nums">+{pointsEarned}</span>
+                   </div>
+                   {participantData?.streak! > 1 && (
+                     <span className="text-xs font-black uppercase text-primary animate-pulse">🔥 {participantData?.streak} Streak Bonus!</span>
+                   )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="p-14 rounded-[1.5rem] animate-float" style={{ backgroundColor: finalFg, color: finalBg }}><Heart className="h-20 w-20 fill-current" /></div>
@@ -307,9 +321,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             <span className="font-black text-2xl tracking-tighter uppercase">PopPulse*</span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-[1rem] bg-black/10">
-              <Trophy className="h-4 w-4 text-yellow-500" />
-              <span className="font-black tabular-nums">{participantData?.score || 0}</span>
+            <div className="flex flex-col items-end">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-[1rem] bg-black/10">
+                <Trophy className="h-4 w-4 text-yellow-500" />
+                <span className="font-black tabular-nums">{participantData?.score || 0}</span>
+              </div>
+              {participantData?.streak! > 0 && (
+                <span className="text-[9px] font-black uppercase text-primary mt-1">🔥 Streak: {participantData?.streak}</span>
+              )}
             </div>
             {timeLeft !== null && (
               <div className="flex items-center gap-3 px-6 py-2 rounded-[1rem] border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
@@ -321,7 +340,15 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         </div>
 
         <main className="space-y-12 flex-1">
-          <h2 className="text-5xl md:text-6xl font-black leading-[0.9] tracking-tighter uppercase">{currentQuestion.question}</h2>
+          <div className="space-y-6">
+            {currentQuestion.isDoublePoints && (
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-400 text-yellow-900 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                <Zap className="h-3 w-3 fill-current" /> 2X Double Points
+              </div>
+            )}
+            <h2 className="text-5xl md:text-6xl font-black leading-[0.9] tracking-tighter uppercase">{currentQuestion.question}</h2>
+          </div>
+          
           {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
             <div className="grid gap-4">
               {currentQuestion.options.map((opt, idx) => (
@@ -332,7 +359,6 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
               ))}
             </div>
           )}
-          {/* ... handle other types ... */}
           <Button disabled={loading || (selection === null && !textValue && ratingValue === 0)} onClick={handleSubmit} className="w-full h-24 text-3xl font-black rounded-[1.5rem] mt-8 uppercase tracking-tighter border-2 shadow-xl active:scale-95" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>{loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}</Button>
         </main>
       </div>

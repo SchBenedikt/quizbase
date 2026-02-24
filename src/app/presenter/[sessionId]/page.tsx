@@ -4,19 +4,19 @@
 import { useState, useEffect, use, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Sparkles, Monitor, Settings2, UserMinus, QrCode, Trophy, Play, Star } from "lucide-react";
+import { 
+  Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Sparkles, 
+  Monitor, Settings2, UserMinus, QrCode, Trophy, Play, Star 
+} from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, collection, query, orderBy } from "firebase/firestore";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { aiOpenTextSummarizer } from "@/ai/flows/ai-open-text-summarizer";
 import { useToast } from "@/hooks/use-toast";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +36,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const code = session?.code || "---";
   const currentTheme = session?.theme || 'orange';
   const customColor = session?.customColor;
-  const showResults = session?.showResultsToParticipants ?? true;
 
   const questionsQuery = useMemoFirebase(() => {
     if (!session?.userId || !session?.pollId) return null;
@@ -60,7 +59,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const { data: participants } = useCollection<PollParticipant>(participantsQuery);
 
   const [results, setResults] = useState<Record<string, number>>({});
-  const [isSummarizing, setIsSummarizing] = useState(false);
   const [isQRVisible, setIsQRVisible] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -166,6 +164,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/p/${code}` : '';
   const currentIdx = questions.findIndex(q => q.id === session?.currentQuestionId);
   const activeParticipants = participants?.filter(p => p.status === 'active') || [];
+  const currentQuestion = questions[currentIdx];
 
   return (
     <div className="no-scroll h-screen w-screen flex flex-col font-body transition-colors duration-700 overflow-hidden" style={dynamicStyles}>
@@ -227,14 +226,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                    <QRCodeSVG value={joinUrl} size={400} level="H" />
                 </div>
              </div>
-             <div className="w-full space-y-4">
-                <p className="text-xs font-black uppercase tracking-[0.5em] text-center opacity-40">Detected Signals ({activeParticipants.length})</p>
-                <div className="flex flex-wrap justify-center gap-4">
-                   {activeParticipants.map(p => (
-                     <div key={p.id} className="bg-black/10 px-8 py-3 rounded-full font-black text-xl uppercase animate-in fade-in slide-in-from-bottom-2" style={{ borderColor: finalFg + '20', border: '2px solid' }}>{p.nickname || "???"}</div>
-                   ))}
-                </div>
-             </div>
           </div>
         ) : session?.currentQuestionId === 'podium' ? (
           <div className="w-full max-w-4xl flex flex-col items-center space-y-16 animate-in slide-in-from-bottom-10 duration-1000">
@@ -266,16 +257,33 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
              </div>
           </div>
         ) : (
-          <div className="w-full max-w-[1600px] h-full flex flex-col gap-10">
+          <div className="w-full max-w-[1600px] h-full flex flex-col gap-6">
             {!showLeaderboard ? (
               <>
-                <div className="text-center shrink-0 space-y-10">
-                  <div className="inline-flex items-center gap-10 px-16 py-8 rounded-[2.5rem] text-7xl font-black uppercase tracking-[0.2em] shadow-2xl" style={{ backgroundColor: finalFg, color: finalBg }}>Step {currentIdx + 1} of {questions.length}</div>
-                  <h2 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter max-w-6xl mx-auto uppercase">{questions[currentIdx]?.question}</h2>
+                <div className="text-center shrink-0 space-y-6">
+                  <div className="flex items-center justify-center gap-6">
+                    <div className="px-10 py-4 rounded-[1.5rem] text-4xl font-black uppercase tracking-[0.2em] shadow-xl" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions.length}</div>
+                    {currentQuestion?.isDoublePoints && (
+                      <div className="px-10 py-4 rounded-[1.5rem] text-4xl font-black uppercase tracking-[0.2em] bg-yellow-400 text-yellow-900 animate-bounce flex items-center gap-3">
+                        <Zap className="h-6 w-6 fill-current" /> 2X Points
+                      </div>
+                    )}
+                  </div>
+                  <h2 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter max-w-6xl mx-auto uppercase">{currentQuestion?.question}</h2>
                 </div>
-                <div className="flex-1 min-h-0 w-full relative">
-                  <Card className="h-full border-4 rounded-[3rem] bg-black/5 p-12 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '08' }}>
-                    <ResultChart question={questions[currentIdx]} results={results} allResponses={allResponses?.filter(r => r.questionId === session?.currentQuestionId) || []} />
+                
+                <div className="flex-1 min-h-0 w-full flex flex-col lg:flex-row gap-8">
+                  {currentQuestion?.imageHint && (
+                    <div className="lg:w-1/3 h-full rounded-[3rem] border-4 overflow-hidden shadow-2xl" style={{ borderColor: finalFg + '20' }}>
+                       <img 
+                        src={`https://picsum.photos/seed/${currentQuestion.imageHint}/1200/900`} 
+                        alt="Context" 
+                        className="w-full h-full object-cover" 
+                       />
+                    </div>
+                  )}
+                  <Card className="flex-1 border-4 rounded-[3rem] bg-black/5 p-12 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '08' }}>
+                    <ResultChart question={currentQuestion} results={results} allResponses={allResponses?.filter(r => r.questionId === session?.currentQuestionId) || []} />
                   </Card>
                 </div>
               </>
@@ -287,7 +295,10 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                      <div key={p.id} className="flex items-center gap-6 p-6 rounded-[2rem] border-4" style={{ backgroundColor: i === 0 ? finalFg : finalFg + '10', color: i === 0 ? finalBg : finalFg, borderColor: i === 0 ? finalFg : finalFg + '10' }}>
                        <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center font-black text-2xl bg-black/10">{i + 1}</div>
                        <span className="flex-1 text-3xl font-black uppercase truncate">{p.nickname || "Anonymous"}</span>
-                       <span className="text-4xl font-black tracking-tight tabular-nums">{p.score || 0}</span>
+                       <div className="flex flex-col items-end">
+                         <span className="text-4xl font-black tracking-tight tabular-nums">{p.score || 0}</span>
+                         {p.streak > 1 && <span className="text-[10px] font-black uppercase text-primary">🔥 {p.streak} Streak</span>}
+                       </div>
                      </div>
                    ))}
                  </div>
