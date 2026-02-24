@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -148,7 +147,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                   </div>
 
                   {/* Main Content Area */}
-                  <div className={cn("flex-1 flex flex-col justify-center", isCollapsed ? "p-4 space-y-4" : "p-8 sm:p-12 space-y-10")}>
+                  <div className={cn("flex-1 flex flex-col justify-center", isCollapsed ? "p-4" : "p-8 sm:p-12 space-y-10")}>
                     <header className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
                         <Button 
@@ -419,13 +418,6 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                            </div>
                         </div>
                       </div>
-                    )}
-
-                    {isCollapsed && (
-                       <div className="flex items-center gap-4 opacity-40">
-                          <div className="h-px flex-1 bg-foreground/10" />
-                          <span className="text-[10px] font-black uppercase tracking-widest">{q.timeLimit || 0}s</span>
-                       </div>
                     )}
                   </div>
                 </div>
