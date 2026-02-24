@@ -6,15 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle, ArrowUp, ArrowDown, User, ShieldAlert } from "lucide-react";
+import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle, ArrowUp, ArrowDown, User, ShieldAlert, Clock } from "lucide-react";
 import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
 import { useFirestore, useCollection, useDoc, useMemoFirebase, useUser } from "@/firebase";
 import { doc, collection, serverTimestamp, getDoc, query, where, limit, setDoc } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { ResultChart } from "@/components/poll/ResultChart";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import { useAuth } from "@/firebase/provider";
 
@@ -98,11 +96,22 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setSliderValue(qData.range?.min || 50);
             setRanking(qData.options ? qData.options.map((_, i) => i) : []);
             
+            // Manage Timer
+            if (timerRef.current) {
+              clearInterval(timerRef.current);
+              timerRef.current = null;
+            }
+
             if (qData.timeLimit && qData.timeLimit > 0) {
               setTimeLeft(qData.timeLimit);
-              if (timerRef.current) clearInterval(timerRef.current);
               timerRef.current = setInterval(() => {
-                setTimeLeft(prev => (prev === null || prev <= 0) ? 0 : prev - 1);
+                setTimeLeft(prev => {
+                  if (prev === null || prev <= 1) {
+                    if (timerRef.current) clearInterval(timerRef.current);
+                    return 0;
+                  }
+                  return prev - 1;
+                });
               }, 1000);
             } else {
               setTimeLeft(null);
@@ -112,6 +121,9 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       };
       fetchQ();
     }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [session?.currentQuestionId, session?.userId, session?.pollId, db]);
 
   const handleSubmit = async () => {
@@ -267,7 +279,15 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         style={dynamicStyles}
       >
         <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center text-center space-y-12">
-          {isQuiz ? (
+          {timeLeft === 0 && !voted ? (
+            <div className="space-y-6 animate-in zoom-in duration-500">
+               <div className="w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-4 bg-amber-500 border-amber-600">
+                 <Clock className="h-12 w-12 text-white" />
+               </div>
+               <h1 className="text-5xl font-black uppercase tracking-tighter">Time's Up!</h1>
+               <p className="font-bold text-xl max-w-xs mx-auto uppercase tracking-tight opacity-80">You didn't submit in time.</p>
+            </div>
+          ) : isQuiz ? (
             <div className="space-y-6 animate-in zoom-in duration-500">
               <div className={cn(
                 "w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-4",
@@ -291,7 +311,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             </div>
           )}
 
-          {!isQuiz && (
+          {!isQuiz && timeLeft !== 0 && (
             <div className="space-y-4">
               <h1 className="text-5xl font-black uppercase tracking-tighter leading-none">Sync Confirmed!</h1>
               <p className="font-bold text-xl max-w-xs mx-auto uppercase tracking-tight opacity-80">Stand by for the next signal...</p>

@@ -80,13 +80,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     if (!session?.currentQuestionId || !questions) return;
     const currentQ = questions.find(q => q.id === session.currentQuestionId);
     
+    // Clear existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     if (currentQ?.timeLimit && currentQ.timeLimit > 0) {
       setTimeLeft(currentQ.timeLimit);
-      if (timerRef.current) clearInterval(timerRef.current);
       
       timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
-          if (prev === null || prev <= 0) {
+          if (prev === null || prev <= 1) {
             if (timerRef.current) clearInterval(timerRef.current);
             return 0;
           }
@@ -264,8 +269,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center relative overflow-hidden">
         <div className="w-full max-w-[1600px] h-full flex flex-col gap-10">
           <div className="text-center shrink-0 space-y-8">
-             <div className="inline-flex items-center gap-4 px-8 py-3 rounded-full text-xl font-black uppercase tracking-[0.4em] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
-               <Activity className="h-6 w-6" /> Step {currentIdx + 1} of {questions.length}
+             <div className="inline-flex items-center gap-6 px-10 py-4 rounded-full text-2xl font-black uppercase tracking-[0.4em] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
+               <Activity className="h-8 w-8" /> Step {currentIdx + 1} of {questions.length}
              </div>
              <h2 className="text-5xl md:text-8xl font-black leading-[0.95] tracking-tight max-w-6xl mx-auto uppercase">
                {q.question}
@@ -314,9 +319,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           >
             <ChevronRight className="h-7 w-7" />
           </Button>
-          <span className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-4">
-            Step Navigation
-          </span>
         </div>
         
         <div className="flex items-center gap-12">
