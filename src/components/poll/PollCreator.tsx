@@ -118,9 +118,12 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
               )}
             >
               <CardContent className="p-0">
-                <div className="flex flex-col lg:flex-row min-h-[400px]">
+                <div className={cn("flex flex-col lg:flex-row", !isCollapsed && "min-h-[400px]")}>
                   {/* Left Controls */}
-                  <div className="w-full lg:w-16 flex lg:flex-col items-center justify-between lg:justify-start p-4 bg-muted/20 border-b-2 lg:border-b-0 lg:border-r-2 border-foreground/5 shrink-0 gap-4">
+                  <div className={cn(
+                    "w-full lg:w-16 flex lg:flex-col items-center justify-between lg:justify-start p-4 bg-muted/20 border-b-2 lg:border-b-0 lg:border-r-2 border-foreground/5 shrink-0 gap-4",
+                    isCollapsed && "lg:py-6"
+                  )}>
                     <div className="text-2xl font-black opacity-20">{idx + 1}</div>
                     <div className="flex lg:flex-col gap-2">
                       <Button 
@@ -142,13 +145,15 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                         <ArrowDown className="h-5 w-5" />
                       </Button>
                     </div>
-                    <div className="hidden lg:flex flex-col gap-2 mt-auto pb-4">
-                       <GripVertical className="h-6 w-6 opacity-10" />
-                    </div>
+                    {!isCollapsed && (
+                      <div className="hidden lg:flex flex-col gap-2 mt-auto pb-4">
+                        <GripVertical className="h-6 w-6 opacity-10" />
+                      </div>
+                    )}
                   </div>
 
                   {/* Main Content Area */}
-                  <div className="flex-1 p-8 sm:p-12 space-y-10">
+                  <div className={cn("flex-1 flex flex-col justify-center", isCollapsed ? "p-6 space-y-4" : "p-8 sm:p-12 space-y-10")}>
                     <header className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
                         <Button 
@@ -160,20 +165,28 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                           {isCollapsed ? <ChevronRight className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
                         </Button>
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 flex items-center justify-center bg-primary text-primary-foreground rounded-[1rem] shadow-lg">
-                            {q.type === 'multiple-choice' && <ListChecks className="h-6 w-6" />}
-                            {q.type === 'word-cloud' && <Cloud className="h-6 w-6" />}
-                            {q.type === 'open-text' && <MessageSquare className="h-6 w-6" />}
-                            {q.type === 'rating' && <Star className="h-6 w-6" />}
-                            {q.type === 'slider' && <SlidersHorizontal className="h-6 w-6" />}
-                            {q.type === 'guess-number' && <Hash className="h-6 w-6" />}
-                            {q.type === 'ranking' && <ListOrdered className="h-6 w-6" />}
-                            {q.type === 'scale' && <Ruler className="h-6 w-6" />}
+                          <div className={cn(
+                            "flex items-center justify-center bg-primary text-primary-foreground rounded-[1rem] shadow-lg",
+                            isCollapsed ? "w-10 h-10" : "w-12 h-12"
+                          )}>
+                            {q.type === 'multiple-choice' && <ListChecks className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'word-cloud' && <Cloud className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'open-text' && <MessageSquare className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'rating' && <Star className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'slider' && <SlidersHorizontal className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'guess-number' && <Hash className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'ranking' && <ListOrdered className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'scale' && <Ruler className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
                           </div>
                           <div className="flex flex-col">
                             <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 leading-none mb-1">Question Type</span>
-                            <span className="text-xl font-black uppercase tracking-tight leading-none">{q.type.replace('-', ' ')}</span>
+                            <span className={cn("font-black uppercase tracking-tight leading-none", isCollapsed ? "text-lg" : "text-xl")}>{q.type.replace('-', ' ')}</span>
                           </div>
+                          {isCollapsed && q.question && (
+                            <div className="ml-4 border-l-2 border-foreground/5 pl-4 truncate max-w-md">
+                              <span className="text-sm font-bold uppercase tracking-tight opacity-60">{q.question}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
 
