@@ -194,7 +194,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   if (!q) return null;
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
   const activeParticipants = participants?.filter(p => p.status === 'active') || [];
-  const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/p/${code}` : '';
+  const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/join` : '';
 
   return (
     <div 
@@ -382,20 +382,20 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       </footer>
 
       <Dialog open={isQRVisible} onOpenChange={setIsQRVisible}>
-        <DialogContent className="max-w-3xl p-12 rounded-[2.5rem] border-4 text-center overflow-hidden" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-          <DialogHeader className="mb-12">
-            <DialogTitle className="text-7xl font-black uppercase tracking-tighter leading-none">Join the Pulse</DialogTitle>
+        <DialogContent className="max-w-xl p-8 rounded-[2rem] border-4 text-center overflow-hidden max-h-[90vh] overflow-y-auto" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+          <DialogHeader className="mb-8">
+            <DialogTitle className="text-4xl font-black uppercase tracking-tighter leading-none">Join the Pulse</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col items-center gap-12">
-            <div className="bg-white p-10 rounded-[2.5rem] border-[12px] border-current shadow-2xl animate-in zoom-in-50 duration-700">
-              <QRCodeSVG value={joinUrl} size={400} level="H" includeMargin={false} />
+          <div className="flex flex-col items-center gap-8">
+            <div className="bg-white p-6 rounded-[2rem] border-[8px] border-current shadow-2xl animate-in zoom-in-50 duration-700">
+              <QRCodeSVG value={joinUrl} size={280} level="H" includeMargin={false} />
             </div>
-            <div className="space-y-4">
-              <p className="text-[12px] font-black uppercase tracking-[0.6em] opacity-40">Scan to broadcast your signal</p>
-              <div className="flex items-center justify-center gap-6">
-                 <div className="h-2 w-2 rounded-full bg-current animate-pulse" />
-                 <p className="text-9xl font-black tracking-tighter leading-none">{code}</p>
-                 <div className="h-2 w-2 rounded-full bg-current animate-pulse" />
+            <div className="space-y-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Scan to broadcast your signal</p>
+              <div className="flex items-center justify-center gap-4">
+                 <div className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
+                 <p className="text-7xl font-black tracking-tighter leading-none">{code}</p>
+                 <div className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
               </div>
             </div>
           </div>
