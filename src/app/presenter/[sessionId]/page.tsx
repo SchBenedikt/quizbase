@@ -254,8 +254,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center relative overflow-hidden">
         <div className="w-full max-w-[1600px] h-full flex flex-col gap-10">
           <div className="text-center shrink-0 space-y-6">
-             <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-sm font-black uppercase tracking-[0.3em] shadow-sm" style={{ backgroundColor: finalFg + '15', color: finalFg }}>
-               <Activity className="h-4 w-4" /> Step {currentIdx + 1} of {questions.length}
+             <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-base font-black uppercase tracking-[0.3em] shadow-sm" style={{ backgroundColor: finalFg + '15', color: finalFg }}>
+               <Activity className="h-5 w-5" /> Step {currentIdx + 1} of {questions.length}
              </div>
              <h2 className="text-5xl md:text-7xl font-black leading-[1.0] tracking-tight max-w-6xl mx-auto uppercase">
                {q.question}
@@ -312,13 +312,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '08' }}>
            <Popover>
              <PopoverTrigger asChild>
-               <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
-                 <Settings2 className="h-4 w-4 mr-3" /> Sync Settings
+               <Button 
+                variant="ghost" 
+                size="icon"
+                className="h-12 w-12 rounded-[1rem] hover:bg-black/10 transition-all shadow-none" 
+                style={{ color: finalFg }}
+               >
+                 <Settings2 className="h-6 w-6" />
                </Button>
              </PopoverTrigger>
              <PopoverContent className="w-80 p-8 rounded-[2rem] border-2 bg-background flex flex-col gap-6 text-foreground shadow-2xl" align="center">
                 <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Audience Controls</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Settings</p>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="show-results" className="text-xs font-bold uppercase tracking-tight">Live Feedback Stream</Label>
                     <Switch id="show-results" checked={showResults} onCheckedChange={toggleResultVisibility} />
