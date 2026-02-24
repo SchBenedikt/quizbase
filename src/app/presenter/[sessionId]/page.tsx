@@ -309,45 +309,47 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           </span>
         </div>
         
-        <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '08' }}>
-           <Popover>
-             <PopoverTrigger asChild>
-               <Button 
-                variant="ghost" 
-                size="icon"
-                className="h-12 w-12 rounded-[1rem] hover:bg-black/10 transition-all shadow-none" 
-                style={{ color: finalFg }}
-               >
-                 <Settings2 className="h-6 w-6" />
-               </Button>
-             </PopoverTrigger>
-             <PopoverContent className="w-80 p-8 rounded-[2rem] border-2 bg-background flex flex-col gap-6 text-foreground shadow-2xl" align="center">
-                <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Settings</p>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="show-results" className="text-xs font-bold uppercase tracking-tight">Live Feedback Stream</Label>
-                    <Switch id="show-results" checked={showResults} onCheckedChange={toggleResultVisibility} />
-                  </div>
-                  <p className="text-[10px] opacity-40 uppercase leading-tight font-bold">
-                    When active, participants will see aggregated data after transmitting.
-                  </p>
-                </div>
-                <div className="pt-4 border-t-2">
-                  <Button 
-                    variant="outline" 
-                    className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest"
-                    onClick={() => document.documentElement.requestFullscreen()}
-                  >
-                    <Monitor className="h-4 w-4 mr-2" /> Fullscreen Display
-                  </Button>
-                </div>
-             </PopoverContent>
-           </Popover>
-        </div>
+        <div className="flex items-center gap-12">
+          <div className="flex items-center gap-4 opacity-40">
+             <Zap className="h-6 w-6 fill-current" />
+             <span className="font-black text-[11px] uppercase tracking-[0.3em]">Studio Presenter</span>
+          </div>
 
-        <div className="flex items-center gap-4 opacity-40">
-           <Zap className="h-6 w-6 fill-current" />
-           <span className="font-black text-[11px] uppercase tracking-[0.3em]">Studio Presenter</span>
+          <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '08' }}>
+             <Popover>
+               <PopoverTrigger asChild>
+                 <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-12 w-12 rounded-[1rem] hover:bg-black/10 transition-all shadow-none" 
+                  style={{ color: finalFg }}
+                 >
+                   <Settings2 className="h-6 w-6" />
+                 </Button>
+               </PopoverTrigger>
+               <PopoverContent className="w-80 p-8 rounded-[2rem] border-2 bg-background flex flex-col gap-6 text-foreground shadow-2xl" align="end">
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Settings</p>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="show-results" className="text-xs font-bold uppercase tracking-tight">Live Feedback Stream</Label>
+                      <Switch id="show-results" checked={showResults} onCheckedChange={toggleResultVisibility} />
+                    </div>
+                    <p className="text-[10px] opacity-40 uppercase leading-tight font-bold">
+                      When active, participants will see aggregated data after transmitting.
+                    </p>
+                  </div>
+                  <div className="pt-4 border-t-2">
+                    <Button 
+                      variant="outline" 
+                      className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest"
+                      onClick={() => document.documentElement.requestFullscreen()}
+                    >
+                      <Monitor className="h-4 w-4 mr-2" /> Fullscreen Display
+                    </Button>
+                  </div>
+               </PopoverContent>
+             </Popover>
+          </div>
         </div>
       </footer>
     </div>
