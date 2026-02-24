@@ -118,8 +118,8 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
               )}
             >
               <CardContent className="p-0">
-                <div className={cn("flex flex-col lg:flex-row", !isCollapsed && "min-h-[400px]")}>
-                  {/* Left Controls */}
+                <div className={cn("flex flex-col lg:flex-row")}>
+                  {/* Left Controls - Reordering and Index */}
                   <div className={cn(
                     "w-full lg:w-16 flex lg:flex-col items-center justify-between lg:justify-start p-4 bg-muted/20 border-b-2 lg:border-b-0 lg:border-r-2 border-foreground/5 shrink-0 gap-4",
                     isCollapsed && "lg:py-6"
@@ -145,11 +145,6 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                         <ArrowDown className="h-5 w-5" />
                       </Button>
                     </div>
-                    {!isCollapsed && (
-                      <div className="hidden lg:flex flex-col gap-2 mt-auto pb-4">
-                        <GripVertical className="h-6 w-6 opacity-10" />
-                      </div>
-                    )}
                   </div>
 
                   {/* Main Content Area */}
@@ -428,7 +423,6 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
 
                     {isCollapsed && (
                        <div className="flex items-center gap-4 opacity-40">
-                          <span className="text-[10px] font-black uppercase tracking-widest">Question Anchor Loaded</span>
                           <div className="h-px flex-1 bg-foreground/10" />
                           <span className="text-[10px] font-black uppercase tracking-widest">{q.timeLimit || 0}s</span>
                        </div>
