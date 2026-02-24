@@ -25,7 +25,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const db = useFirestore();
   const { toast } = useToast();
   
-  const sessionRef = useMemoFirebase(() => doc(db, "sessions", resolvedParams.sessionId), [db, resolvedParams.sessionId]);
+  const sessionRef = useMemoFirebase(() => {
+    if (!resolvedParams.sessionId) return null;
+    return doc(db, "sessions", resolvedParams.sessionId);
+  }, [db, resolvedParams.sessionId]);
+  
   const { data: session, isLoading: sessionLoading } = useDoc<PollSession>(sessionRef);
 
   const title = session?.title || "Live Presentation";
@@ -35,21 +39,24 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const showResults = session?.showResultsToParticipants ?? true;
 
   const questionsQuery = useMemoFirebase(() => {
-    if (!session) return null;
+    if (!session?.userId || !session?.pollId) return null;
     return query(collection(db, `users/${session.userId}/surveys/${session.pollId}/questions`), orderBy("order", "asc"));
-  }, [db, session]);
+  }, [db, session?.userId, session?.pollId]);
+  
   const { data: questions } = useCollection<PollQuestion>(questionsQuery);
 
   const responsesQuery = useMemoFirebase(() => {
     if (!resolvedParams.sessionId) return null;
     return collection(db, `sessions/${resolvedParams.sessionId}/responses`);
   }, [db, resolvedParams.sessionId]);
+  
   const { data: allResponses } = useCollection(responsesQuery);
 
   const participantsQuery = useMemoFirebase(() => {
     if (!resolvedParams.sessionId) return null;
     return query(collection(db, `sessions/${resolvedParams.sessionId}/participants`), orderBy("score", "desc"));
   }, [db, resolvedParams.sessionId]);
+  
   const { data: participants } = useCollection<PollParticipant>(participantsQuery);
 
   const [results, setResults] = useState<Record<string, number>>({});
@@ -75,7 +82,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   useEffect(() => {
     if (session && !session.currentQuestionId && questions && questions.length > 0) {
-      updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[0].id });
+      updateDocumentNonBlocking(sessionRef!, { currentQuestionId: questions[0].id });
     }
   }, [session, questions, sessionRef]);
 
@@ -111,7 +118,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   }, [session?.currentQuestionId, questions]);
 
   const handleNext = () => {
-    if (!questions || !session) return;
+    if (!questions || !session || !sessionRef) return;
     const currentIdx = questions.findIndex(q => q.id === session.currentQuestionId);
     if (currentIdx < questions.length - 1) {
       updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[currentIdx + 1].id });
@@ -119,7 +126,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   };
 
   const handlePrev = () => {
-    if (!questions || !session) return;
+    if (!questions || !session || !sessionRef) return;
     const currentIdx = questions.findIndex(q => q.id === session.currentQuestionId);
     if (currentIdx > 0) {
       updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[currentIdx - 1].id });
@@ -127,8 +134,10 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   };
 
   const handleKick = (participantId: string) => {
+    if (!resolvedParams.sessionId) return;
     const pRef = doc(db, `sessions/${resolvedParams.sessionId}/participants/${participantId}`);
     updateDocumentNonBlocking(pRef, { status: 'kicked' });
+    toast({ title: "Participant Removed", description: "The user has been disconnected." });
   };
 
   const toggleResultVisibility = () => {
@@ -188,7 +197,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const q = questions[currentIdx] || questions[0];
   const activeParticipants = participants?.filter(p => p.status === 'active') || [];
   const topParticipants = activeParticipants.slice(0, 5);
-  const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/join` : '';
+  const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/p/${code}` : '';
 
   return (
     <div 
@@ -232,24 +241,28 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               </div>
               <ScrollArea className="h-80">
                 <div className="p-2 space-y-1">
-                  {activeParticipants.map(p => (
-                    <div 
-                      key={p.id} 
-                      className="flex items-center justify-between p-4 rounded-[1rem] transition-colors group"
-                      style={{ borderBottom: `1px solid ${finalBg}10` }}
-                    >
-                      <span className="text-sm font-bold uppercase truncate pr-4">{p.nickname || "Anonymous"}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleKick(p.id)}
-                        className="h-8 w-8 rounded-[0.5rem] transition-colors hover:bg-black/20"
-                        style={{ color: finalBg }}
+                  {activeParticipants.length === 0 ? (
+                    <div className="p-8 text-center opacity-40 text-[10px] font-black uppercase tracking-widest">No signals detected</div>
+                  ) : (
+                    activeParticipants.map(p => (
+                      <div 
+                        key={p.id} 
+                        className="flex items-center justify-between p-4 rounded-[1rem] transition-colors group"
+                        style={{ borderBottom: `1px solid ${finalBg}10` }}
                       >
-                        <UserMinus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                        <span className="text-sm font-bold uppercase truncate pr-4">{p.nickname || "Anonymous"}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleKick(p.id)}
+                          className="h-8 w-8 rounded-[0.5rem] transition-colors hover:bg-black/20"
+                          style={{ color: finalBg }}
+                        >
+                          <UserMinus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))
+                  )}
                 </div>
               </ScrollArea>
             </PopoverContent>
@@ -262,7 +275,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           {!showLeaderboard ? (
             <>
               <div className="text-center shrink-0 space-y-10">
-                <div className="inline-flex items-center gap-10 px-20 py-10 rounded-[2.5rem] text-7xl font-black uppercase tracking-[0.2em] shadow-2xl animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
+                <div className="inline-flex items-center gap-10 px-16 py-8 rounded-[2.5rem] text-7xl font-black uppercase tracking-[0.2em] shadow-2xl animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
                   Step {currentIdx + 1} of {questions.length}
                 </div>
                 <h2 className="text-6xl md:text-8xl font-black leading-[0.9] tracking-tighter max-w-6xl mx-auto uppercase">
@@ -299,24 +312,28 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                </div>
 
                <div className="w-full max-w-3xl space-y-4">
-                 {topParticipants.map((p, i) => (
-                   <div 
-                    key={p.id} 
-                    className="flex items-center gap-6 p-6 rounded-[2rem] border-4 animate-in slide-in-from-right duration-500"
-                    style={{ 
-                      backgroundColor: i === 0 ? finalFg : finalFg + '10', 
-                      color: i === 0 ? finalBg : finalFg,
-                      borderColor: i === 0 ? finalFg : finalFg + '10',
-                      transitionDelay: `${i * 100}ms`
-                    }}
-                   >
-                     <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center font-black text-2xl bg-black/10">
-                       {i + 1}
+                 {topParticipants.length === 0 ? (
+                    <p className="text-center text-3xl font-black uppercase opacity-20">Awaiting activity...</p>
+                 ) : (
+                   topParticipants.map((p, i) => (
+                     <div 
+                      key={p.id} 
+                      className="flex items-center gap-6 p-6 rounded-[2rem] border-4 animate-in slide-in-from-right duration-500"
+                      style={{ 
+                        backgroundColor: i === 0 ? finalFg : finalFg + '10', 
+                        color: i === 0 ? finalBg : finalFg,
+                        borderColor: i === 0 ? finalFg : finalFg + '10',
+                        transitionDelay: `${i * 100}ms`
+                      }}
+                     >
+                       <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center font-black text-2xl bg-black/10">
+                         {i + 1}
+                       </div>
+                       <span className="flex-1 text-3xl font-black uppercase truncate">{p.nickname || "Anonymous"}</span>
+                       <span className="text-4xl font-black tracking-tight tabular-nums">{p.score || 0}</span>
                      </div>
-                     <span className="flex-1 text-3xl font-black uppercase truncate">{p.nickname || "Anonymous"}</span>
-                     <span className="text-4xl font-black tracking-tight tabular-nums">{p.score || 0}</span>
-                   </div>
-                 ))}
+                   ))
+                 )}
                </div>
             </div>
           )}
