@@ -121,7 +121,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   }, [session?.currentQuestionId, session?.userId, session?.pollId, db]);
 
   const handleSubmit = async () => {
-    if (!currentQuestion || !session || (timeLeft === 0 && currentQuestion.timeLimit)) return;
+    if (!currentQuestion || !session || voted || (timeLeft === 0 && currentQuestion.timeLimit)) return;
     setLoading(true);
     
     let value: any = "";
@@ -274,6 +274,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             <div className="space-y-6">
                <div className="w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-4 bg-amber-500 border-amber-600"><Clock className="h-12 w-12 text-white" /></div>
                <h1 className="text-5xl font-black uppercase tracking-tighter">Time's Up!</h1>
+               <p className="text-xl font-bold uppercase tracking-widest opacity-40">Your signal was not transmitted in time.</p>
             </div>
           ) : isQuiz ? (
             <div className="space-y-6">
@@ -330,23 +331,27 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 <span className="text-[9px] font-black uppercase text-primary mt-1">🔥 Streak: {participantData?.streak}</span>
               )}
             </div>
-            {timeLeft !== null && (
-              <div className="flex items-center gap-3 px-6 py-2 rounded-[1rem] border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-                <Timer className="h-4 w-4" />
-                <span className="text-xl font-black tabular-nums">{timeLeft}</span>
-              </div>
-            )}
           </div>
         </div>
 
         <main className="space-y-12 flex-1">
           <div className="space-y-6">
-            {currentQuestion.isDoublePoints && (
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-400 text-yellow-900 text-[10px] font-black uppercase tracking-widest animate-pulse">
-                <Zap className="h-3 w-3 fill-current" /> 2X Double Points
+            <div className="flex items-start justify-between gap-6">
+              <div className="flex-1 space-y-4">
+                {currentQuestion.isDoublePoints && (
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-400 text-yellow-900 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                    <Zap className="h-3 w-3 fill-current" /> 2X Double Points
+                  </div>
+                )}
+                <h2 className="text-5xl md:text-6xl font-black leading-[0.9] tracking-tighter uppercase">{currentQuestion.question}</h2>
               </div>
-            )}
-            <h2 className="text-5xl md:text-6xl font-black leading-[0.9] tracking-tighter uppercase">{currentQuestion.question}</h2>
+              {timeLeft !== null && (
+                <div className="flex items-center gap-3 px-6 py-4 rounded-[1.5rem] border-4 shrink-0 animate-in zoom-in duration-500" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                  <Timer className="h-6 w-6" />
+                  <span className="text-3xl font-black tabular-nums">{timeLeft}</span>
+                </div>
+              )}
+            </div>
           </div>
           
           {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
@@ -359,9 +364,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
               ))}
             </div>
           )}
-          <Button disabled={loading || (selection === null && !textValue && ratingValue === 0)} onClick={handleSubmit} className="w-full h-24 text-3xl font-black rounded-[1.5rem] mt-8 uppercase tracking-tighter border-2 shadow-xl active:scale-95" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>{loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}</Button>
+          <Button disabled={loading || (selection === null && !textValue && ratingValue === 0) || (timeLeft === 0 && currentQuestion.timeLimit)} onClick={handleSubmit} className="w-full h-24 text-3xl font-black rounded-[1.5rem] mt-8 uppercase tracking-tighter border-2 shadow-xl active:scale-95" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>{loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}</Button>
         </main>
       </div>
     </div>
   );
 }
+

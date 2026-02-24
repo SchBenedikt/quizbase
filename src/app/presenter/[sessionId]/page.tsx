@@ -175,12 +175,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         </div>
         
         <div className="flex items-center gap-12">
-          {timeLeft !== null && session?.currentQuestionId !== 'lobby' && (
-            <div className="flex items-center gap-4 px-8 py-3 rounded-[1.25rem] border-4 animate-pulse" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-              <Timer className="h-6 w-6" />
-              <span className="text-4xl font-black tabular-nums">{timeLeft}</span>
-            </div>
-          )}
           <div className="flex flex-col items-end">
             <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 leading-none mb-1">Session Code</p>
             <p className="text-5xl font-black tracking-tighter leading-none">{code}</p>
@@ -257,19 +251,25 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
              </div>
           </div>
         ) : (
-          <div className="w-full max-w-[1600px] h-full flex flex-col gap-6">
+          <div className="w-full max-w-[1600px] h-full flex flex-col gap-8">
             {!showLeaderboard ? (
               <>
-                <div className="text-center shrink-0 space-y-6">
-                  <div className="flex items-center justify-center gap-6">
-                    <div className="px-10 py-4 rounded-[1.5rem] text-4xl font-black uppercase tracking-[0.2em] shadow-xl" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions.length}</div>
+                <div className="text-center shrink-0 space-y-8 relative">
+                  <div className="flex items-center justify-center gap-8">
+                    <div className="px-10 py-6 rounded-[2rem] text-5xl font-black uppercase tracking-[0.2em] shadow-xl" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions.length}</div>
                     {currentQuestion?.isDoublePoints && (
-                      <div className="px-10 py-4 rounded-[1.5rem] text-4xl font-black uppercase tracking-[0.2em] bg-yellow-400 text-yellow-900 animate-bounce flex items-center gap-3">
-                        <Zap className="h-6 w-6 fill-current" /> 2X Points
+                      <div className="px-10 py-6 rounded-[2rem] text-5xl font-black uppercase tracking-[0.2em] bg-yellow-400 text-yellow-900 animate-bounce flex items-center gap-3">
+                        <Zap className="h-8 w-8 fill-current" /> 2X Points
+                      </div>
+                    )}
+                    {timeLeft !== null && (
+                      <div className="px-12 py-6 rounded-[2rem] border-8 flex items-center gap-4 animate-in zoom-in duration-500 shadow-2xl" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                        <Timer className="h-10 w-10" />
+                        <span className="text-6xl font-black tabular-nums">{timeLeft}</span>
                       </div>
                     )}
                   </div>
-                  <h2 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter max-w-6xl mx-auto uppercase">{currentQuestion?.question}</h2>
+                  <h2 className="text-6xl md:text-8xl font-black leading-[0.85] tracking-tighter max-w-6xl mx-auto uppercase">{currentQuestion?.question}</h2>
                 </div>
                 
                 <div className="flex-1 min-h-0 w-full flex flex-col lg:flex-row gap-8">
