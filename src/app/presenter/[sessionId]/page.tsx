@@ -4,7 +4,7 @@
 import { useState, useEffect, use, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Palette, Sparkles, Monitor, Settings2, Moon, Sun, Activity, UserMinus, X } from "lucide-react";
+import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Sparkles, Monitor, Settings2, Activity, UserMinus, QrCode } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
@@ -13,10 +13,11 @@ import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { aiOpenTextSummarizer } from "@/ai/flows/ai-open-text-summarizer";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { QRCodeSVG } from "qrcode.react";
 import { cn } from "@/lib/utils";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -53,6 +54,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
   const [results, setResults] = useState<Record<string, number>>({});
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [isQRVisible, setIsQRVisible] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -192,6 +194,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   if (!q) return null;
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
   const activeParticipants = participants?.filter(p => p.status === 'active') || [];
+  const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/p/${code}` : '';
 
   return (
     <div 
@@ -269,8 +272,8 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center relative overflow-hidden">
         <div className="w-full max-w-[1600px] h-full flex flex-col gap-10">
           <div className="text-center shrink-0 space-y-8">
-             <div className="inline-flex items-center gap-6 px-10 py-4 rounded-full text-2xl font-black uppercase tracking-[0.4em] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
-               <Activity className="h-8 w-8" /> Step {currentIdx + 1} of {questions.length}
+             <div className="inline-flex items-center gap-8 px-14 py-6 rounded-full text-4xl font-black uppercase tracking-[0.4em] shadow-sm animate-in fade-in slide-in-from-top-4 duration-700" style={{ backgroundColor: finalFg, color: finalBg }}>
+               <Activity className="h-10 w-10" /> Step {currentIdx + 1} of {questions.length}
              </div>
              <h2 className="text-5xl md:text-8xl font-black leading-[0.95] tracking-tight max-w-6xl mx-auto uppercase">
                {q.question}
@@ -354,19 +357,50 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                 </p>
               </div>
               <div className="pt-4 border-t-2" style={{ borderColor: finalBg + '20' }}>
-                <Button 
-                  variant="outline" 
-                  className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest shadow-none"
-                  style={{ backgroundColor: finalBg + '10', borderColor: finalBg + '20', color: finalBg }}
-                  onClick={() => document.documentElement.requestFullscreen()}
-                >
-                  <Monitor className="h-4 w-4 mr-2" /> Fullscreen Display
-                </Button>
+                <div className="grid gap-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest shadow-none"
+                    style={{ backgroundColor: finalBg + '10', borderColor: finalBg + '20', color: finalBg }}
+                    onClick={() => setIsQRVisible(true)}
+                  >
+                    <QrCode className="h-4 w-4 mr-2" /> Display QR Access
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest shadow-none"
+                    style={{ backgroundColor: finalBg + '10', borderColor: finalBg + '20', color: finalBg }}
+                    onClick={() => document.documentElement.requestFullscreen()}
+                  >
+                    <Monitor className="h-4 w-4 mr-2" /> Fullscreen Display
+                  </Button>
+                </div>
               </div>
             </PopoverContent>
           </Popover>
         </div>
       </footer>
+
+      <Dialog open={isQRVisible} onOpenChange={setIsQRVisible}>
+        <DialogContent className="max-w-3xl p-12 rounded-[2.5rem] border-4 text-center overflow-hidden" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+          <DialogHeader className="mb-12">
+            <DialogTitle className="text-7xl font-black uppercase tracking-tighter leading-none">Join the Pulse</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-12">
+            <div className="bg-white p-10 rounded-[2.5rem] border-[12px] border-current shadow-2xl animate-in zoom-in-50 duration-700">
+              <QRCodeSVG value={joinUrl} size={400} level="H" includeMargin={false} />
+            </div>
+            <div className="space-y-4">
+              <p className="text-[12px] font-black uppercase tracking-[0.6em] opacity-40">Scan to broadcast your signal</p>
+              <div className="flex items-center justify-center gap-6">
+                 <div className="h-2 w-2 rounded-full bg-current animate-pulse" />
+                 <p className="text-9xl font-black tracking-tighter leading-none">{code}</p>
+                 <div className="h-2 w-2 rounded-full bg-current animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
