@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -32,7 +33,7 @@
         "id": { "type": "string" },
         "pollId": { "type": "string" },
         "text": { "type": "string" },
-        "type": { "type": "string", "enum": ["multiple-choice", "open-text", "rating", "slider", "word-cloud"] },
+        "type": { "type": "string", "enum": ["multiple-choice", "open-text", "rating", "slider", "word-cloud", "ranking", "scale", "guess-number"] },
         "options": { "type": "array", "items": { "type": "string" } },
         "order": { "type": "number" }
       },
@@ -48,11 +49,24 @@
         "userId": { "type": "string" },
         "code": { "type": "string" },
         "status": { "type": "string", "enum": ["active", "ended"] },
-        "theme": { "type": "string", "enum": ["orange", "red", "green", "blue"] },
+        "theme": { "type": "string" },
         "currentQuestionId": { "type": "string" },
+        "showResultsToParticipants": { "type": "boolean" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "pollId", "userId", "code", "status", "createdAt"]
+    },
+    "Participant": {
+      "title": "Participant",
+      "description": "An individual attending a live session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nickname": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "kicked"] },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "status", "joinedAt"]
     },
     "Response": {
       "title": "Response",
@@ -63,6 +77,7 @@
         "sessionId": { "type": "string" },
         "questionId": { "type": "string" },
         "value": { "type": "string" },
+        "userId": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["id", "sessionId", "questionId", "value", "createdAt"]
@@ -87,6 +102,10 @@
     "/sessions/{sessionId}": {
       "schema": "#/entities/Session",
       "description": "Live sessions."
+    },
+    "/sessions/{sessionId}/participants/{userId}": {
+      "schema": "#/entities/Participant",
+      "description": "Participants in a session."
     },
     "/sessions/{sessionId}/responses/{responseId}": {
       "schema": "#/entities/Response",

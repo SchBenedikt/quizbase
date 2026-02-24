@@ -1,3 +1,4 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -42,7 +43,6 @@ service cloud.firestore {
       allow delete: if isExistingOwner(userId);
 
       match /questions/{questionId} {
-        // Participants need to be able to get the question details to participate
         allow get: if true;
         allow list: if isOwner(userId);
         allow create, update, delete: if isOwner(userId);
@@ -56,12 +56,22 @@ service cloud.firestore {
       allow update: if isExistingOwner(resource.data.userId) && isUnchanged('userId');
       allow delete: if isExistingOwner(resource.data.userId);
 
+      match /participants/{userId} {
+        allow get: if true;
+        allow create: if isSignedIn() && request.auth.uid == userId;
+        allow update: if (isSignedIn() && request.auth.uid == userId) || isOwner(get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId);
+        allow list: if isOwner(get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId);
+      }
+
       match /responses/{responseId} {
         // Allow the session creator to list all responses
-        allow list: if isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid;
-        allow get: if isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid;
+        // ALSO allow participants to list responses if results are public
+        allow list: if (isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid) ||
+                      (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true);
         
-        // Participants can submit if active
+        allow get: if (isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid) ||
+                     (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true);
+        
         allow create: if get(/databases/$(database)/documents/sessions/$(sessionId)).data.status == 'active';
         allow update, delete: if false;
       }

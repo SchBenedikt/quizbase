@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, use, useEffect, useRef } from "react";
@@ -5,19 +6,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
-import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle, ArrowUp, ArrowDown } from "lucide-react";
-import { PollQuestion, PollSession } from "@/app/types/poll";
+import { Zap, Heart, Loader2, Star, Timer, CheckCircle2, XCircle, ArrowUp, ArrowDown, User, ShieldAlert } from "lucide-react";
+import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
 import { cn } from "@/lib/utils";
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { doc, collection, serverTimestamp, getDoc, query, where, limit } from "firebase/firestore";
+import { useFirestore, useCollection, useDoc, useMemoFirebase, useUser } from "@/firebase";
+import { doc, collection, serverTimestamp, getDoc, query, where, limit, setDoc } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
+import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
+import { useAuth } from "@/firebase/provider";
 
 export default function ParticipantView({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
   const db = useFirestore();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
   
   const sessionQuery = useMemoFirebase(() => {
     return query(
@@ -30,6 +35,13 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const { data: sessionDocs, isLoading: sessionLoading } = useCollection<PollSession>(sessionQuery);
   const session = sessionDocs?.[0] || null;
 
+  const participantRef = useMemoFirebase(() => {
+    if (!session?.id || !user?.uid) return null;
+    return doc(db, `sessions/${session.id}/participants/${user.uid}`);
+  }, [db, session?.id, user?.uid]);
+
+  const { data: participantData } = useDoc<PollParticipant>(participantRef);
+
   const [currentQuestion, setCurrentQuestion] = useState<PollQuestion | null>(null);
   const [voted, setVoted] = useState(false);
   const [selection, setSelection] = useState<number | null>(null);
@@ -38,6 +50,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const [sliderValue, setSliderValue] = useState(50);
   const [ratingValue, setRatingValue] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [nickname, setNickname] = useState("");
+  const [isSettingNickname, setIsSettingNickname] = useState(true);
   
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -47,6 +61,26 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     return collection(db, `sessions/${session.id}/responses`);
   }, [db, session?.id]);
   const { data: allResponses } = useCollection(responsesQuery);
+
+  // Auto-login if not authenticated
+  useEffect(() => {
+    if (!isUserLoading && !user && auth) {
+      initiateAnonymousSignIn(auth);
+    }
+  }, [user, isUserLoading, auth]);
+
+  // Handle Participant presence
+  useEffect(() => {
+    if (session?.id && user?.uid && !isSettingNickname) {
+      const pRef = doc(db, `sessions/${session.id}/participants/${user.uid}`);
+      setDoc(pRef, {
+        id: user.uid,
+        nickname: nickname || "Anonymous",
+        status: 'active',
+        joinedAt: serverTimestamp()
+      }, { merge: true });
+    }
+  }, [session?.id, user?.uid, isSettingNickname, nickname, db]);
 
   useEffect(() => {
     if (session?.currentQuestionId && session.userId && session.pollId) {
@@ -74,10 +108,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
               setTimeLeft(null);
             }
           }
-        } catch (error) {
-          // Contextual error handled by fetch hook if applicable, but getDoc is single-time.
-          // Fallback silence or specific UI handling if needed.
-        }
+        } catch (error) {}
       };
       fetchQ();
     }
@@ -101,7 +132,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       sessionId: session.id,
       questionId: currentQuestion.id,
       value,
-      userId: session.userId, 
+      userId: user?.uid || 'anon', 
       createdAt: serverTimestamp(),
     });
     
@@ -128,7 +159,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     return (yiq >= 128) ? '#000000' : '#ffffff';
   };
 
-  if (sessionLoading) {
+  if (sessionLoading || isUserLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-10 w-10 animate-spin text-foreground" />
@@ -165,6 +196,57 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     color: finalFg,
     borderColor: finalFg + '33'
   };
+
+  // Kicked State
+  if (participantData?.status === 'kicked') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background space-y-8">
+        <div className="w-24 h-24 rounded-[2rem] bg-destructive/10 flex items-center justify-center">
+          <ShieldAlert className="h-12 w-12 text-destructive" />
+        </div>
+        <h1 className="text-5xl font-black uppercase tracking-tighter">Disconnected</h1>
+        <p className="text-sm font-bold opacity-60 uppercase tracking-widest max-w-xs mx-auto">
+          You have been removed from this session by the host.
+        </p>
+        <Button onClick={() => window.location.href = '/join'} variant="outline" className="h-14 rounded-[1rem] font-black uppercase tracking-widest px-10">Return to Lobby</Button>
+      </div>
+    );
+  }
+
+  // Nickname Prompt
+  if (isSettingNickname) {
+    return (
+      <div className="min-h-screen flex flex-col p-8 transition-colors duration-700 font-body" style={dynamicStyles}>
+        <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center space-y-12">
+           <header className="text-center space-y-4">
+             <div className="w-20 h-20 rounded-[1.5rem] bg-white/10 flex items-center justify-center mx-auto border-2" style={{ borderColor: finalFg + '33' }}>
+                <User className="h-10 w-10" />
+             </div>
+             <h1 className="text-5xl font-black uppercase tracking-tighter">Identify.</h1>
+             <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Choose a nickname or proceed as guest</p>
+           </header>
+
+           <div className="w-full space-y-6">
+             <Input 
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="YOUR NICKNAME..."
+                maxLength={20}
+                className="h-24 text-4xl font-black text-center rounded-[1.5rem] border-4 bg-black/5 focus-visible:ring-0 placeholder:opacity-10 uppercase tracking-tighter"
+                style={{ borderColor: finalFg, color: finalFg }}
+             />
+             <Button 
+                onClick={() => setIsSettingNickname(false)}
+                className="w-full h-24 text-2xl font-black rounded-[1.5rem] border-4 uppercase tracking-tighter transition-all"
+                style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
+             >
+               Enter Studio <Zap className="ml-4 h-6 w-6 fill-current" />
+             </Button>
+           </div>
+        </div>
+      </div>
+    );
+  }
 
   if (voted || (timeLeft === 0 && currentQuestion?.timeLimit)) {
     const qResults: Record<string, number> = {};

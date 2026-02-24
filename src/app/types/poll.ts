@@ -1,3 +1,4 @@
+
 export type PollType = 'multiple-choice' | 'open-text' | 'rating' | 'slider' | 'word-cloud' | 'guess-number' | 'ranking' | 'scale';
 
 export interface PollQuestion {
@@ -24,6 +25,13 @@ export interface PollSession {
   customColor?: string; // Hex color code
   showResultsToParticipants: boolean;
   createdAt: any;
+}
+
+export interface PollParticipant {
+  id: string;
+  nickname?: string;
+  status: 'active' | 'kicked';
+  joinedAt: any;
 }
 
 export interface PollResponse {

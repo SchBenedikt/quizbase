@@ -1,11 +1,12 @@
+
 "use client";
 
 import { useState, useEffect, use, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Palette, Sparkles, Monitor, Settings2, Moon, Sun, Activity } from "lucide-react";
+import { Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Palette, Sparkles, Monitor, Settings2, Moon, Sun, Activity, UserMinus, X } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
-import { PollQuestion, PollSession } from "@/app/types/poll";
+import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, collection, query, orderBy } from "firebase/firestore";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
@@ -15,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
@@ -41,6 +43,12 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     return collection(db, `sessions/${resolvedParams.sessionId}/responses`);
   }, [db, resolvedParams.sessionId]);
   const { data: allResponses } = useCollection(responsesQuery);
+
+  const participantsQuery = useMemoFirebase(() => {
+    if (!resolvedParams.sessionId) return null;
+    return collection(db, `sessions/${resolvedParams.sessionId}/participants`);
+  }, [db, resolvedParams.sessionId]);
+  const { data: participants } = useCollection<PollParticipant>(participantsQuery);
 
   const [results, setResults] = useState<Record<string, number>>({});
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -109,9 +117,10 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   };
 
-  const setTheme = (theme: string, customColor?: string) => {
-    if (!sessionRef) return;
-    updateDocumentNonBlocking(sessionRef, { theme, customColor: customColor || null });
+  const handleKick = (participantId: string) => {
+    const participantRef = doc(db, `sessions/${resolvedParams.sessionId}/participants/${participantId}`);
+    updateDocumentNonBlocking(participantRef, { status: 'kicked' });
+    toast({ title: "Participant Removed", description: "The user has been kicked from the session." });
   };
 
   const toggleResultVisibility = () => {
@@ -169,56 +178,92 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const dynamicStyles = {
     backgroundColor: finalBg,
     color: finalFg,
-    borderColor: finalFg + '22'
+    borderColor: finalFg + '15'
   };
 
   const currentIdx = questions.findIndex(q => q.id === session?.currentQuestionId);
   const q = questions[currentIdx] || questions[0];
   if (!q) return null;
   const currentResponses = allResponses?.filter(r => r.questionId === q.id) || [];
+  const activeParticipants = participants?.filter(p => p.status === 'active') || [];
 
   return (
     <div 
       className="no-scroll h-screen w-screen flex flex-col font-body transition-colors duration-700 overflow-hidden" 
       style={dynamicStyles}
     >
-      <header className="h-[10vh] px-12 flex items-center justify-between border-b-2 shrink-0 z-20 bg-black/5" style={{ borderColor: finalFg + '15' }}>
+      <header className="h-[12vh] px-12 flex items-center justify-between border-b-2 shrink-0 z-20 bg-black/5" style={{ borderColor: finalFg + '15' }}>
         <div className="flex items-center gap-6">
-          <Zap className="h-8 w-8 fill-current" />
-          <h1 className="text-xl font-bold tracking-tight truncate max-w-xl">{title}</h1>
+          <Zap className="h-10 w-10 fill-current" />
+          <h1 className="text-2xl font-black tracking-tight truncate max-w-xl uppercase">{title}</h1>
         </div>
         
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-12">
           {timeLeft !== null && (
-            <div className="flex items-center gap-3 px-5 py-2 rounded-[1rem] border-2 animate-pulse" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-              <Timer className="h-5 w-5" />
-              <span className="text-2xl font-black tabular-nums">{timeLeft}</span>
+            <div className="flex items-center gap-4 px-8 py-3 rounded-[1.25rem] border-4 animate-pulse" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+              <Timer className="h-6 w-6" />
+              <span className="text-4xl font-black tabular-nums">{timeLeft}</span>
             </div>
           )}
           <div className="flex flex-col items-end">
-            <p className="text-[9px] font-black uppercase tracking-widest opacity-40 leading-none">Session Code</p>
-            <p className="text-4xl font-black tracking-tighter leading-none mt-1">{code}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 leading-none mb-1">Session Code</p>
+            <p className="text-5xl font-black tracking-tighter leading-none">{code}</p>
           </div>
-          <div className="flex items-center gap-4 bg-black/5 px-5 py-2 rounded-[1rem] border-2" style={{ borderColor: finalFg + '10' }}>
-            <Users className="h-5 w-5" />
-            <span className="text-2xl font-black leading-none">{currentResponses.length}</span>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-4 bg-black/5 px-6 py-3 rounded-[1.25rem] border-2 hover:bg-black/10 transition-colors" style={{ borderColor: finalFg + '10' }}>
+                <Users className="h-6 w-6" />
+                <span className="text-3xl font-black leading-none">{activeParticipants.length}</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0 rounded-[2rem] border-2 bg-background shadow-2xl" align="end">
+              <div className="p-6 border-b-2 flex items-center justify-between">
+                <p className="text-xs font-black uppercase tracking-widest opacity-40">Live Participants</p>
+                <div className="h-6 px-3 bg-primary/10 rounded-full flex items-center">
+                  <span className="text-[10px] font-black text-primary">{activeParticipants.length} Active</span>
+                </div>
+              </div>
+              <ScrollArea className="h-80">
+                {activeParticipants.length === 0 ? (
+                  <div className="p-12 text-center opacity-20">
+                    <p className="text-[10px] font-black uppercase tracking-widest">No signals detected</p>
+                  </div>
+                ) : (
+                  <div className="p-2 space-y-1">
+                    {activeParticipants.map(p => (
+                      <div key={p.id} className="flex items-center justify-between p-4 rounded-[1rem] hover:bg-muted transition-colors group">
+                        <span className="text-sm font-bold uppercase truncate pr-4">{p.nickname || "Anonymous"}</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleKick(p.id)}
+                          className="h-8 w-8 rounded-[0.5rem] text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <UserMinus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
         </div>
       </header>
 
-      <main className="flex-1 min-h-0 p-10 flex flex-col items-center justify-center relative overflow-hidden">
-        <div className="w-full max-w-[1400px] h-full flex flex-col gap-8">
-          <div className="text-center shrink-0 space-y-3">
-             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em]" style={{ backgroundColor: finalFg + '15', color: finalFg }}>
-               <Activity className="h-3 w-3" /> Step {currentIdx + 1} of {questions.length}
+      <main className="flex-1 min-h-0 p-12 flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="w-full max-w-[1600px] h-full flex flex-col gap-10">
+          <div className="text-center shrink-0 space-y-6">
+             <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-sm font-black uppercase tracking-[0.3em] shadow-sm" style={{ backgroundColor: finalFg + '15', color: finalFg }}>
+               <Activity className="h-4 w-4" /> Step {currentIdx + 1} of {questions.length}
              </div>
-             <h2 className="text-4xl md:text-6xl font-bold leading-[1.1] tracking-tight max-w-5xl mx-auto">
+             <h2 className="text-5xl md:text-7xl font-black leading-[1.0] tracking-tight max-w-6xl mx-auto uppercase">
                {q.question}
              </h2>
           </div>
 
           <div className="flex-1 min-h-0 w-full relative">
-            <Card className="h-full border-2 rounded-[2rem] bg-black/5 p-10 flex items-center justify-center overflow-hidden shadow-none" style={{ borderColor: finalFg + '08' }}>
+            <Card className="h-full border-4 rounded-[2.5rem] bg-black/5 p-12 flex items-center justify-center overflow-hidden shadow-none" style={{ borderColor: finalFg + '08' }}>
                <ResultChart question={q} results={results} allResponses={currentResponses} />
             </Card>
             
@@ -226,100 +271,78 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <Button 
                 onClick={handleSummarize}
                 disabled={isSummarizing}
-                className="absolute top-6 right-6 h-10 px-5 rounded-[0.75rem] font-black uppercase text-[9px] border-2 transition-all gap-2 shadow-none"
+                className="absolute top-8 right-8 h-12 px-8 rounded-[1rem] font-black uppercase text-[10px] border-2 transition-all gap-3 shadow-xl"
                 style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
               >
-                {isSummarizing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-                Analyze Feedback
+                {isSummarizing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                Analyze Signal
               </Button>
             )}
           </div>
         </div>
       </main>
 
-      <footer className="h-[8vh] flex items-center justify-between shrink-0 px-12 border-t-2 bg-black/5" style={{ borderColor: finalFg + '15' }}>
-        <div className="flex items-center gap-3">
+      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-12 border-t-2 bg-black/5" style={{ borderColor: finalFg + '15' }}>
+        <div className="flex items-center gap-6">
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handlePrev}
             disabled={currentIdx === 0}
-            className="h-10 w-10 rounded-[0.75rem] border-2 bg-black/5 transition-all hover:opacity-80 disabled:opacity-10"
+            className="h-14 w-14 rounded-[1.25rem] border-2 bg-black/5 transition-all hover:opacity-80 disabled:opacity-5"
             style={{ borderColor: finalFg + '20', color: finalFg }}
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-7 w-7" />
           </Button>
           <Button 
             variant="outline" 
             size="icon" 
             onClick={handleNext}
             disabled={currentIdx === questions.length - 1}
-            className="h-10 w-10 rounded-[0.75rem] border-2 bg-black/5 transition-all hover:opacity-80 disabled:opacity-10"
+            className="h-14 w-14 rounded-[1.25rem] border-2 bg-black/5 transition-all hover:opacity-80 disabled:opacity-5"
             style={{ borderColor: finalFg + '20', color: finalFg }}
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-7 w-7" />
           </Button>
+          <span className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-4">
+            Step Navigation
+          </span>
         </div>
         
-        <div className="flex items-center gap-2 bg-black/5 p-1.5 rounded-[1.25rem] border-2" style={{ borderColor: finalFg + '08' }}>
+        <div className="flex items-center gap-4 bg-black/5 p-2 rounded-[1.5rem] border-2" style={{ borderColor: finalFg + '08' }}>
            <Popover>
              <PopoverTrigger asChild>
-                <Button variant="ghost" className="font-black uppercase tracking-widest text-[9px] h-9 px-5 rounded-[0.75rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
-                  <Palette className="h-3.5 w-3.5 mr-2" /> Vibe
-                </Button>
-             </PopoverTrigger>
-             <PopoverContent className="w-[340px] p-5 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground shadow-none" align="center">
-                <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Immersive Experience</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button onClick={() => setTheme('orange')} className="bg-[#ff9312] text-white rounded-[0.75rem] font-bold h-10 border-2 uppercase text-[9px] shadow-none">Orange</Button>
-                  <Button onClick={() => setTheme('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[0.75rem] font-bold h-10 border-2 uppercase text-[9px] shadow-none">Deep Red</Button>
-                  <Button onClick={() => setTheme('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[0.75rem] font-bold h-10 border-2 uppercase text-[9px] shadow-none">Acid Green</Button>
-                  <Button onClick={() => setTheme('blue')} className="bg-[#0d99ff] text-white rounded-[0.75rem] font-bold h-10 border-2 uppercase text-[9px] shadow-none">Pulse Blue</Button>
-                </div>
-                <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mt-2">Minimalist Studio</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button onClick={() => setTheme('minimal-light')} className="bg-[#f4f4f5] text-zinc-950 rounded-[0.75rem] font-bold h-10 border-2 border-zinc-200 uppercase text-[9px] shadow-none"><Sun className="w-3 h-3 mr-2" /> Light</Button>
-                  <Button onClick={() => setTheme('minimal-dark')} className="bg-[#18181b] text-zinc-100 rounded-[0.75rem] font-bold h-10 border-2 border-zinc-800 uppercase text-[9px] shadow-none"><Moon className="w-3 h-3 mr-2" /> Dark</Button>
-                </div>
-                <div className="space-y-2.5 pt-3 border-t-2">
-                   <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Custom Background</p>
-                   <Input 
-                     type="color" 
-                     className="h-10 w-full rounded-[0.75rem] border-2 p-1 cursor-pointer shadow-none"
-                     onChange={(e) => setTheme('custom', e.target.value)}
-                   />
-                </div>
-             </PopoverContent>
-           </Popover>
-           
-           <Popover>
-             <PopoverTrigger asChild>
-               <Button variant="ghost" className="font-black uppercase tracking-widest text-[9px] h-9 px-5 rounded-[0.75rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
-                 <Settings2 className="h-3.5 w-3.5 mr-2" /> Sync
+               <Button variant="ghost" className="font-black uppercase tracking-widest text-[10px] h-12 px-8 rounded-[1rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
+                 <Settings2 className="h-4 w-4 mr-3" /> Sync Settings
                </Button>
              </PopoverTrigger>
-             <PopoverContent className="w-64 p-5 rounded-[1.5rem] border-2 bg-background flex flex-col gap-5 text-foreground shadow-none" align="center">
-                <div className="space-y-3">
-                  <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Audience Controls</p>
+             <PopoverContent className="w-80 p-8 rounded-[2rem] border-2 bg-background flex flex-col gap-6 text-foreground shadow-2xl" align="center">
+                <div className="space-y-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Audience Controls</p>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="show-results" className="text-[11px] font-bold uppercase">Live Results</Label>
+                    <Label htmlFor="show-results" className="text-xs font-bold uppercase tracking-tight">Live Feedback Stream</Label>
                     <Switch id="show-results" checked={showResults} onCheckedChange={toggleResultVisibility} />
                   </div>
-                  <p className="text-[9px] opacity-40 uppercase leading-tight font-bold">
-                    Allow participants to see the pulse stream after submission.
+                  <p className="text-[10px] opacity-40 uppercase leading-tight font-bold">
+                    When active, participants will see aggregated data after transmitting.
                   </p>
+                </div>
+                <div className="pt-4 border-t-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full h-12 rounded-[1rem] font-black uppercase text-[10px] tracking-widest"
+                    onClick={() => document.documentElement.requestFullscreen()}
+                  >
+                    <Monitor className="h-4 w-4 mr-2" /> Fullscreen Display
+                  </Button>
                 </div>
              </PopoverContent>
            </Popover>
-
-           <Button variant="ghost" onClick={() => document.documentElement.requestFullscreen()} className="font-black uppercase tracking-widest text-[9px] h-9 px-5 rounded-[0.75rem] hover:bg-black/10 transition-all" style={{ color: finalFg }}>
-             <Monitor className="h-3.5 w-3.5 mr-2" /> Fullscreen
-           </Button>
         </div>
 
-        <div className="flex items-center gap-2 opacity-30">
-           <Zap className="h-4 w-4 fill-current" />
-           <span className="font-black text-[9px] uppercase tracking-widest">Presenter</span>
+        <div className="flex items-center gap-4 opacity-40">
+           <Zap className="h-6 w-6 fill-current" />
+           <span className="font-black text-[11px] uppercase tracking-[0.3em]">Studio Presenter</span>
         </div>
       </footer>
     </div>
