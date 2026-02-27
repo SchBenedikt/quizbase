@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Zap, ArrowRight, ShieldCheck, Globe } from "lucide-react";
+import { Zap, ArrowRight, Lock, CheckCircle, Sparkles } from "lucide-react";
 
 export default function JoinPage() {
   const [code, setCode] = useState("");
@@ -59,13 +59,13 @@ export default function JoinPage() {
               
               <div className="flex items-center justify-center gap-6 pt-1">
                 <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider opacity-30">
-                  <ShieldCheck className="h-3 w-3" /> Secure
+                  <Lock className="h-3 w-3" /> Secure
                 </div>
                 <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider opacity-30">
-                  <Globe className="h-3 w-3" /> Instant
+                  <CheckCircle className="h-3 w-3" /> Instant
                 </div>
                 <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider opacity-30">
-                  <Zap className="h-3 w-3 fill-current" /> Zero Barrier
+                  <Sparkles className="h-3 w-3" /> Zero Barrier
                 </div>
               </div>
             </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Globe, Lock } from "lucide-react";
+import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Compass, Lock } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc } from "firebase/firestore";
@@ -151,7 +151,7 @@ export default function DashboardPage() {
                        className={cn("h-7 w-7 rounded-md transition-colors shadow-none", survey.isPublic ? "text-primary" : "text-muted-foreground")}
                        title={survey.isPublic ? "Public" : "Private"}
                      >
-                       {survey.isPublic ? <Globe className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+                       {survey.isPublic ? <Compass className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
                      </Button>
                   </div>
                   <Button 

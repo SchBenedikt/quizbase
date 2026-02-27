@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
-import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Globe } from "lucide-react";
+import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Compass } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -69,7 +69,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                 )}
               >
                 <Link href="/discover">
-                  <Globe className="h-3 w-3 mr-1.5" /> Discover
+                  <Compass className="h-3 w-3 mr-1.5" /> Discover
                 </Link>
               </Button>
 
