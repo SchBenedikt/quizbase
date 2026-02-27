@@ -26,7 +26,7 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow get, list: if isOwner(userId);
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow create: if isSignedIn() && request.resource.data.id == userId;
       allow update: if isExistingOwner(userId) && isUnchanged('id');
       allow delete: if isExistingOwner(userId);
     }

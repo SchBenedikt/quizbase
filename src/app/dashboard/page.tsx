@@ -31,9 +31,9 @@ export default function DashboardPage() {
   }, [user, isUserLoading, router]);
 
   const surveysQuery = useMemoFirebase(() => {
-    if (!user) return null;
+    if (!user || !user.uid || isUserLoading) return null;
     return query(collection(db, `users/${user.uid}/surveys`), orderBy("createdAt", "desc"));
-  }, [user, db]);
+  }, [user, db, isUserLoading]);
 
   const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
 
@@ -104,8 +104,8 @@ export default function DashboardPage() {
       <main className="flex-1 studio-container py-28 space-y-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold tracking-tight">Library</h1>
-            <p className="text-sm opacity-40">Manage your surveys and presentations.</p>
+            <h1 className="text-4xl font-bold tracking-tight">Library</h1>
+            <p className="text-base opacity-70">Manage your surveys and presentations.</p>
           </div>
           
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
@@ -115,12 +115,12 @@ export default function DashboardPage() {
                 placeholder="Search surveys..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 pl-9 pr-4 rounded-lg border bg-card focus-visible:ring-1 focus-visible:ring-primary font-medium text-sm w-full shadow-none"
+                className="h-10 pl-9 pr-4 rounded-lg border bg-card focus-visible:ring-1 focus-visible:ring-primary font-medium text-base w-full shadow-none"
               />
             </div>
             <Button 
               onClick={handleCreateNew}
-              className="h-10 px-5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all uppercase tracking-wider shrink-0 w-full sm:w-auto shadow-none"
+              className="h-10 px-5 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all uppercase tracking-wider shrink-0 w-full sm:w-auto shadow-none"
             >
               <Plus className="mr-2 h-4 w-4" /> New Survey
             </Button>
@@ -132,7 +132,7 @@ export default function DashboardPage() {
         ) : !filteredSurveys || filteredSurveys.length === 0 ? (
           <div className="py-32 text-center border border-dashed rounded-xl bg-card/50 space-y-3 border-foreground/10 shadow-none">
              <Sparkles className="h-8 w-8 mx-auto opacity-10" />
-             <p className="text-xs font-medium opacity-40 uppercase tracking-widest">No surveys found</p>
+             <p className="text-sm font-medium opacity-60 uppercase tracking-widest">No surveys found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -165,12 +165,12 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="flex-1 space-y-1.5">
-                  <h3 className="text-sm font-semibold tracking-tight leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                  <h3 className="text-base font-semibold tracking-tight leading-tight line-clamp-2 group-hover:text-primary transition-colors">
                     {survey.title || "Untitled presentation"}
                   </h3>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-3 w-3" />
-                    <time className="text-[10px] font-medium uppercase tracking-wider">
+                    <time className="text-xs font-medium uppercase tracking-wider">
                       {mounted && survey.createdAt ? new Date(survey.createdAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Draft"}
                     </time>
                   </div>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
                      variant="default"
                      onClick={() => handleLaunchExisting(survey)}
                      disabled={loading}
-                     className="flex-1 h-9 rounded-lg font-semibold text-xs shadow-none"
+                     className="flex-1 h-9 rounded-lg font-semibold text-sm shadow-none"
                    >
                      <Play className="mr-1.5 h-3 w-3 fill-current" /> Launch
                    </Button>

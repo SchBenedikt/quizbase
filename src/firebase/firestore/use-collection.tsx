@@ -85,7 +85,16 @@ export function useCollection<T = any>(
           }
         } catch (e) {
           // Fallback if path extraction fails for complex queries
+          console.warn('Failed to extract query path:', e);
         }
+
+        // Log the full error for debugging
+        console.error('Firestore permission error:', {
+          error: error.message,
+          code: error.code,
+          path,
+          query: memoizedTargetRefOrQuery
+        });
 
         const contextualError = new FirestorePermissionError({
           operation: 'list',
