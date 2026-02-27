@@ -54,7 +54,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
             <div className="bg-primary p-2 rounded-[1rem] transition-transform group-hover:scale-110">
               <Zap className="h-5 w-5 text-primary-foreground fill-current" />
             </div>
-            <span className="text-2xl font-black font-headline tracking-tighter uppercase">PopPulse*</span>
+            <span className="text-2xl font-black font-headline tracking-tighter uppercase">Quizbase</span>
           </Link>
           
           {/* Navigation */}

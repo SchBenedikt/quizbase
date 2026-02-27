@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
@@ -5,11 +6,11 @@ import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'PopPulse* | Professional Live Interaction Studio',
+  title: 'Quizbase | Professional Live Interaction Studio',
   description: 'Transform your presentations into real-time conversations. Create interactive surveys, live polls, and word clouds with zero barriers. High-octane engagement for professionals.',
   keywords: ['live polling', 'interactive presentation', 'audience engagement', 'real-time survey', 'presenter tools'],
   openGraph: {
-    title: 'PopPulse* | Professional Live Interaction Studio',
+    title: 'Quizbase | Professional Live Interaction Studio',
     description: 'Your voice, amplified. High-octane real-time engagement for boardrooms and stages.',
     type: 'website',
   },

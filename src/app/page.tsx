@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -44,8 +45,8 @@ export default function Home() {
             <div className="space-y-12 animate-in fade-in slide-in-from-left-10 duration-1000">
               <header className="space-y-6">
                 <h1 className="text-8xl md:text-9xl lg:text-[11rem] font-black leading-[0.75] tracking-tighter uppercase">
-                  Pop. <br />
-                  Pulse. <br />
+                  Quiz. <br />
+                  Base. <br />
                   <span className="opacity-30 italic">*</span>
                 </h1>
               </header>

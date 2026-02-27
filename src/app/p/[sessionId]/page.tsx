@@ -319,7 +319,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         <div className="flex items-center justify-between mb-16">
           <div className="flex items-center gap-3">
             <Zap className="h-8 w-8 fill-current" />
-            <span className="font-black text-2xl tracking-tighter uppercase">PopPulse*</span>
+            <span className="font-black text-2xl tracking-tighter uppercase">Quizbase</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end">
@@ -370,4 +370,3 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     </div>
   );
 }
-

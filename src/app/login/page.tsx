@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -64,7 +65,7 @@ export default function LoginPage() {
       <div className="lg:w-1/2 bg-[#ff9312] p-12 lg:p-24 flex flex-col justify-center text-[#4c2f05]">
         <div className="space-y-8 max-w-xl">
           <h1 className="text-8xl lg:text-[10rem] font-black leading-[0.8] tracking-tighter uppercase">
-            PopPulse*
+            Quizbase
           </h1>
           <div className="space-y-4">
             <p className="text-3xl lg:text-4xl font-bold uppercase leading-none tracking-tight">

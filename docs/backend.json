@@ -3,7 +3,7 @@
   "entities": {
     "User": {
       "title": "User",
-      "description": "Represents a user (presenter) of PopPulse.",
+      "description": "Represents a user (presenter) of Quizbase.",
       "type": "object",
       "properties": {
         "id": { "type": "string" },

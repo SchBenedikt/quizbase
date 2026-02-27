@@ -83,7 +83,7 @@ export default function DiscoverPage() {
           </div>
           <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tighter leading-none">Discover.</h1>
           <p className="text-sm font-bold opacity-40 uppercase tracking-widest max-w-lg">
-            Explore and host high-stakes interactions created by the PopPulse community.
+            Explore and host high-stakes interactions created by the Quizbase community.
           </p>
         </header>
 
