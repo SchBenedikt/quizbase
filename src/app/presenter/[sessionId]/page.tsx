@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { 
   Zap, ChevronLeft, ChevronRight, Users, Timer, Loader2, Sparkles, 
-  Monitor, Settings2, UserMinus, QrCode, Trophy, Play, Star 
+  Monitor, Settings2, UserMinus, QrCode, Trophy, Play, Star, BarChart3 
 } from "lucide-react";
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -362,6 +363,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <div className="grid gap-3">
                 <Button variant="outline" className="w-full h-11 rounded-lg font-medium text-sm" style={{ backgroundColor: finalBg + '10', color: finalBg }} onClick={() => setIsQRVisible(true)}><QrCode className="h-4 w-4 mr-2" /> Show QR Code</Button>
                 <Button variant="outline" className="w-full h-11 rounded-lg font-medium text-sm" style={{ backgroundColor: finalBg + '10', color: finalBg }} onClick={() => document.documentElement.requestFullscreen()}><Monitor className="h-4 w-4 mr-2" /> Fullscreen</Button>
+                <Link href={`/presenter/${resolvedParams.sessionId}/stats`}>
+                  <Button variant="outline" className="w-full h-11 rounded-lg font-medium text-sm" style={{ backgroundColor: finalBg + '10', color: finalBg }}><BarChart3 className="h-4 w-4 mr-2" /> Statistics</Button>
+                </Link>
               </div>
             </PopoverContent>
           </Popover>
