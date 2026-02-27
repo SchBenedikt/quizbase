@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { 
   Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, 
   Star, ChevronDown, ChevronRight, Timer, CheckCircle2, 
-  Hash, ListOrdered, Ruler, ArrowUp, ArrowDown, Zap, Image as ImageIcon 
+  Hash, ListOrdered, Ruler, ArrowUp, ArrowDown, Zap, Image as ImageIcon, ToggleLeft
 } from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
 import { PollQuestion, PollType } from "@/app/types/poll";
@@ -59,7 +59,8 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
       id: Math.random().toString(36).substr(2, 9),
       type,
       question: "",
-      options: (type === 'multiple-choice' || type === 'ranking') ? ["Option 1", "Option 2"] : undefined,
+      options: (type === 'multiple-choice' || type === 'ranking') ? ["Option 1", "Option 2"] : 
+               type === 'true-false' ? ["True", "False"] : undefined,
       range: (type === 'slider' || type === 'guess-number' || type === 'scale') ? { min: 0, max: type === 'scale' ? 10 : 100, step: 1 } : undefined,
       labels: type === 'scale' ? { min: "Disagree", max: "Agree" } : undefined,
       correctOptionIndices: [],
@@ -166,6 +167,7 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
                             isCollapsed ? "w-10 h-10" : "w-12 h-12"
                           )}>
                             {q.type === 'multiple-choice' && <ListChecks className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
+                            {q.type === 'true-false' && <ToggleLeft className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
                             {q.type === 'word-cloud' && <Cloud className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
                             {q.type === 'open-text' && <MessageSquare className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
                             {q.type === 'rating' && <Star className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
@@ -220,16 +222,16 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
                             </div>
                           </div>
 
-                              {(q.type === 'multiple-choice' || q.type === 'ranking') && q.options && (
+                              {(q.type === 'multiple-choice' || q.type === 'ranking' || q.type === 'true-false') && q.options && (
                             <div className="space-y-5">
                               <div className="flex items-center justify-between">
                                 <Label className="text-base font-medium">Answer options</Label>
-                                {q.type === 'multiple-choice' && isQuiz && <span className="text-sm font-medium text-primary">Select correct answer</span>}
+                                {(q.type === 'multiple-choice' || q.type === 'true-false') && isQuiz && <span className="text-sm font-medium text-primary">Select correct answer</span>}
                               </div>
                               <div className="grid sm:grid-cols-2 gap-4">
                                 {q.options.map((opt, oIdx) => (
                                   <div key={oIdx} className="flex gap-3 group/opt">
-                                    {q.type === 'multiple-choice' && isQuiz && (
+                                    {(q.type === 'multiple-choice' || q.type === 'true-false') && isQuiz && (
                                       <Button 
                                         variant="ghost" 
                                         size="icon"
@@ -247,14 +249,15 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
                                     <div className="flex-1 relative">
                                       <Input 
                                         value={opt} 
+                                        readOnly={q.type === 'true-false'}
                                         onChange={(e) => {
                                           const newOpts = [...q.options!];
                                           newOpts[oIdx] = e.target.value;
                                           updateQuestion(q.id, { options: newOpts });
                                         }}
-                                        className="h-12 border border-foreground/10 bg-card rounded-lg px-4 font-medium text-base focus-visible:ring-1 focus-visible:ring-primary shadow-none"
+                                        className={cn("h-12 border border-foreground/10 bg-card rounded-lg px-4 font-medium text-base focus-visible:ring-1 focus-visible:ring-primary shadow-none", q.type === 'true-false' && "opacity-60 cursor-default")}
                                       />
-                                      {q.options!.length > 2 && (
+                                      {q.type !== 'true-false' && q.options!.length > 2 && (
                                         <Button 
                                           variant="ghost" 
                                           size="icon" 
@@ -273,13 +276,15 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
                                     </div>
                                   </div>
                                 ))}
-                                <Button 
-                                  variant="outline" 
-                                  onClick={() => updateQuestion(q.id, { options: [...q.options!, `New option`] })} 
-                                  className="h-12 rounded-lg border-dashed border-foreground/20 font-medium hover:bg-primary/5 hover:border-primary transition-colors text-base shadow-none"
-                                >
-                                  <Plus className="mr-3 h-5 w-5" /> Add option
-                                </Button>
+                                {q.type !== 'true-false' && (
+                                  <Button 
+                                    variant="outline" 
+                                    onClick={() => updateQuestion(q.id, { options: [...q.options!, `New option`] })} 
+                                    className="h-12 rounded-lg border-dashed border-foreground/20 font-medium hover:bg-primary/5 hover:border-primary transition-colors text-base shadow-none"
+                                  >
+                                    <Plus className="mr-3 h-5 w-5" /> Add option
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           )}
@@ -363,7 +368,8 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
         </div>
         <div className="flex items-center gap-3 overflow-x-auto max-w-[70vw] no-scrollbar px-4">
           {[
-            { type: 'multiple-choice', icon: ListChecks, label: 'Quiz' },
+            { type: 'multiple-choice', icon: ListChecks, label: 'Choice' },
+            { type: 'true-false', icon: ToggleLeft, label: 'True/False' },
             { type: 'ranking', icon: ListOrdered, label: 'Rank' },
             { type: 'scale', icon: Ruler, label: 'Scale' },
             { type: 'word-cloud', icon: Cloud, label: 'Cloud' },

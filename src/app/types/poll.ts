@@ -1,5 +1,5 @@
 
-export type PollType = 'multiple-choice' | 'open-text' | 'rating' | 'slider' | 'word-cloud' | 'guess-number' | 'ranking' | 'scale';
+export type PollType = 'multiple-choice' | 'true-false' | 'open-text' | 'rating' | 'slider' | 'word-cloud' | 'guess-number' | 'ranking' | 'scale';
 
 export interface PollQuestion {
   id: string;

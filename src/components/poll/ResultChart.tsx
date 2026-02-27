@@ -15,10 +15,10 @@ interface ResultChartProps {
 export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
   const chartColor = 'currentColor';
 
-  if ((question.type === 'multiple-choice' || question.type === 'ranking') && question.options) {
+  if ((question.type === 'multiple-choice' || question.type === 'true-false' || question.type === 'ranking') && question.options) {
     let data: any[] = [];
 
-    if (question.type === 'multiple-choice') {
+    if (question.type === 'multiple-choice' || question.type === 'true-false') {
       data = question.options.map((opt, idx) => ({
         name: opt,
         value: results[idx] || 0

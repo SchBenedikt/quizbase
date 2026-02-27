@@ -41,8 +41,9 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const [voted, setVoted] = useState(false);
   const [selection, setSelection] = useState<number | null>(null);
   const [textValue, setTextValue] = useState("");
-  const [sliderValue, setSliderValue] = useState(50);
+  const [sliderValue, setSliderValue] = useState(0);
   const [ratingValue, setRatingValue] = useState(0);
+  const [rankingOrder, setRankingOrder] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [nickname, setNickname] = useState("");
   const [isSettingNickname, setIsSettingNickname] = useState(true);
@@ -85,6 +86,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setSelection(null);
             setTextValue("");
             setRatingValue(0);
+            setRankingOrder([]);
             setSliderValue(qData.range?.min ?? 0);
             setLastCorrect(null);
             setPointsEarned(0);
@@ -123,9 +125,10 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const isAnswerMissing = (): boolean => {
     if (!currentQuestion) return true;
     const type = currentQuestion.type;
-    if (type === 'multiple-choice') return selection === null;
+    if (type === 'multiple-choice' || type === 'true-false') return selection === null;
     if (type === 'word-cloud' || type === 'open-text' || type === 'guess-number') return !textValue.trim();
     if (type === 'rating') return ratingValue === 0;
+    if (type === 'ranking') return rankingOrder.length !== (currentQuestion.options?.length ?? 0);
     // slider and scale always have a value
     return false;
   };
@@ -137,7 +140,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     let value: any = "";
     let isCorrect = false;
 
-    if (currentQuestion.type === 'multiple-choice') {
+    if (currentQuestion.type === 'multiple-choice' || currentQuestion.type === 'true-false') {
       value = selection;
       if (currentQuestion.correctOptionIndices && selection !== null) {
         isCorrect = currentQuestion.correctOptionIndices.includes(selection);
@@ -148,6 +151,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     if (currentQuestion.type === 'slider' || currentQuestion.type === 'scale') value = sliderValue;
     if (currentQuestion.type === 'rating') value = ratingValue;
     if (currentQuestion.type === 'guess-number') value = parseFloat(textValue) || 0;
+    if (currentQuestion.type === 'ranking') value = rankingOrder;
 
     const responseCol = collection(db, `sessions/${session.id}/responses`);
     addDocumentNonBlocking(responseCol, {
@@ -417,6 +421,73 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   <span className="font-medium text-base">{opt}</span>
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* True / False */}
+          {currentQuestion.type === 'true-false' && (
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { label: 'True', icon: '✓', idx: 0 },
+                { label: 'False', icon: '✗', idx: 1 },
+              ].map(({ label, icon, idx }) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelection(idx)}
+                  className={cn(
+                    "h-24 rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.97] font-bold text-2xl",
+                    selection === idx ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10"
+                  )}
+                  style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
+                >
+                  <span className="text-3xl">{icon}</span>
+                  <span className="text-base font-semibold">{label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Ranking */}
+          {currentQuestion.type === 'ranking' && currentQuestion.options && (
+            <div className="space-y-3">
+              <p className="text-xs font-medium opacity-40 uppercase tracking-wider">
+                Tap options in your preferred order ({rankingOrder.length}/{currentQuestion.options.length} ranked)
+              </p>
+              <div className="grid gap-2">
+                {currentQuestion.options.map((opt, idx) => {
+                  const rankPos = rankingOrder.indexOf(idx);
+                  const isRanked = rankPos !== -1;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        if (isRanked) {
+                          setRankingOrder(rankingOrder.filter(i => i !== idx));
+                        } else {
+                          setRankingOrder([...rankingOrder, idx]);
+                        }
+                      }}
+                      className={cn(
+                        "w-full h-14 rounded-xl border-2 flex items-center px-4 gap-3 transition-all active:scale-[0.98] text-left",
+                        isRanked ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10"
+                      )}
+                      style={isRanked ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
+                    >
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border text-sm font-bold"
+                        style={{
+                          backgroundColor: isRanked ? finalBg : 'transparent',
+                          color: finalFg,
+                          borderColor: isRanked ? finalBg : finalFg + '55',
+                        }}
+                      >
+                        {isRanked ? rankPos + 1 : '–'}
+                      </div>
+                      <span className="font-medium text-base">{opt}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
