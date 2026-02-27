@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Zap, ArrowRight, Lock, CheckCircle, Sparkles } from "lucide-react";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 export default function JoinPage() {
   const [code, setCode] = useState("");
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleJoin = () => {
     if (code.length >= 6) {
@@ -27,9 +29,9 @@ export default function JoinPage() {
       <div className="max-w-sm w-full relative z-10 space-y-6 flex flex-col items-center">
         <header className="text-center space-y-2">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            Join Session
+            {t.join.title}
           </h1>
-          <p className="text-sm text-foreground/40">Enter your 6-digit session code</p>
+          <p className="text-sm text-foreground/40">{t.join.subtitle}</p>
         </header>
 
         <Card className="w-full border rounded-2xl overflow-hidden bg-white dark:bg-zinc-900 shadow-none transition-all">
@@ -39,7 +41,7 @@ export default function JoinPage() {
                 <Input 
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  placeholder="000000"
+                  placeholder={t.join.placeholder}
                   maxLength={6}
                   autoFocus
                   className="text-5xl md:text-6xl font-black text-center h-20 border-none bg-transparent focus-visible:ring-0 uppercase tracking-widest placeholder:opacity-10 text-primary shadow-none p-0"
@@ -54,18 +56,18 @@ export default function JoinPage() {
                 onClick={handleJoin}
                 className="w-full h-12 font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all group shadow-none"
               >
-                Join Session <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                {t.join.button} <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
               
               <div className="flex items-center justify-center gap-6 pt-1">
                 <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider opacity-30">
-                  <Lock className="h-3 w-3" /> Secure
+                  <Lock className="h-3 w-3" /> {t.join.secure}
                 </div>
                 <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider opacity-30">
-                  <CheckCircle className="h-3 w-3" /> Instant
+                  <CheckCircle className="h-3 w-3" /> {t.join.instant}
                 </div>
                 <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-wider opacity-30">
-                  <Sparkles className="h-3 w-3" /> Zero Barrier
+                  <Sparkles className="h-3 w-3" /> {t.join.zeroBarrier}
                 </div>
               </div>
             </div>

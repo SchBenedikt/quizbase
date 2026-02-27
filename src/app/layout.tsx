@@ -4,6 +4,7 @@ import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://quizbase.app'),
@@ -78,9 +79,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <FirebaseClientProvider>
-            {children}
-            <Toaster />
-          </FirebaseClientProvider>
+              <LanguageProvider>
+                {children}
+                <Toaster />
+              </LanguageProvider>
+            </FirebaseClientProvider>
         </ThemeProvider>
       </body>
     </html>

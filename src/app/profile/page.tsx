@@ -9,11 +9,12 @@ import { ArrowLeft, Save, User, Mail, Moon, Sun, Laptop, Link2, Check, FileText 
 import { Header } from "@/components/layout/Header";
 import { useUser, useAuth, useFirestore, useDoc, useMemoFirebase } from "@/firebase";
 import { updateProfile } from "firebase/auth";
-import { doc, updateDoc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function ProfilePage() {
   const auth = useAuth();
   const db = useFirestore();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -75,9 +77,9 @@ export default function ProfilePage() {
       await updateProfile(auth.currentUser, { displayName: name });
       const ref = doc(db, "users", user.uid);
       await setDoc(ref, { name, bio, username, updatedAt: new Date() }, { merge: true });
-      toast({ title: "Profile saved", description: "Your changes have been saved." });
+      toast({ title: t.profile.profileSaved, description: t.profile.profileSavedDesc });
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Update failed", description: e.message });
+      toast({ variant: "destructive", title: t.profile.updateFailed, description: e.message });
     } finally {
       setLoading(false);
     }
@@ -101,7 +103,7 @@ export default function ProfilePage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight">Profile & Settings</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t.profile.title}</h1>
         </div>
 
         {/* Profile card summary */}
@@ -110,7 +112,7 @@ export default function ProfilePage() {
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-lg font-bold truncate">{name || "Anonymous"}</p>
+            <p className="text-lg font-bold truncate">{name || t.profile.anonymous}</p>
             <p className="text-sm text-muted-foreground truncate">{user.email}</p>
             {bio && <p className="text-sm opacity-60 mt-1 line-clamp-1">{bio}</p>}
           </div>
@@ -120,17 +122,17 @@ export default function ProfilePage() {
             className={cn("shrink-0 h-9 rounded-lg gap-2 text-xs font-semibold shadow-none border transition-all", copied && "border-green-500 text-green-600")}
           >
             {copied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
-            {copied ? "Copied!" : "Share Profile"}
+            {copied ? t.profile.copied : t.profile.shareProfile}
           </Button>
         </div>
 
         <Tabs defaultValue="identity" className="w-full">
           <TabsList className="bg-muted p-1 h-auto rounded-xl mb-8 flex w-full max-w-md shadow-none">
             <TabsTrigger value="identity" className="flex-1 py-2.5 rounded-lg font-semibold text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
-              <User className="w-3.5 h-3.5 mr-1.5" /> Profile
+              <User className="w-3.5 h-3.5 mr-1.5" /> {t.profile.profileTab}
             </TabsTrigger>
             <TabsTrigger value="preferences" className="flex-1 py-2.5 rounded-lg font-semibold text-xs data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">
-              <Laptop className="w-3.5 h-3.5 mr-1.5" /> Appearance
+              <Laptop className="w-3.5 h-3.5 mr-1.5" /> {t.profile.appearanceTab}
             </TabsTrigger>
           </TabsList>
 
@@ -139,7 +141,7 @@ export default function ProfilePage() {
               <CardContent className="p-8 space-y-8">
                 <form onSubmit={handleUpdate} className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Display Name</label>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.profile.displayName}</label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 opacity-30" />
                       <Input 
@@ -152,28 +154,28 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Username</label>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.profile.username}</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium select-none">@</span>
                       <Input 
                         value={username}
                         onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                        placeholder="yourname"
+                        placeholder={t.profile.usernamePlaceholder}
                         maxLength={30}
                         className="h-12 pl-8 pr-4 rounded-xl border bg-muted/50 focus-visible:ring-1 font-medium shadow-none"
                       />
                     </div>
-                    <p className="text-[11px] text-muted-foreground pl-1">Letters, numbers and underscores only.</p>
+                    <p className="text-[11px] text-muted-foreground pl-1">{t.profile.usernameHint}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bio</label>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.profile.bio}</label>
                     <div className="relative">
                       <FileText className="absolute left-4 top-3.5 h-4 w-4 opacity-30" />
                       <textarea 
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
-                        placeholder="Tell the community about yourself..."
+                        placeholder={t.profile.bioPlaceholder}
                         rows={3}
                         maxLength={200}
                         className="w-full pl-11 pr-4 py-3 rounded-xl border bg-muted/50 font-medium text-sm resize-none outline-none focus:ring-1 focus:ring-ring shadow-none"
@@ -183,7 +185,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email Address</label>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.profile.email}</label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 opacity-30" />
                       <Input 
@@ -199,7 +201,7 @@ export default function ProfilePage() {
                     disabled={loading}
                     className="w-full h-11 text-sm font-semibold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all gap-2 shadow-none"
                   >
-                    {loading ? "Saving..." : "Save Changes"} <Save className="h-4 w-4" />
+                    {loading ? t.profile.saving : t.profile.saveChanges} <Save className="h-4 w-4" />
                   </Button>
                 </form>
               </CardContent>
@@ -209,12 +211,12 @@ export default function ProfilePage() {
           <TabsContent value="preferences" className="mt-0 max-w-2xl">
             <Card className="border rounded-2xl p-8 bg-card space-y-8 shadow-none">
               <div className="space-y-4">
-                <h3 className="text-base font-semibold">Theme</h3>
+                <h3 className="text-base font-semibold">{t.profile.theme}</h3>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { value: 'light', label: 'Light', icon: Sun },
-                    { value: 'dark', label: 'Dark', icon: Moon },
-                    { value: 'system', label: 'System', icon: Laptop },
+                    { value: 'light', label: t.profile.themeLight, icon: Sun },
+                    { value: 'dark', label: t.profile.themeDark, icon: Moon },
+                    { value: 'system', label: t.profile.themeSystem, icon: Laptop },
                   ].map(({ value, label, icon: Icon }) => (
                     <button
                       key={value}

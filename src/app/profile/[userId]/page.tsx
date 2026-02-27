@@ -11,12 +11,15 @@ import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
+import { useTranslation } from "@/contexts/LanguageContext";
+
 export default function PublicProfilePage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
   const router = useRouter();
   const db = useFirestore();
   const { user } = useUser();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const userRef = useMemoFirebase(() => doc(db, "users", userId), [db, userId]);
   const { data: profileUser, isLoading: profileLoading } = useDoc<{ name?: string; bio?: string; username?: string }>(userRef);
@@ -29,7 +32,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
 
   const handleLaunch = async (survey: any) => {
     if (!user) {
-      toast({ title: "Sign in required", description: "Log in to host a session." });
+      toast({ title: t.auth.signIn, description: "Log in to host a session." });
       router.push("/login");
       return;
     }
@@ -54,7 +57,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
       }, { merge: true });
       router.push(`/presenter/${sessionRef.id}`);
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Launch failed", description: error?.message || "Could not start session." });
+      toast({ variant: "destructive", title: t.profile.launchFailed, description: error?.message || "Could not start session." });
     }
   };
 
@@ -64,7 +67,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
     </div>
   );
 
-  const displayName = profileUser?.name || "Anonymous";
+  const displayName = profileUser?.name || t.profile.anonymous;
   const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
@@ -96,7 +99,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Compass className="h-4 w-4 text-primary" />
-            <h2 className="text-base font-semibold">Public Surveys</h2>
+            <h2 className="text-base font-semibold">{t.profile.publicSurveys}</h2>
           </div>
 
           {surveysLoading ? (
@@ -104,7 +107,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
           ) : !surveys || surveys.length === 0 ? (
             <div className="py-20 text-center border border-dashed rounded-xl space-y-2">
               <Lock className="h-6 w-6 mx-auto opacity-20" />
-              <p className="text-sm font-medium opacity-40">No public surveys yet</p>
+              <p className="text-sm font-medium opacity-40">{t.profile.noPublicSurveys}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -125,7 +128,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
                     onClick={() => handleLaunch(survey)}
                     className="w-full h-9 rounded-lg text-xs font-semibold gap-2 shadow-none"
                   >
-                    <Play className="h-3 w-3 fill-current" /> Host Session
+                    <Play className="h-3 w-3 fill-current" /> {t.profile.hostSession}
                   </Button>
                 </article>
               ))}

@@ -11,37 +11,34 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
-    }
-
     function isUnchanged(fieldName) {
       return request.resource.data[fieldName] == resource.data[fieldName];
     }
 
-    // Support Global Discovery (Collection Group)
+    // Support Global Discovery (Collection Group) — public surveys readable by anyone
     match /{path=**}/surveys/{surveyId} {
       allow read: if resource.data.isPublic == true;
     }
 
+    // User profiles — owners can manage, anyone can read for public profile pages
     match /users/{userId} {
-      allow get, list: if isOwner(userId);
+      allow get: if true; // Public: needed for /profile/[userId] page to show name, username, bio
+      allow list: if isOwner(userId);
       allow create: if isSignedIn() && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && isUnchanged('id');
-      allow delete: if isExistingOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
     }
 
     match /users/{userId}/surveys/{surveyId} {
       allow get: if isOwner(userId) || resource.data.isPublic == true;
-      allow list: if isOwner(userId) || resource.data.isPublic == true;
+      allow list: if isOwner(userId);
       allow create: if isOwner(userId) && request.resource.data.userId == userId;
-      allow update: if isExistingOwner(userId) && isUnchanged('userId');
-      allow delete: if isExistingOwner(userId);
+      allow update: if isOwner(userId) && isUnchanged('userId');
+      allow delete: if isOwner(userId);
 
       match /questions/{questionId} {
-        allow get: if true;
-        allow list: if true;
-        allow create, update, delete: if isOwner(userId);
+        allow read: if true;
+        allow write: if isOwner(userId);
       }
     }
 
@@ -49,25 +46,32 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isExistingOwner(resource.data.userId) && isUnchanged('userId');
-      allow delete: if isExistingOwner(resource.data.userId);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
 
-      match /participants/{userId} {
+      match /participants/{participantId} {
         allow get: if true;
         allow list: if true;
-        allow create: if isSignedIn() && request.auth.uid == userId;
-        allow update: if (isSignedIn() && request.auth.uid == userId) || (resource != null && isOwner(get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId));
+        allow create: if isSignedIn() && request.auth.uid == participantId;
+        allow update: if isSignedIn() && (
+          request.auth.uid == participantId ||
+          get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid
+        );
+        allow delete: if false;
       }
 
       match /responses/{responseId} {
-        // Explicitly allow listing if results are public or requester is owner
-        allow list: if (get(/databases/$(database)/documents/sessions/$(sessionId)).data.showResultsToParticipants == true) ||
-                         (isSignedIn() && get(/databases/$(database)/documents/sessions/$(sessionId)).data.userId == request.auth.uid);
-        
-        allow get: if true;
-        allow create: if true; // Let participants vote
+        allow read: if true;     // Results are visible to all — results page relies on this
+        allow create: if true;   // Anonymous and logged-in participants can submit answers
+        allow update, delete: if false;
+      }
+
+      match /reactions/{reactionId} {
+        allow read: if true;     // Presenter subscribes to reactions feed
+        allow create: if isSignedIn(); // Authenticated (incl. anonymous) users can react
         allow update, delete: if false;
       }
     }
   }
 }
+

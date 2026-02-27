@@ -13,17 +13,23 @@ import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/firebase";
 import { cn } from "@/lib/utils";
-
-const CATEGORIES = ['All', 'Quiz', 'Survey'];
+import { useTranslation } from "@/contexts/LanguageContext";
 
 export default function DiscoverPage() {
   const router = useRouter();
   const db = useFirestore();
   const { user } = useUser();
   const { toast } = useToast();
+  const { t, locale } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [category, setCategory] = useState("All");
+  const [category, setCategory] = useState("all");
+
+  const CATEGORIES = [
+    { key: "all", label: t.discover.all },
+    { key: "quiz", label: t.discover.quiz },
+    { key: "survey", label: t.discover.survey },
+  ];
 
   const publicSurveysQuery = useMemoFirebase(() => {
     return query(
@@ -37,7 +43,7 @@ export default function DiscoverPage() {
 
   const handleLaunch = async (survey: any) => {
     if (!user) {
-      toast({ title: "Sign in required", description: "Log in to host a session." });
+      toast({ title: t.auth.signIn, description: "Log in to host a session." });
       router.push("/login");
       return;
     }
@@ -47,7 +53,8 @@ export default function DiscoverPage() {
     
     try {
       const qCol = collection(db, `users/${survey.userId}/surveys/${survey.id}/questions`);
-      const qSnap = await getDocs(query(qCol, orderBy("order", "asc")));
+      // Prefetch questions to validate they exist before launching
+      await getDocs(query(qCol, orderBy("order", "asc")));
 
       setDocumentNonBlocking(sessionRef, {
         id: sessionRef.id,
@@ -66,7 +73,7 @@ export default function DiscoverPage() {
       }, { merge: true });
       router.push(`/presenter/${sessionRef.id}`);
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Launch Failed", description: error?.message || "Could not start session." });
+      toast({ variant: "destructive", title: t.profile.launchFailed, description: error?.message || "Could not start session." });
     } finally {
       setLoading(false);
     }
@@ -74,7 +81,7 @@ export default function DiscoverPage() {
 
   const filtered = surveys?.filter(s => {
     const matchText = s.title?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchCat = category === 'All' || (category === 'Quiz' ? s.isQuiz : !s.isQuiz);
+    const matchCat = category === 'all' || (category === 'quiz' ? s.isQuiz : !s.isQuiz);
     return matchText && matchCat;
   });
 
@@ -87,10 +94,10 @@ export default function DiscoverPage() {
         <div className="space-y-3">
           <div className="flex items-center gap-2.5">
             <Compass className="h-5 w-5 text-primary" />
-            <h1 className="text-3xl font-bold tracking-tight">Discover</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t.discover.title}</h1>
           </div>
           <p className="text-sm text-muted-foreground max-w-lg">
-            Browse and host public surveys and quizzes created by the Quizbase community.
+            {t.discover.subtitle}
           </p>
         </div>
 
@@ -99,7 +106,7 @@ export default function DiscoverPage() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
-              placeholder="Search surveys..."
+              placeholder={t.discover.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-10 pl-10 pr-4 rounded-lg border bg-card focus-visible:ring-1 focus-visible:ring-primary font-medium shadow-none"
@@ -108,16 +115,16 @@ export default function DiscoverPage() {
           <div className="flex items-center gap-2">
             {CATEGORIES.map(cat => (
               <button
-                key={cat}
-                onClick={() => setCategory(cat)}
+                key={cat.key}
+                onClick={() => setCategory(cat.key)}
                 className={cn(
                   "h-10 px-4 rounded-lg text-xs font-semibold border transition-all shadow-none",
-                  category === cat
+                  category === cat.key
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-card border-foreground/10 text-foreground/60 hover:border-foreground/30"
                 )}
               >
-                {cat}
+                {cat.label}
               </button>
             ))}
           </div>
@@ -129,7 +136,7 @@ export default function DiscoverPage() {
         ) : !filtered || filtered.length === 0 ? (
           <div className="py-32 text-center border border-dashed rounded-xl bg-card/50 space-y-3">
             <Sparkles className="h-8 w-8 mx-auto opacity-10" />
-            <p className="text-sm font-medium opacity-40">No surveys found</p>
+            <p className="text-sm font-medium opacity-40">{t.discover.noResults}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -146,7 +153,7 @@ export default function DiscoverPage() {
                     "text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded-full",
                     survey.isQuiz ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
                   )}>
-                    {survey.isQuiz ? "Quiz" : "Survey"}
+                    {survey.isQuiz ? t.discover.quiz : t.discover.survey}
                   </span>
                 </div>
                 
@@ -157,12 +164,12 @@ export default function DiscoverPage() {
                   <div className="flex flex-col gap-1 text-[11px] text-muted-foreground">
                     <div className="flex items-center gap-1.5">
                       <User className="h-3 w-3 shrink-0" />
-                      <span className="truncate">Community Host</span>
+                      <span className="truncate">{t.discover.communityHost}</span>
                     </div>
                     {survey.createdAt?.seconds && (
                       <div className="flex items-center gap-1.5">
                         <Calendar className="h-3 w-3 shrink-0" />
-                        <span>{new Date(survey.createdAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        <span>{new Date(survey.createdAt.seconds * 1000).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                       </div>
                     )}
                   </div>
@@ -173,7 +180,7 @@ export default function DiscoverPage() {
                   disabled={loading}
                   className="w-full h-9 rounded-lg font-semibold text-xs gap-2 shadow-none"
                 >
-                  <Play className="h-3.5 w-3.5 fill-current" /> Host Session
+                  <Play className="h-3.5 w-3.5 fill-current" /> {t.discover.hostSession}
                 </Button>
               </article>
             ))}

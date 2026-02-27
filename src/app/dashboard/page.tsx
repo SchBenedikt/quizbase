@@ -13,12 +13,14 @@ import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const { toast } = useToast();
+  const { t, locale } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mounted, setMounted] = useState(false);
@@ -105,15 +107,15 @@ export default function DashboardPage() {
       <main className="flex-1 studio-container py-28 space-y-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold tracking-tight">Library</h1>
-            <p className="text-base opacity-70">Manage your surveys and presentations.</p>
+            <h1 className="text-4xl font-bold tracking-tight">{t.dashboard.title}</h1>
+            <p className="text-base opacity-70">{t.dashboard.subtitle}</p>
           </div>
           
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-30" />
               <Input 
-                placeholder="Search surveys..."
+                placeholder={t.dashboard.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-10 pl-9 pr-4 rounded-lg border bg-card focus-visible:ring-1 focus-visible:ring-primary font-medium text-base w-full shadow-none"
@@ -123,7 +125,7 @@ export default function DashboardPage() {
               onClick={handleCreateNew}
               className="h-10 px-5 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all uppercase tracking-wider shrink-0 w-full sm:w-auto shadow-none"
             >
-              <Plus className="mr-2 h-4 w-4" /> New Survey
+              <Plus className="mr-2 h-4 w-4" /> {t.dashboard.newSurvey}
             </Button>
           </div>
         </div>
@@ -133,7 +135,7 @@ export default function DashboardPage() {
         ) : !filteredSurveys || filteredSurveys.length === 0 ? (
           <div className="py-32 text-center border border-dashed rounded-xl bg-card/50 space-y-3 border-foreground/10 shadow-none">
              <Sparkles className="h-8 w-8 mx-auto opacity-10" />
-             <p className="text-sm font-medium opacity-60 uppercase tracking-widest">No surveys found</p>
+             <p className="text-sm font-medium opacity-60 uppercase tracking-widest">{t.dashboard.noSurveys}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -149,7 +151,7 @@ export default function DashboardPage() {
                        size="icon" 
                        onClick={() => togglePublic(survey.id, !!survey.isPublic)}
                        className={cn("h-7 w-7 rounded-md transition-colors shadow-none", survey.isPublic ? "text-primary" : "text-muted-foreground")}
-                       title={survey.isPublic ? "Public" : "Private"}
+                       title={survey.isPublic ? t.dashboard.public : t.dashboard.private}
                      >
                        {survey.isPublic ? <Compass className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
                      </Button>
@@ -172,7 +174,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-3 w-3" />
                     <time className="text-xs font-medium uppercase tracking-wider">
-                      {mounted && survey.createdAt ? new Date(survey.createdAt.seconds * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Draft"}
+                      {mounted && survey.createdAt ? new Date(survey.createdAt.seconds * 1000).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Draft"}
                     </time>
                   </div>
                 </div>
@@ -184,7 +186,7 @@ export default function DashboardPage() {
                      disabled={loading}
                      className="flex-1 h-9 rounded-lg font-semibold text-sm shadow-none"
                    >
-                     <Play className="mr-1.5 h-3 w-3 fill-current" /> Launch
+                     <Play className="mr-1.5 h-3 w-3 fill-current" /> {t.dashboard.launch}
                    </Button>
                    <Button 
                      variant="outline" 

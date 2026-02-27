@@ -10,6 +10,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Compass } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useTranslation, type Locale } from "@/contexts/LanguageContext";
 
 interface HeaderProps {
   className?: string;
@@ -23,6 +24,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
   const pathname = usePathname();
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { t, locale, setLocale } = useTranslation();
 
   useEffect(() => {
     setMounted(true);
@@ -35,6 +37,10 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  };
+
+  const toggleLocale = () => {
+    setLocale(locale === 'en' ? 'de' : 'en');
   };
 
   return (
@@ -69,7 +75,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                 )}
               >
                 <Link href="/discover">
-                  <Compass className="h-3 w-3 mr-1.5" /> Discover
+                  <Compass className="h-3 w-3 mr-1.5" /> {t.nav.discover}
                 </Link>
               </Button>
 
@@ -84,7 +90,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                     )}
                   >
                     <Link href="/dashboard">
-                      <LayoutDashboard className="h-3 w-3 mr-1.5" /> Dashboard
+                      <LayoutDashboard className="h-3 w-3 mr-1.5" /> {t.nav.dashboard}
                     </Link>
                   </Button>
                   <Button 
@@ -96,7 +102,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                     )}
                   >
                     <Link href="/profile">
-                      <Settings className="h-3 w-3 mr-1.5" /> Settings
+                      <Settings className="h-3 w-3 mr-1.5" /> {t.nav.settings}
                     </Link>
                   </Button>
                   <Button 
@@ -104,35 +110,53 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                     variant="ghost" 
                     className="rounded-md px-3 font-semibold text-xs h-8 transition-all hover:bg-foreground/10"
                   >
-                    <LogOut className="h-3 w-3 mr-1.5" /> Logout
+                    <LogOut className="h-3 w-3 mr-1.5" /> {t.nav.logout}
                   </Button>
                 </>
               ) : (
                 <div className="flex items-center gap-1.5">
                   <Button variant="ghost" asChild className="rounded-lg px-4 h-9 font-semibold text-xs hover:bg-foreground/5 shadow-none">
-                    <Link href="/login">Login</Link>
+                    <Link href="/login">{t.nav.login}</Link>
                   </Button>
                   <Button asChild className="hidden sm:inline-flex rounded-lg px-5 h-9 font-semibold text-xs bg-foreground text-background border border-foreground hover:bg-transparent hover:text-foreground transition-all shadow-none">
-                    <Link href="/login?signup=true">Sign Up</Link>
+                    <Link href="/login?signup=true">{t.nav.signUp}</Link>
                   </Button>
                 </div>
               )}
             </div>
 
-            {mounted && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={toggleTheme}
-                className="rounded-lg h-9 w-9 border border-foreground/10 hover:bg-foreground/5 transition-all shadow-none"
-                aria-label="Toggle theme"
-              >
-                {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-              </Button>
-            )}
+            <div className="flex items-center gap-1.5">
+              {/* Language toggle */}
+              {mounted && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleLocale}
+                  className="rounded-lg h-9 w-9 border border-foreground/10 hover:bg-foreground/5 transition-all shadow-none text-xs font-bold"
+                  aria-label="Toggle language"
+                  title={locale === 'en' ? 'Deutsch' : 'English'}
+                >
+                  {locale === 'en' ? 'DE' : 'EN'}
+                </Button>
+              )}
+
+              {/* Theme toggle */}
+              {mounted && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={toggleTheme}
+                  className="rounded-lg h-9 w-9 border border-foreground/10 hover:bg-foreground/5 transition-all shadow-none"
+                  aria-label="Toggle theme"
+                >
+                  {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </Button>
+              )}
+            </div>
           </div>
         </nav>
       </div>
     </header>
   );
 }
+
