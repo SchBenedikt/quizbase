@@ -13,6 +13,9 @@ import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import { useAuth } from "@/firebase/provider";
 
+const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '🔥', '🎉'];
+const REACTION_COOLDOWN_MS = 1000;
+
 export default function ParticipantView({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
   const db = useFirestore();
@@ -49,9 +52,22 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   const [isSettingNickname, setIsSettingNickname] = useState(true);
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
   const [pointsEarned, setPointsEarned] = useState<number>(0);
+  const [reactionCooldown, setReactionCooldown] = useState(false);
   
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleReaction = (emoji: string) => {
+    if (!session?.id || reactionCooldown) return;
+    setReactionCooldown(true);
+    const reactionsCol = collection(db, `sessions/${session.id}/reactions`);
+    addDocumentNonBlocking(reactionsCol, {
+      emoji,
+      userId: user?.uid || 'anon',
+      createdAt: serverTimestamp(),
+    });
+    setTimeout(() => setReactionCooldown(false), REACTION_COOLDOWN_MS);
+  };
 
   useEffect(() => {
     if (!isUserLoading && !user && auth) {
@@ -346,6 +362,23 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
           <p className="text-sm font-medium opacity-30">Waiting for next question...</p>
         </div>
+        {/* Live Reactions bar */}
+        <div className="shrink-0 px-5 py-3 border-t flex items-center justify-between" style={{ borderColor: finalFg + '18' }}>
+          <p className="text-[10px] font-semibold uppercase tracking-widest opacity-30">React</p>
+          <div className="flex gap-2">
+            {REACTION_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                onClick={() => handleReaction(emoji)}
+                disabled={reactionCooldown}
+                className="text-2xl transition-all active:scale-75 hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label={`Send ${emoji} reaction`}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -592,6 +625,24 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             {loading ? <Loader2 className="animate-spin h-5 w-5 mx-auto" /> : "Submit"}
           </button>
         </main>
+
+        {/* Live Reactions bar */}
+        <div className="shrink-0 px-5 py-3 border-t flex items-center justify-between" style={{ borderColor: finalFg + '18' }}>
+          <p className="text-[10px] font-semibold uppercase tracking-widest opacity-30">React</p>
+          <div className="flex gap-2">
+            {REACTION_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                onClick={() => handleReaction(emoji)}
+                disabled={reactionCooldown}
+                className="text-2xl transition-all active:scale-75 hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label={`Send ${emoji} reaction`}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ import {
 import { ResultChart } from "@/components/poll/ResultChart";
 import { PollQuestion, PollSession, PollParticipant } from "@/app/types/poll";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
-import { doc, collection, query, orderBy } from "firebase/firestore";
+import { doc, collection, query, orderBy, limit } from "firebase/firestore";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
@@ -57,6 +57,33 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   }, [db, resolvedParams.sessionId]);
   
   const { data: participants } = useCollection<PollParticipant>(participantsQuery);
+
+  const reactionsQuery = useMemoFirebase(() => {
+    if (!resolvedParams.sessionId) return null;
+    return query(
+      collection(db, `sessions/${resolvedParams.sessionId}/reactions`),
+      orderBy("createdAt", "desc"),
+      limit(30)
+    );
+  }, [db, resolvedParams.sessionId]);
+  const { data: rawReactions } = useCollection<{ emoji: string; createdAt: any }>(reactionsQuery);
+
+  // Convert incoming reactions into animated floating items
+  type FloatingReaction = { id: string; emoji: string; x: number };
+  const [floatingReactions, setFloatingReactions] = useState<FloatingReaction[]>([]);
+  const seenReactionIds = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!rawReactions) return;
+    rawReactions.forEach((r: any) => {
+      if (!seenReactionIds.current.has(r.id)) {
+        seenReactionIds.current.add(r.id);
+        const item: FloatingReaction = { id: r.id, emoji: r.emoji, x: 10 + Math.random() * 80 };
+        setFloatingReactions(prev => [...prev, item]);
+        setTimeout(() => setFloatingReactions(prev => prev.filter(f => f.id !== r.id)), 3500);
+      }
+    });
+  }, [rawReactions]);
 
   const [results, setResults] = useState<Record<string, number>>({});
   const [isQRVisible, setIsQRVisible] = useState(false);
@@ -203,6 +230,16 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       </header>
 
       <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center relative overflow-hidden">
+        {/* Floating emoji reactions */}
+        {floatingReactions.map((r) => (
+          <span
+            key={r.id}
+            className="pointer-events-none absolute text-5xl select-none z-50 animate-float-up"
+            style={{ left: `${r.x}%`, bottom: '10%' }}
+          >
+            {r.emoji}
+          </span>
+        ))}
         {session?.currentQuestionId === 'lobby' ? (
           <div className="w-full max-w-5xl flex flex-col items-center justify-center space-y-12 animate-in zoom-in duration-700">
              <div className="grid lg:grid-cols-2 gap-16 items-center w-full">

@@ -174,6 +174,36 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Why Quizbase — unique features */}
+        <section className="py-24 bg-[#ff9312] text-[#4c2f05]">
+          <div className="studio-container px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-[0.9] mb-4">
+                Why Quizbase?
+              </h2>
+              <p className="text-base font-semibold opacity-60 max-w-xl mx-auto">
+                Everything Mentimeter and Kahoot offer — plus unique features you won't find anywhere else.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { emoji: '👍', title: 'Live Emoji Reactions', desc: 'Audience sends emoji reactions in real time — they float up on the presenter screen for instant crowd energy.' },
+                { emoji: '🏆', title: 'Quiz & Survey Modes', desc: 'Switch between scored quiz mode (with streak bonuses and leaderboard) and anonymous survey mode per session.' },
+                { emoji: '🗂️', title: '9 Question Types', desc: 'Multiple choice, True/False, ranking, word cloud, star rating, slider, scale, open text, and number guess.' },
+                { emoji: '⚡', title: 'Zero Barriers', desc: 'Participants join with a 6-digit code — no app download, no account, no friction.' },
+                { emoji: '🎨', title: 'Live Theming', desc: 'Pick a theme color per session. The presenter and participant views update in real time.' },
+                { emoji: '🆓', title: 'Free & Open Source', desc: 'No paywalls. No participant limits. No slideshow taxes. Just pure live interaction.' },
+              ].map((feat, i) => (
+                <div key={i} className="bg-[#4c2f05]/8 border border-[#4c2f05]/15 rounded-2xl p-7 space-y-3 hover:bg-[#4c2f05]/12 transition-colors">
+                  <span className="text-4xl">{feat.emoji}</span>
+                  <h3 className="text-lg font-bold tracking-tight">{feat.title}</h3>
+                  <p className="text-sm font-medium opacity-60 leading-relaxed">{feat.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="py-32 text-center bg-[#ff9312] text-[#4c2f05] border-t-2 border-[#4c2f05]/20">
           <div className="studio-container space-y-12 px-4">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-[0.85]">

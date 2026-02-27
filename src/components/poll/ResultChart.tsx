@@ -62,7 +62,7 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
                   return (
                     <div className="bg-foreground p-6 rounded-[1rem] border-2 border-background shadow-none">
                       <p className="font-black text-background text-3xl leading-none">
-                        {payload[0].value.toFixed(1)}
+                        {Number(payload[0]?.value ?? 0).toFixed(1)}
                         <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 ml-3 block mt-1.5">
                           {question.type === 'multiple-choice' ? 'Total Responses' : 'Average Priority'}
                         </span>
