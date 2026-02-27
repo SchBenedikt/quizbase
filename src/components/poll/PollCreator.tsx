@@ -19,9 +19,10 @@ interface PollCreatorProps {
   onSave?: (questions: PollQuestion[]) => void;
   onChange?: (questions: PollQuestion[]) => void;
   initialQuestions?: PollQuestion[];
+  isQuiz?: boolean;
 }
 
-export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProps) {
+export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }: PollCreatorProps) {
   const [questions, setQuestions] = useState<PollQuestion[]>(initialQuestions.length > 0 ? initialQuestions : [
     {
       id: Math.random().toString(36).substr(2, 9),
@@ -219,16 +220,16 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                             </div>
                           </div>
 
-                          {(q.type === 'multiple-choice' || q.type === 'ranking') && q.options && (
+                              {(q.type === 'multiple-choice' || q.type === 'ranking') && q.options && (
                             <div className="space-y-5">
                               <div className="flex items-center justify-between">
                                 <Label className="text-base font-medium">Answer options</Label>
-                                {q.type === 'multiple-choice' && <span className="text-sm font-medium text-primary">Select correct answer</span>}
+                                {q.type === 'multiple-choice' && isQuiz && <span className="text-sm font-medium text-primary">Select correct answer</span>}
                               </div>
                               <div className="grid sm:grid-cols-2 gap-4">
                                 {q.options.map((opt, oIdx) => (
                                   <div key={oIdx} className="flex gap-3 group/opt">
-                                    {q.type === 'multiple-choice' && (
+                                    {q.type === 'multiple-choice' && isQuiz && (
                                       <Button 
                                         variant="ghost" 
                                         size="icon"
@@ -315,19 +316,21 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                            <div className="space-y-5 pt-5 border-t border-foreground/5">
                               <Label className="text-base font-medium">Parameters</Label>
                               
-                              <div className="flex items-center justify-between p-5 rounded-lg border border-foreground/10 bg-muted/20">
-                                 <div className="flex items-center gap-4">
-                                    <Zap className={cn("h-5 w-5 transition-colors", q.isDoublePoints ? "text-yellow-500 fill-current" : "opacity-30")} />
-                                    <div className="flex flex-col">
-                                       <span className="text-base font-medium leading-none">Double points</span>
-                                       <span className="text-sm opacity-50 mt-1">High stakes</span>
-                                    </div>
-                                 </div>
-                                 <Switch 
-                                    checked={q.isDoublePoints} 
-                                    onCheckedChange={(val) => updateQuestion(q.id, { isDoublePoints: val })} 
-                                 />
-                              </div>
+                              {isQuiz && (
+                                <div className="flex items-center justify-between p-5 rounded-lg border border-foreground/10 bg-muted/20">
+                                   <div className="flex items-center gap-4">
+                                      <Zap className={cn("h-5 w-5 transition-colors", q.isDoublePoints ? "text-yellow-500 fill-current" : "opacity-30")} />
+                                      <div className="flex flex-col">
+                                         <span className="text-base font-medium leading-none">Double points</span>
+                                         <span className="text-sm opacity-50 mt-1">High stakes</span>
+                                      </div>
+                                   </div>
+                                   <Switch 
+                                      checked={q.isDoublePoints} 
+                                      onCheckedChange={(val) => updateQuestion(q.id, { isDoublePoints: val })} 
+                                   />
+                                </div>
+                              )}
 
                               <div className="space-y-3">
                                  <div className="flex items-center justify-between">

@@ -85,7 +85,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             setSelection(null);
             setTextValue("");
             setRatingValue(0);
-            setSliderValue(qData.range?.min || 50);
+            setSliderValue(qData.range?.min ?? 0);
             setLastCorrect(null);
             setPointsEarned(0);
             
@@ -120,6 +120,16 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     };
   }, [session?.currentQuestionId, session?.userId, session?.pollId, db]);
 
+  const isAnswerMissing = (): boolean => {
+    if (!currentQuestion) return true;
+    const type = currentQuestion.type;
+    if (type === 'multiple-choice') return selection === null;
+    if (type === 'word-cloud' || type === 'open-text' || type === 'guess-number') return !textValue.trim();
+    if (type === 'rating') return ratingValue === 0;
+    // slider and scale always have a value
+    return false;
+  };
+
   const handleSubmit = async () => {
     if (!currentQuestion || !session || voted || (timeLeft === 0 && currentQuestion.timeLimit)) return;
     setLoading(true);
@@ -148,7 +158,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
       createdAt: serverTimestamp(),
     });
 
-    if (participantRef) {
+    // Only calculate and update score in quiz mode
+    if (session.isQuiz && participantRef) {
       if (isCorrect) {
         const baseScore = 500;
         const timeBonus = (currentQuestion.timeLimit && timeLeft) ? Math.round((timeLeft / currentQuestion.timeLimit) * 500) : 0;
@@ -185,14 +196,14 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (sessionLoading || isUserLoading) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <Loader2 className="h-10 w-10 animate-spin text-foreground" />
+      <Loader2 className="h-8 w-8 animate-spin text-foreground opacity-30" />
     </div>
   );
 
   if (!session) return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background">
-      <h1 className="text-3xl font-black uppercase tracking-tighter opacity-30">Session Not Found</h1>
-      <Button onClick={() => window.location.href = '/join'} className="mt-12 h-16 px-12 rounded-[1.5rem] bg-foreground text-background font-black">Return</Button>
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background space-y-6">
+      <h1 className="text-2xl font-bold opacity-30">Session not found</h1>
+      <Button onClick={() => window.location.href = '/join'} className="h-12 px-8 rounded-lg">Back to Join</Button>
     </div>
   );
 
@@ -209,55 +220,78 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   const finalFg = getContrastColor(finalBg);
   const dynamicStyles = { backgroundColor: finalBg, color: finalFg, borderColor: finalFg + '33' };
+  const isQuizMode = !!session.isQuiz;
 
   if (participantData?.status === 'kicked') return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background space-y-8">
-      <ShieldAlert className="h-12 w-12 text-destructive" />
-      <h1 className="text-5xl font-black uppercase">Disconnected</h1>
-      <Button onClick={() => window.location.href = '/join'} className="h-14 rounded-[1rem] font-black uppercase px-10">Lobby</Button>
+    <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center bg-background space-y-6">
+      <ShieldAlert className="h-10 w-10 text-destructive" />
+      <h1 className="text-2xl font-bold">Disconnected</h1>
+      <Button onClick={() => window.location.href = '/join'} className="h-11 rounded-lg font-medium px-8">Back to Join</Button>
     </div>
   );
 
   if (isSettingNickname) return (
-    <div className="min-h-screen flex flex-col p-8 transition-colors duration-700 font-body" style={dynamicStyles}>
-      <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center space-y-12">
-         <header className="text-center space-y-6">
-           <div className="w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto border-4" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-              <User className="h-12 w-12" />
+    <div className="min-h-screen flex flex-col p-6 transition-colors duration-700 font-body" style={dynamicStyles}>
+      <div className="max-w-sm mx-auto w-full flex-1 flex flex-col items-center justify-center space-y-8">
+         <header className="text-center space-y-4">
+           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+              <User className="h-8 w-8" />
            </div>
-           <h1 className="text-6xl font-black uppercase tracking-tighter">Identity.</h1>
+           <h1 className="text-3xl font-bold">Choose a nickname</h1>
          </header>
-         <div className="w-full space-y-6">
-           <Input value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="YOUR NICKNAME..." maxLength={20} className="h-28 text-5xl font-black text-center rounded-[2rem] border-4 bg-black/10 focus-visible:ring-0 placeholder:opacity-10 uppercase tracking-tighter" style={{ borderColor: finalFg, color: finalFg }} />
-           <Button onClick={() => setIsSettingNickname(false)} className="w-full h-28 text-3xl font-black rounded-[2rem] border-4 uppercase tracking-tighter transition-all" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>Enter Studio <Zap className="ml-4 h-8 w-8 fill-current" /></Button>
+         <div className="w-full space-y-4">
+           <Input 
+             value={nickname} 
+             onChange={(e) => setNickname(e.target.value)} 
+             onKeyDown={(e) => e.key === 'Enter' && setIsSettingNickname(false)}
+             placeholder="Your nickname..." 
+             maxLength={20} 
+             className="h-14 text-xl font-medium text-center rounded-xl border-2 bg-black/10 focus-visible:ring-0 placeholder:opacity-30" 
+             style={{ borderColor: finalFg + '44', color: finalFg }} 
+           />
+           <Button 
+             onClick={() => setIsSettingNickname(false)} 
+             className="w-full h-14 text-base font-semibold rounded-xl border-2 transition-all" 
+             style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
+           >
+             Enter <Zap className="ml-2 h-4 w-4 fill-current" />
+           </Button>
          </div>
       </div>
     </div>
   );
 
   if (session.currentQuestionId === 'podium') return (
-    <div className="min-h-screen flex flex-col p-8 transition-colors duration-700 font-body items-center justify-center" style={dynamicStyles}>
-      <div className="space-y-8 text-center">
-        <Trophy className="h-24 w-24 mx-auto animate-bounce text-yellow-500" />
-        <h1 className="text-7xl font-black uppercase tracking-tighter">Pulse Finished!</h1>
-        <div className="bg-black/10 p-12 rounded-[3rem] border-4" style={{ borderColor: finalFg + '33' }}>
-           <p className="text-xs font-black uppercase tracking-[0.5em] mb-4 opacity-40">Your Final Signal</p>
-           <p className="text-8xl font-black tabular-nums">{participantData?.score || 0}</p>
-        </div>
-        <Button onClick={() => window.location.href = '/join'} className="h-20 px-12 rounded-[1.5rem] font-black uppercase tracking-widest text-xl" style={{ backgroundColor: finalFg, color: finalBg }}>New Signal</Button>
+    <div className="min-h-screen flex flex-col p-6 transition-colors duration-700 font-body items-center justify-center" style={dynamicStyles}>
+      <div className="space-y-6 text-center max-w-sm w-full">
+        <Trophy className="h-16 w-16 mx-auto animate-bounce text-yellow-500" />
+        <h1 className="text-4xl font-bold">Session finished!</h1>
+        {isQuizMode && (
+          <div className="bg-black/10 px-8 py-6 rounded-2xl" style={{ borderColor: finalFg + '33' }}>
+             <p className="text-xs font-semibold uppercase tracking-widest mb-2 opacity-40">Your score</p>
+             <p className="text-5xl font-black tabular-nums">{participantData?.score || 0}</p>
+          </div>
+        )}
+        <Button 
+          onClick={() => window.location.href = '/join'} 
+          className="h-12 px-10 rounded-xl font-semibold" 
+          style={{ backgroundColor: finalFg, color: finalBg }}
+        >
+          Join another session
+        </Button>
       </div>
     </div>
   );
 
   if (session.currentQuestionId === 'lobby') return (
-    <div className="min-h-screen flex flex-col p-8 transition-colors duration-700 font-body items-center justify-center" style={dynamicStyles}>
-      <div className="space-y-8 text-center">
-        <div className="w-24 h-24 rounded-[2rem] border-4 flex items-center justify-center mx-auto animate-pulse" style={{ borderColor: finalFg }}>
-          <Zap className="h-12 w-12 fill-current" />
+    <div className="min-h-screen flex flex-col p-6 transition-colors duration-700 font-body items-center justify-center" style={dynamicStyles}>
+      <div className="space-y-6 text-center max-w-sm w-full">
+        <div className="w-16 h-16 rounded-2xl border-2 flex items-center justify-center mx-auto animate-pulse" style={{ borderColor: finalFg }}>
+          <Zap className="h-8 w-8 fill-current" />
         </div>
-        <h1 className="text-5xl font-black uppercase tracking-tighter">You're in!</h1>
-        <p className="text-2xl font-bold opacity-60 uppercase tracking-widest">Waiting for the Host to start...</p>
-        <div className="mt-12 bg-black/10 px-8 py-4 rounded-full font-black text-xl uppercase tracking-widest">
+        <h1 className="text-3xl font-bold">You're in!</h1>
+        <p className="text-base font-medium opacity-50">Waiting for the host to start...</p>
+        <div className="mt-4 bg-black/10 px-6 py-3 rounded-full font-semibold text-base">
           {nickname || "Anonymous"}
         </div>
       </div>
@@ -265,43 +299,48 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   );
 
   if (voted || (timeLeft === 0 && currentQuestion?.timeLimit)) {
-    const isQuiz = currentQuestion?.type === 'multiple-choice' && currentQuestion.correctOptionIndices && currentQuestion.correctOptionIndices.length > 0;
+    const hasCorrectAnswers = currentQuestion?.type === 'multiple-choice' && 
+      currentQuestion.correctOptionIndices && 
+      currentQuestion.correctOptionIndices.length > 0;
+    const showQuizResult = isQuizMode && hasCorrectAnswers;
     
     return (
-      <div className="min-h-screen flex flex-col p-8 transition-colors duration-700" style={dynamicStyles}>
-        <div className="max-w-lg mx-auto w-full flex-1 flex flex-col items-center justify-center text-center space-y-12">
+      <div className="min-h-screen flex flex-col p-6 transition-colors duration-700" style={dynamicStyles}>
+        <div className="max-w-sm mx-auto w-full flex-1 flex flex-col items-center justify-center text-center space-y-8">
           {timeLeft === 0 && !voted ? (
-            <div className="space-y-6">
-               <div className="w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-4 bg-amber-500 border-amber-600"><Clock className="h-12 w-12 text-white" /></div>
-               <h1 className="text-5xl font-black uppercase tracking-tighter">Time's Up!</h1>
-               <p className="text-xl font-bold uppercase tracking-widest opacity-40">Your signal was not transmitted in time.</p>
+            <div className="space-y-4">
+               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto bg-amber-500 border-2 border-amber-600"><Clock className="h-8 w-8 text-white" /></div>
+               <h1 className="text-3xl font-bold">Time's up!</h1>
+               <p className="text-base font-medium opacity-40">Your answer was not submitted in time.</p>
             </div>
-          ) : isQuiz ? (
-            <div className="space-y-6">
-              <div className={cn("w-24 h-24 rounded-[1.5rem] flex items-center justify-center mx-auto border-4", lastCorrect ? "bg-green-500 border-green-600" : "bg-red-500 border-red-600")}>
-                {lastCorrect ? <CheckCircle2 className="h-12 w-12 text-white" /> : <XCircle className="h-12 w-12 text-white" />}
+          ) : showQuizResult ? (
+            <div className="space-y-4">
+              <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border-2", lastCorrect ? "bg-green-500 border-green-600" : "bg-red-500 border-red-600")}>
+                {lastCorrect ? <CheckCircle2 className="h-8 w-8 text-white" /> : <XCircle className="h-8 w-8 text-white" />}
               </div>
-              <h1 className="text-5xl font-black uppercase tracking-tighter">{lastCorrect ? "Correct!" : "Nice Try!"}</h1>
+              <h1 className="text-3xl font-bold">{lastCorrect ? "Correct!" : "Not quite!"}</h1>
               {lastCorrect && (
-                <div className="bg-black/10 px-8 py-4 rounded-[1rem] flex flex-col items-center gap-2">
-                   <div className="flex items-center gap-4">
-                     <Trophy className="h-6 w-6 text-yellow-500" />
-                     <span className="text-4xl font-black tabular-nums">+{pointsEarned}</span>
+                <div className="bg-black/10 px-6 py-4 rounded-xl flex flex-col items-center gap-1">
+                   <div className="flex items-center gap-3">
+                     <Trophy className="h-5 w-5 text-yellow-500" />
+                     <span className="text-2xl font-bold tabular-nums">+{pointsEarned}</span>
                    </div>
-                   {participantData?.streak! > 1 && (
-                     <span className="text-xs font-black uppercase text-primary animate-pulse">🔥 {participantData?.streak} Streak Bonus!</span>
+                   {(participantData?.streak ?? 0) > 1 && (
+                     <span className="text-xs font-medium opacity-60">🔥 {participantData?.streak} streak bonus</span>
                    )}
                 </div>
               )}
             </div>
           ) : (
-            <div className="p-14 rounded-[1.5rem] animate-float" style={{ backgroundColor: finalFg, color: finalBg }}><Heart className="h-20 w-20 fill-current" /></div>
+            <div className="space-y-4">
+              <div className="p-10 rounded-2xl" style={{ backgroundColor: finalFg, color: finalBg }}>
+                <Heart className="h-12 w-12 fill-current" />
+              </div>
+              <h1 className="text-2xl font-bold">Response sent!</h1>
+            </div>
           )}
 
-          <div className="w-full mt-12 text-center opacity-40">
-             <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-2">Syncing with stage...</p>
-             <p className="text-xl font-bold uppercase tracking-widest">Stand by for next question</p>
-          </div>
+          <p className="text-sm font-medium opacity-30">Waiting for next question...</p>
         </div>
       </div>
     );
@@ -309,64 +348,181 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   if (!currentQuestion) return (
     <div className="min-h-screen flex items-center justify-center p-8 text-center" style={dynamicStyles}>
-      <p className="text-3xl font-black uppercase opacity-30 tracking-widest">Connecting to Pulse...</p>
+      <p className="text-lg font-medium opacity-30">Connecting...</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen flex flex-col p-8 font-body transition-colors duration-700" style={dynamicStyles}>
+    <div className="min-h-screen flex flex-col p-6 font-body transition-colors duration-700" style={dynamicStyles}>
       <div className="max-w-lg mx-auto w-full flex-1 flex flex-col">
-        <div className="flex items-center justify-between mb-16">
-          <div className="flex items-center gap-3">
-            <Zap className="h-8 w-8 fill-current" />
-            <span className="font-black text-2xl tracking-tighter uppercase">Quizbase</span>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-2">
+            <Zap className="h-5 w-5 fill-current" />
+            <span className="font-bold text-sm">Quizbase</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-[1rem] bg-black/10">
-                <Trophy className="h-4 w-4 text-yellow-500" />
-                <span className="font-black tabular-nums">{participantData?.score || 0}</span>
-              </div>
-              {participantData?.streak! > 0 && (
-                <span className="text-[9px] font-black uppercase text-primary mt-1">🔥 Streak: {participantData?.streak}</span>
+          {isQuizMode && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/10">
+              <Trophy className="h-4 w-4 text-yellow-500" />
+              <span className="font-bold tabular-nums text-sm">{participantData?.score || 0}</span>
+              {(participantData?.streak ?? 0) > 0 && (
+                <span className="text-xs">🔥 {participantData?.streak}</span>
               )}
             </div>
-          </div>
+          )}
         </div>
 
-        <main className="space-y-12 flex-1">
-          <div className="space-y-6">
-            <div className="flex items-start justify-between gap-6">
-              <div className="flex-1 space-y-4">
-                {currentQuestion.isDoublePoints && (
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-400 text-yellow-900 text-[10px] font-black uppercase tracking-widest animate-pulse">
-                    <Zap className="h-3 w-3 fill-current" /> 2X Double Points
+        <main className="space-y-6 flex-1">
+          {/* Question */}
+          <div className="space-y-3">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 space-y-2">
+                {isQuizMode && currentQuestion.isDoublePoints && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400 text-yellow-900 text-xs font-bold uppercase tracking-wider animate-pulse">
+                    <Zap className="h-3 w-3 fill-current" /> 2× Points
                   </div>
                 )}
-                <h2 className="text-5xl md:text-6xl font-black leading-[0.9] tracking-tighter uppercase">{currentQuestion.question}</h2>
+                <h2 className="text-2xl md:text-3xl font-bold leading-tight">{currentQuestion.question}</h2>
               </div>
               {timeLeft !== null && (
-                <div className="flex items-center gap-3 px-6 py-4 rounded-[1.5rem] border-4 shrink-0 animate-in zoom-in duration-500" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-                  <Timer className="h-6 w-6" />
-                  <span className="text-3xl font-black tabular-nums">{timeLeft}</span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl border-2 shrink-0" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                  <Timer className="h-4 w-4" />
+                  <span className="text-lg font-bold tabular-nums">{timeLeft}</span>
                 </div>
               )}
             </div>
           </div>
-          
+
+          {/* Multiple choice */}
           {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
-            <div className="grid gap-4">
+            <div className="grid gap-3">
               {currentQuestion.options.map((opt, idx) => (
-                <Button key={idx} variant="outline" className={cn("h-24 text-xl font-black rounded-[1.5rem] border-2 transition-all active:scale-95 text-left justify-start px-8", selection === idx ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10")} style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }} onClick={() => setSelection(idx)}>
-                  <div className="w-12 h-12 rounded-[1rem] flex items-center justify-center mr-6 shrink-0 transition-colors border-2 text-lg font-black" style={{ backgroundColor: selection === idx ? finalBg : finalFg, color: selection === idx ? finalFg : finalBg, borderColor: selection === idx ? finalBg : finalFg }}>{String.fromCharCode(65 + idx)}</div>
-                  <span className="truncate uppercase">{opt}</span>
-                </Button>
+                <button
+                  key={idx}
+                  onClick={() => setSelection(idx)}
+                  className={cn(
+                    "w-full h-14 rounded-xl border-2 flex items-center px-4 gap-3 transition-all active:scale-[0.98] text-left",
+                    selection === idx ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10"
+                  )}
+                  style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
+                >
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border text-sm font-bold transition-colors"
+                    style={{ 
+                      backgroundColor: selection === idx ? finalBg : 'transparent', 
+                      color: finalFg, 
+                      borderColor: selection === idx ? finalBg : finalFg + '55' 
+                    }}>
+                    {String.fromCharCode(65 + idx)}
+                  </div>
+                  <span className="font-medium text-base">{opt}</span>
+                </button>
               ))}
             </div>
           )}
-          <Button disabled={loading || (selection === null && !textValue && ratingValue === 0) || (timeLeft === 0 && currentQuestion.timeLimit)} onClick={handleSubmit} className="w-full h-24 text-3xl font-black rounded-[1.5rem] mt-8 uppercase tracking-tighter border-2 shadow-xl active:scale-95" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>{loading ? <Loader2 className="animate-spin h-10 w-10" /> : "Transmit"}</Button>
+
+          {/* Word cloud */}
+          {currentQuestion.type === 'word-cloud' && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium opacity-40 uppercase tracking-wider">One word</p>
+              <input
+                type="text"
+                value={textValue}
+                onChange={(e) => setTextValue(e.target.value.replace(/\s+/g, '').toUpperCase())}
+                placeholder="ONE WORD..."
+                maxLength={30}
+                className="w-full h-16 px-5 rounded-xl border-2 bg-black/10 text-2xl font-bold text-center tracking-widest placeholder:opacity-20 focus:outline-none focus:bg-black/20 transition-colors uppercase"
+                style={{ borderColor: finalFg + '44', color: finalFg }}
+              />
+            </div>
+          )}
+
+          {/* Open text */}
+          {currentQuestion.type === 'open-text' && (
+            <div className="space-y-2">
+              <textarea
+                value={textValue}
+                onChange={(e) => setTextValue(e.target.value)}
+                placeholder="Your answer..."
+                maxLength={300}
+                rows={4}
+                className="w-full px-5 py-4 rounded-xl border-2 bg-black/10 text-base font-medium placeholder:opacity-30 focus:outline-none focus:bg-black/20 transition-colors resize-none"
+                style={{ borderColor: finalFg + '44', color: finalFg }}
+              />
+            </div>
+          )}
+
+          {/* Guess number */}
+          {currentQuestion.type === 'guess-number' && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium opacity-40 uppercase tracking-wider">
+                Range: {currentQuestion.range?.min ?? 0} – {currentQuestion.range?.max ?? 100}
+              </p>
+              <input
+                type="number"
+                value={textValue}
+                onChange={(e) => setTextValue(e.target.value)}
+                placeholder={`${currentQuestion.range?.min ?? 0}`}
+                min={currentQuestion.range?.min ?? 0}
+                max={currentQuestion.range?.max ?? 100}
+                className="w-full h-16 px-5 rounded-xl border-2 bg-black/10 text-3xl font-bold text-center placeholder:opacity-20 focus:outline-none focus:bg-black/20 transition-colors"
+                style={{ borderColor: finalFg + '44', color: finalFg }}
+              />
+            </div>
+          )}
+
+          {/* Slider */}
+          {(currentQuestion.type === 'slider' || currentQuestion.type === 'scale') && (
+            <div className="space-y-6 py-2">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium opacity-50">
+                  {currentQuestion.labels?.min || (currentQuestion.range?.min ?? 0)}
+                </span>
+                <span className="text-4xl font-bold tabular-nums">{sliderValue}</span>
+                <span className="text-sm font-medium opacity-50">
+                  {currentQuestion.labels?.max || (currentQuestion.range?.max ?? 100)}
+                </span>
+              </div>
+              <input
+                type="range"
+                min={currentQuestion.range?.min ?? 0}
+                max={currentQuestion.range?.max ?? 100}
+                step={currentQuestion.range?.step ?? 1}
+                value={sliderValue}
+                onChange={(e) => setSliderValue(Number(e.target.value))}
+                className="w-full h-3 rounded-full appearance-none cursor-pointer"
+                style={{ accentColor: finalFg }}
+              />
+            </div>
+          )}
+
+          {/* Rating (Stars) */}
+          {currentQuestion.type === 'rating' && (
+            <div className="flex items-center justify-center gap-4 py-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setRatingValue(star)}
+                  className="transition-all active:scale-90 hover:scale-110"
+                  style={{ color: finalFg }}
+                >
+                  <Star className={cn("h-12 w-12 transition-all", ratingValue >= star ? "fill-current" : "opacity-20")} />
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Submit */}
+          <button
+            disabled={loading || isAnswerMissing() || (timeLeft === 0 && !!currentQuestion.timeLimit)}
+            onClick={handleSubmit}
+            className="w-full h-14 text-base font-semibold rounded-xl mt-2 border-2 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
+          >
+            {loading ? <Loader2 className="animate-spin h-5 w-5 mx-auto" /> : "Submit"}
+          </button>
         </main>
       </div>
     </div>
   );
 }
+

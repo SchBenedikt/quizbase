@@ -25,6 +25,7 @@ export interface PollSession {
   currentQuestionId: string | 'lobby' | 'podium' | null;
   status: 'active' | 'ended';
   isStarted?: boolean;
+  isQuiz?: boolean;
   theme?: 'orange' | 'red' | 'green' | 'blue' | 'custom' | 'minimal-light' | 'minimal-dark';
   customColor?: string; // Hex color code
   showResultsToParticipants: boolean;
@@ -54,6 +55,7 @@ export interface Survey {
   userId: string;
   title: string;
   isPublic?: boolean;
+  isQuiz?: boolean;
   theme?: string;
   customColor?: string;
   createdAt: any;

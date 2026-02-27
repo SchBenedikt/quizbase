@@ -57,6 +57,7 @@ export default function DiscoverPage() {
         createdAt: serverTimestamp(),
         theme: survey.theme || 'orange',
         customColor: survey.customColor || null,
+        isQuiz: survey.isQuiz || false,
         showResultsToParticipants: true
       };
 

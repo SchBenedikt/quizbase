@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion } from "@/app/types/poll";
-import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon, Trophy, BarChart3 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
@@ -37,6 +37,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   const [sessionTitle, setSessionTitle] = useState("");
   const [theme, setTheme] = useState<string>("orange");
   const [customColor, setCustomColor] = useState<string | null>(null);
+  const [isQuiz, setIsQuiz] = useState<boolean>(false);
   const [currentQuestions, setCurrentQuestions] = useState<PollQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<number | null>(null);
@@ -46,6 +47,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       setSessionTitle(poll.title || "");
       setTheme(poll.theme || "orange");
       setCustomColor(poll.customColor || null);
+      setIsQuiz(poll.isQuiz ?? false);
     }
   }, [poll]);
 
@@ -61,7 +63,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
   }, [user, isUserLoading, router]);
 
-  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null) => {
+  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null, isQuizToSave: boolean) => {
     if (!user || !pollRef) return;
     
     try {
@@ -69,6 +71,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         title: titleToSave, 
         theme: themeToSave, 
         customColor: customColorToSave,
+        isQuiz: isQuizToSave,
         updatedAt: serverTimestamp() 
       }, { merge: true });
 
@@ -110,16 +113,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
 
     const timer = setTimeout(() => {
       if (currentQuestions.length > 0) {
-        performSave(currentQuestions, sessionTitle, theme, customColor);
+        performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz);
       }
     }, 2000); 
 
     return () => clearTimeout(timer);
-  }, [currentQuestions, sessionTitle, theme, customColor, initialQuestions, performSave]);
+  }, [currentQuestions, sessionTitle, theme, customColor, isQuiz, initialQuestions, performSave]);
 
   const handleManualSave = async () => {
     setLoading(true);
-    await performSave(currentQuestions, sessionTitle, theme, customColor);
+    await performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz);
     toast({ title: "Survey Saved", description: "All changes have been synced." });
     setLoading(false);
   };
@@ -177,6 +180,22 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
+                {/* Survey vs Quiz toggle */}
+                <div className="flex rounded-lg border border-foreground/10 overflow-hidden h-12 bg-muted/30">
+                  <button
+                    onClick={() => setIsQuiz(false)}
+                    className={`flex-1 px-5 flex items-center justify-center gap-2 text-sm font-medium transition-all ${!isQuiz ? 'bg-foreground text-background' : 'hover:bg-foreground/5'}`}
+                  >
+                    <BarChart3 className="h-4 w-4" /> Survey
+                  </button>
+                  <button
+                    onClick={() => setIsQuiz(true)}
+                    className={`flex-1 px-5 flex items-center justify-center gap-2 text-sm font-medium transition-all ${isQuiz ? 'bg-primary text-primary-foreground' : 'hover:bg-foreground/5'}`}
+                  >
+                    <Trophy className="h-4 w-4" /> Quiz
+                  </button>
+                </div>
+
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="h-12 px-6 rounded-lg border border-foreground/10 font-medium gap-2 bg-card hover:bg-muted shadow-none text-base">
@@ -233,6 +252,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
           <PollCreator 
             initialQuestions={initialQuestions} 
             onChange={setCurrentQuestions}
+            isQuiz={isQuiz}
           />
         </div>
       </div>
