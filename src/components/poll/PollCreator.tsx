@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { 
   Trash2, Plus, ListChecks, Cloud, SlidersHorizontal, MessageSquare, 
-  Star, ChevronDown, ChevronRight, Timer, CheckCircle2, GripVertical, 
+  Star, ChevronDown, ChevronRight, Timer, CheckCircle2, 
   Hash, ListOrdered, Ruler, ArrowUp, ArrowDown, Zap, Image as ImageIcon 
 } from "lucide-react";
 import { AIQuestionRefiner } from "./AIQuestionRefiner";
@@ -111,14 +111,13 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
             <Card 
               key={q.id} 
               className={cn(
-                "border-4 rounded-[2rem] bg-card overflow-hidden transition-all hover:border-primary/20 shadow-xl group",
+                "border-4 rounded-[2rem] bg-card overflow-hidden transition-all hover:border-primary/20 shadow-none group",
                 isCollapsed && "hover:bg-muted/30",
-                q.isDoublePoints && "ring-4 ring-yellow-400 ring-offset-4"
+                q.isDoublePoints && "border-yellow-400"
               )}
             >
               <CardContent className="p-0">
                 <div className="flex h-full">
-                  {/* Left Sidebar - Reordering and Index */}
                   <div className={cn(
                     "w-16 flex flex-col items-center bg-muted/20 border-r-2 border-foreground/5 shrink-0 gap-4",
                     isCollapsed ? "py-4" : "py-8"
@@ -130,7 +129,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                         size="icon" 
                         onClick={() => moveQuestion(idx, 'up')}
                         disabled={idx === 0}
-                        className="h-10 w-10 rounded-[0.75rem] hover:bg-primary/10 disabled:opacity-5 border-2 border-transparent hover:border-primary/20"
+                        className="h-10 w-10 rounded-[0.75rem] hover:bg-primary/10 disabled:opacity-5 border-2 border-transparent hover:border-primary/20 shadow-none"
                       >
                         <ArrowUp className="h-5 w-5" />
                       </Button>
@@ -139,14 +138,13 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                         size="icon" 
                         onClick={() => moveQuestion(idx, 'down')}
                         disabled={idx === questions.length - 1}
-                        className="h-10 w-10 rounded-[0.75rem] hover:bg-primary/10 disabled:opacity-5 border-2 border-transparent hover:border-primary/20"
+                        className="h-10 w-10 rounded-[0.75rem] hover:bg-primary/10 disabled:opacity-5 border-2 border-transparent hover:border-primary/20 shadow-none"
                       >
                         <ArrowDown className="h-5 w-5" />
                       </Button>
                     </div>
                   </div>
 
-                  {/* Main Content Area */}
                   <div className={cn("flex-1 flex flex-col justify-center", isCollapsed ? "p-4" : "p-8 sm:p-12 space-y-10")}>
                     <header className="flex items-center justify-between">
                       <div className="flex items-center gap-6">
@@ -154,13 +152,13 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                           variant="ghost" 
                           size="icon" 
                           onClick={() => toggleCollapse(q.id)}
-                          className="h-10 w-10 sm:h-12 sm:w-12 rounded-[1rem] border-2 border-foreground/5"
+                          className="h-10 w-10 sm:h-12 sm:w-12 rounded-[1rem] border-2 border-foreground/5 shadow-none"
                         >
                           {isCollapsed ? <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" /> : <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6" />}
                         </Button>
                         <div className="flex items-center gap-4">
                           <div className={cn(
-                            "flex items-center justify-center bg-primary text-primary-foreground rounded-[1rem] shadow-lg",
+                            "flex items-center justify-center bg-primary text-primary-foreground rounded-[1rem] shadow-none",
                             isCollapsed ? "w-8 h-8 sm:w-10 sm:h-10" : "w-12 h-12"
                           )}>
                             {q.type === 'multiple-choice' && <ListChecks className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
@@ -173,12 +171,12 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                             {q.type === 'scale' && <Ruler className={isCollapsed ? "h-4 w-4 sm:h-5 sm:w-5" : "h-6 w-6"} />}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 leading-none mb-1">Question Type</span>
-                            <span className={cn("font-black uppercase tracking-tight leading-none", isCollapsed ? "text-base sm:text-lg" : "text-xl")}>{q.type.replace('-', ' ')}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40 leading-none mb-1">Type</span>
+                            <span className={cn("font-bold capitalize tracking-tight leading-none", isCollapsed ? "text-base sm:text-lg" : "text-xl")}>{q.type.replace('-', ' ')}</span>
                           </div>
                           {isCollapsed && q.question && (
                             <div className="ml-4 border-l-2 border-foreground/5 pl-4 truncate max-w-md hidden md:block">
-                              <span className="text-sm font-bold uppercase tracking-tight opacity-60">{q.question}</span>
+                              <span className="text-sm font-bold opacity-60">{q.question}</span>
                             </div>
                           )}
                         </div>
@@ -190,7 +188,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                           size="icon" 
                           onClick={() => removeQuestion(q.id)} 
                           disabled={questions.length <= 1}
-                          className="h-10 w-10 sm:h-12 sm:w-12 rounded-[1rem] hover:bg-destructive/10 hover:text-destructive border-2 border-transparent hover:border-destructive/20 text-foreground/20"
+                          className="h-10 w-10 sm:h-12 sm:w-12 rounded-[1rem] hover:bg-destructive/10 hover:text-destructive border-2 border-transparent hover:border-destructive/20 text-foreground/20 shadow-none"
                         >
                           <Trash2 className="h-5 w-5" />
                         </Button>
@@ -199,16 +197,15 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
 
                     {!isCollapsed && (
                       <div className="grid lg:grid-cols-[1fr,350px] gap-12">
-                        {/* Editor Form */}
                         <div className="space-y-10">
                           <div className="space-y-4">
-                            <Label className="text-xs font-black uppercase tracking-[0.4em] opacity-30 ml-2">Question Title</Label>
+                            <Label className="text-xs font-bold uppercase tracking-widest opacity-30 ml-2">Question</Label>
                             <div className="relative group">
                               <Input 
                                 value={q.question} 
                                 onChange={(e) => updateQuestion(q.id, { question: e.target.value })}
-                                placeholder="TYPE YOUR SIGNAL DRAFT..."
-                                className="text-4xl font-black h-24 border-4 bg-muted/5 rounded-[1.5rem] px-10 focus-visible:ring-0 border-foreground/5 tracking-tighter uppercase placeholder:opacity-5"
+                                placeholder="Enter your question here..."
+                                className="text-4xl font-bold h-24 border-4 bg-muted/5 rounded-[1.5rem] px-10 focus-visible:ring-0 border-foreground/5 tracking-tighter shadow-none"
                               />
                               <div className="absolute right-4 top-1/2 -translate-y-1/2">
                                 <AIQuestionRefiner 
@@ -222,8 +219,8 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                           {(q.type === 'multiple-choice' || q.type === 'ranking') && q.options && (
                             <div className="space-y-6">
                               <div className="flex items-center justify-between px-2">
-                                <Label className="text-xs font-black uppercase tracking-[0.4em] opacity-30">Answer Options</Label>
-                                {q.type === 'multiple-choice' && <span className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">Select Correct Signal</span>}
+                                <Label className="text-xs font-bold uppercase tracking-widest opacity-30">Answer options</Label>
+                                {q.type === 'multiple-choice' && <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Select correct answer</span>}
                               </div>
                               <div className="grid sm:grid-cols-2 gap-4">
                                 {q.options.map((opt, oIdx) => (
@@ -234,9 +231,9 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                         size="icon"
                                         onClick={() => toggleCorrectAnswer(q.id, oIdx)}
                                         className={cn(
-                                          "h-16 w-16 rounded-[1.25rem] border-4 transition-all shrink-0",
+                                          "h-16 w-16 rounded-[1.25rem] border-4 transition-all shrink-0 shadow-none",
                                           q.correctOptionIndices?.includes(oIdx) 
-                                            ? "bg-green-500 text-white border-green-600 shadow-[0px_4px_0px_0px_#166534]" 
+                                            ? "bg-green-500 text-white border-green-600" 
                                             : "bg-black/5 text-transparent border-foreground/5 hover:border-primary/40"
                                         )}
                                       >
@@ -251,7 +248,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                           newOpts[oIdx] = e.target.value;
                                           updateQuestion(q.id, { options: newOpts });
                                         }}
-                                        className="h-16 border-4 bg-card rounded-[1.25rem] px-8 font-black text-lg uppercase tracking-tight focus-visible:ring-0 border-foreground/5"
+                                        className="h-16 border-4 bg-card rounded-[1.25rem] px-8 font-bold text-lg tracking-tight focus-visible:ring-0 border-foreground/5 shadow-none"
                                       />
                                       {q.options!.length > 2 && (
                                         <Button 
@@ -264,7 +261,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                               .map(i => i > oIdx ? i - 1 : i);
                                             updateQuestion(q.id, { options: newOpts, correctOptionIndices: newIndices });
                                           }} 
-                                          className="absolute -right-3 -top-3 h-8 w-8 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover/opt:opacity-100 transition-opacity shadow-lg"
+                                          className="absolute -right-3 -top-3 h-8 w-8 rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover/opt:opacity-100 transition-opacity shadow-none"
                                         >
                                           <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -274,90 +271,31 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                 ))}
                                 <Button 
                                   variant="outline" 
-                                  onClick={() => updateQuestion(q.id, { options: [...q.options!, `NEW SIGNAL`] })} 
-                                  className="h-16 rounded-[1.25rem] border-dashed border-4 font-black uppercase tracking-widest hover:bg-primary/5 hover:border-primary transition-all text-xs"
+                                  onClick={() => updateQuestion(q.id, { options: [...q.options!, `New option`] })} 
+                                  className="h-16 rounded-[1.25rem] border-dashed border-4 font-bold uppercase tracking-widest hover:bg-primary/5 hover:border-primary transition-all text-xs shadow-none"
                                 >
-                                  <Plus className="mr-3 h-5 w-5" /> Add Answer
+                                  <Plus className="mr-3 h-5 w-5" /> Add option
                                 </Button>
                               </div>
                             </div>
                           )}
-
-                          {/* Numeric Parameters */}
-                          {(q.type === 'slider' || q.type === 'guess-number' || q.type === 'scale') && q.range && (
-                            <div className="space-y-8 bg-black/5 p-8 rounded-[2rem] border-4 border-foreground/5">
-                               <Label className="text-xs font-black uppercase tracking-[0.4em] opacity-30">Studio Scale Parameters</Label>
-                               <div className="grid grid-cols-3 gap-8">
-                                 <div className="space-y-3">
-                                   <span className="text-[10px] font-black uppercase opacity-40 block ml-1">Min Value</span>
-                                   <Input 
-                                     type="number"
-                                     value={q.range.min}
-                                     onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, min: parseInt(e.target.value) || 0 } })}
-                                     className="h-14 border-4 rounded-[1rem] font-black text-xl text-center"
-                                   />
-                                 </div>
-                                 <div className="space-y-3">
-                                   <span className="text-[10px] font-black uppercase opacity-40 block ml-1">Max Value</span>
-                                   <Input 
-                                     type="number"
-                                     value={q.range.max}
-                                     onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, max: parseInt(e.target.value) || 100 } })}
-                                     className="h-14 border-4 rounded-[1rem] font-black text-xl text-center"
-                                   />
-                                 </div>
-                                 <div className="space-y-3">
-                                   <span className="text-[10px] font-black uppercase opacity-40 block ml-1">Step</span>
-                                   <Input 
-                                     type="number"
-                                     value={q.range.step}
-                                     onChange={(e) => updateQuestion(q.id, { range: { ...q.range!, step: parseInt(e.target.value) || 1 } })}
-                                     className="h-14 border-4 rounded-[1rem] font-black text-xl text-center"
-                                   />
-                                 </div>
-                               </div>
-
-                               {q.type === 'scale' && q.labels && (
-                                 <div className="grid grid-cols-2 gap-8">
-                                   <div className="space-y-3">
-                                     <span className="text-[10px] font-black uppercase opacity-40 block ml-1">Anchor Low</span>
-                                     <Input 
-                                       value={q.labels.min}
-                                       onChange={(e) => updateQuestion(q.id, { labels: { ...q.labels!, min: e.target.value.toUpperCase() } })}
-                                       className="h-14 border-4 rounded-[1rem] font-black text-lg uppercase px-6"
-                                     />
-                                   </div>
-                                   <div className="space-y-3">
-                                     <span className="text-[10px] font-black uppercase opacity-40 block ml-1">Anchor High</span>
-                                     <Input 
-                                       value={q.labels.max}
-                                       onChange={(e) => updateQuestion(q.id, { labels: { ...q.labels!, max: e.target.value.toUpperCase() } })}
-                                       className="h-14 border-4 rounded-[1rem] font-black text-lg uppercase px-6"
-                                     />
-                                   </div>
-                                 </div>
-                               )}
-                            </div>
-                          )}
                         </div>
 
-                        {/* Right Settings Sidebar */}
                         <div className="space-y-8 lg:border-l-2 lg:border-foreground/5 lg:pl-12">
                            <div className="space-y-6">
-                              <Label className="text-xs font-black uppercase tracking-[0.4em] opacity-30">Stage Visual</Label>
+                              <Label className="text-xs font-bold uppercase tracking-widest opacity-30">Visual anchor</Label>
                               <div className="aspect-[4/3] bg-muted/30 rounded-[2rem] border-4 border-dashed border-foreground/10 flex flex-col items-center justify-center gap-4 overflow-hidden relative group/image">
                                 {q.imageHint ? (
                                   <img 
                                     src={`https://picsum.photos/seed/${q.imageHint}/800/600`} 
-                                    alt="Stage Preview" 
+                                    alt="Preview" 
                                     className="w-full h-full object-cover opacity-80 group-hover/image:opacity-100 transition-opacity" 
                                   />
                                 ) : (
                                   <ImageIcon className="h-12 w-12 opacity-10" />
                                 )}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex flex-col items-center justify-center p-8 text-center">
-                                   <p className="text-white font-black uppercase tracking-tighter text-xl">Cinematic Stage Visual</p>
-                                   <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-2">Visible to all participants</p>
+                                   <p className="text-white font-bold text-xl">Stage visual anchor</p>
                                 </div>
                               </div>
                               <div className="relative">
@@ -365,21 +303,21 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
                                 <Input 
                                   value={q.imageHint || ""} 
                                   onChange={(e) => updateQuestion(q.id, { imageHint: e.target.value })}
-                                  placeholder="IMAGE KEYWORD..."
-                                  className="h-12 pl-12 rounded-[1rem] text-[10px] font-black uppercase tracking-widest border-2"
+                                  placeholder="Visual keyword..."
+                                  className="h-12 pl-12 rounded-[1rem] text-xs font-bold border-2 shadow-none"
                                 />
                               </div>
                            </div>
 
                            <div className="space-y-6 pt-6 border-t-2 border-foreground/5">
-                              <Label className="text-xs font-black uppercase tracking-[0.4em] opacity-30">Question Rules</Label>
+                              <Label className="text-xs font-bold uppercase tracking-widest opacity-30">Parameters</Label>
                               
                               <div className="flex items-center justify-between p-6 rounded-[1.5rem] border-4 border-foreground/5 bg-black/5">
                                  <div className="flex items-center gap-4">
                                     <Zap className={cn("h-6 w-6 transition-colors", q.isDoublePoints ? "text-yellow-400 fill-current" : "opacity-20")} />
                                     <div className="flex flex-col">
-                                       <span className="text-sm font-black uppercase leading-none">Double Points</span>
-                                       <span className="text-[8px] font-bold opacity-30 uppercase tracking-widest mt-1">High-Stakes Mode</span>
+                                       <span className="text-sm font-bold leading-none">Double points</span>
+                                       <span className="text-[8px] font-bold opacity-30 uppercase tracking-widest mt-1">High stakes</span>
                                     </div>
                                  </div>
                                  <Switch 
@@ -390,29 +328,14 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
 
                               <div className="space-y-3">
                                  <div className="flex items-center justify-between px-2">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Time Limit</span>
-                                    <span className="text-sm font-black tabular-nums">{q.timeLimit || 0}s</span>
-                                 </div>
-                                 <div className="grid grid-cols-4 gap-2">
-                                    {[5, 10, 20, 60].map(sec => (
-                                      <Button 
-                                        key={sec} 
-                                        variant="outline" 
-                                        onClick={() => updateQuestion(q.id, { timeLimit: sec })}
-                                        className={cn(
-                                          "h-10 rounded-[0.75rem] text-[10px] font-black border-2",
-                                          q.timeLimit === sec ? "bg-foreground text-background" : "hover:bg-primary/10"
-                                        )}
-                                      >
-                                        {sec}s
-                                      </Button>
-                                    ))}
+                                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Time limit</span>
+                                    <span className="text-sm font-bold tabular-nums">{q.timeLimit || 0}s</span>
                                  </div>
                                  <Input 
                                     type="number"
                                     value={q.timeLimit || 0}
                                     onChange={(e) => updateQuestion(q.id, { timeLimit: parseInt(e.target.value) || 0 })}
-                                    className="h-12 text-center text-xl font-black border-4 rounded-[1rem]"
+                                    className="h-12 text-center text-xl font-bold border-4 rounded-[1rem] shadow-none"
                                  />
                               </div>
                            </div>
@@ -427,11 +350,10 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
         })}
       </div>
 
-      {/* Global Command Center */}
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-foreground text-background p-4 rounded-[2.5rem] flex items-center gap-3 z-50 shadow-[0px_20px_50px_rgba(0,0,0,0.3)] border-4 border-background/20">
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-foreground text-background p-4 rounded-[2.5rem] flex items-center gap-3 z-50 border-4 border-background/20 shadow-none">
         <div className="flex items-center gap-3 px-6 py-2 border-r-2 border-background/10">
            <Plus className="h-6 w-6" />
-           <span className="text-xs font-black uppercase tracking-[0.3em]">Inject Signal</span>
+           <span className="text-xs font-bold uppercase tracking-widest">Add item</span>
         </div>
         <div className="flex items-center gap-2 overflow-x-auto max-w-[70vw] no-scrollbar px-4">
           {[
@@ -447,7 +369,7 @@ export function PollCreator({ onChange, initialQuestions = [] }: PollCreatorProp
             <Button 
               key={tool.type}
               onClick={() => addQuestion(tool.type as PollType)} 
-              className="h-14 px-6 gap-3 bg-white/10 hover:bg-primary hover:text-primary-foreground border-2 border-transparent font-black uppercase text-[10px] tracking-widest transition-all shadow-none rounded-[1.25rem] whitespace-nowrap"
+              className="h-14 px-6 gap-3 bg-white/10 hover:bg-primary hover:text-primary-foreground border-2 border-transparent font-bold uppercase text-[10px] tracking-widest transition-all shadow-none rounded-[1.25rem] whitespace-nowrap"
             >
               <tool.icon className="h-5 w-5" /> {tool.label}
             </Button>

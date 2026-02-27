@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -42,7 +41,7 @@ export default function DashboardPage() {
     if (!user) return;
     const surveyRef = doc(db, `users/${user.uid}/surveys/${surveyId}`);
     deleteDocumentNonBlocking(surveyRef);
-    toast({ title: "Survey Deleted", description: "The presentation has been removed." });
+    toast({ title: "Survey deleted", description: "The presentation has been removed." });
   };
 
   const togglePublic = (surveyId: string, currentStatus: boolean) => {
@@ -66,10 +65,10 @@ export default function DashboardPage() {
         id: sessionRef.id,
         pollId: survey.id,
         userId: user.uid,
-        title: survey.title || "Untitled Presentation",
+        title: survey.title || "Untitled presentation",
         code,
         status: "active",
-        currentQuestionId: "lobby", // Start in Lobby
+        currentQuestionId: "lobby",
         isStarted: false,
         createdAt: serverTimestamp(),
         theme: survey.theme || 'orange',
@@ -106,7 +105,7 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1">
             <h1 className="text-3xl font-black uppercase tracking-tight">Library</h1>
-            <p className="text-sm font-medium opacity-40">Manage your high-stakes interactions.</p>
+            <p className="text-sm font-medium opacity-40">Manage your interaction studio surveys.</p>
           </div>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
@@ -131,25 +130,25 @@ export default function DashboardPage() {
         {surveysLoading ? (
           <div className="py-40 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto opacity-10" /></div>
         ) : !filteredSurveys || filteredSurveys.length === 0 ? (
-          <div className="py-40 text-center border-2 border-dashed rounded-[2rem] bg-card/50 space-y-4 border-foreground/5">
+          <div className="py-40 text-center border-2 border-dashed rounded-[2rem] bg-card/50 space-y-4 border-foreground/5 shadow-none">
              <Sparkles className="h-10 w-10 mx-auto opacity-10" />
-             <p className="text-xs font-black uppercase opacity-20 tracking-[0.3em]">No surveys found</p>
+             <p className="text-xs font-bold opacity-40 uppercase tracking-widest">No surveys found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredSurveys.map((survey) => (
-              <article key={survey.id} className="bg-card p-6 rounded-[1.5rem] border-2 border-foreground/5 flex flex-col gap-6 group hover:border-primary/30 transition-all h-full relative shadow-sm">
+              <article key={survey.id} className="bg-card p-6 rounded-[1.5rem] border-2 border-foreground/5 flex flex-col gap-6 group hover:border-primary/30 transition-all h-full relative shadow-none">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-[0.75rem] flex items-center justify-center border-2 border-foreground/5 shrink-0 bg-muted/50 group-hover:bg-primary/10 transition-colors">
+                    <div className="w-10 h-10 rounded-[0.75rem] flex items-center justify-center border-2 border-foreground/5 shrink-0 bg-muted/50 group-hover:bg-primary/10 transition-colors shadow-none">
                        <BarChart3 className="h-4 w-4 text-primary" />
                     </div>
                     <Button 
                        variant="ghost" 
                        size="icon" 
                        onClick={() => togglePublic(survey.id, !!survey.isPublic)}
-                       className={cn("h-8 w-8 rounded-[0.5rem] transition-colors", survey.isPublic ? "text-primary" : "text-muted-foreground")}
-                       title={survey.isPublic ? "Publicly Discoverable" : "Private"}
+                       className={cn("h-8 w-8 rounded-[0.5rem] transition-colors shadow-none", survey.isPublic ? "text-primary" : "text-muted-foreground")}
+                       title={survey.isPublic ? "Public" : "Private"}
                      >
                        {survey.isPublic ? <Globe className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
                      </Button>
@@ -158,7 +157,7 @@ export default function DashboardPage() {
                      variant="ghost" 
                      size="icon" 
                      onClick={() => handleDeleteSurvey(survey.id)}
-                     className="h-8 w-8 rounded-[0.5rem] hover:text-destructive hover:bg-destructive/5 transition-colors opacity-0 group-hover:opacity-100"
+                     className="h-8 w-8 rounded-[0.5rem] hover:text-destructive hover:bg-destructive/5 transition-colors opacity-0 group-hover:opacity-100 shadow-none"
                      aria-label={`Delete ${survey.title || "Untitled Survey"}`}
                    >
                      <Trash2 className="h-4 w-4" />
@@ -167,7 +166,7 @@ export default function DashboardPage() {
                 
                 <div className="flex-1 space-y-2">
                   <h3 className="text-lg font-bold tracking-tight leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-                    {survey.title || "Untitled Presentation"}
+                    {survey.title || "Untitled presentation"}
                   </h3>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-3.5 w-3.5" />
@@ -182,7 +181,7 @@ export default function DashboardPage() {
                      variant="default"
                      onClick={() => handleLaunchExisting(survey)}
                      disabled={loading}
-                     className="flex-1 h-10 rounded-[0.75rem] font-black uppercase text-[10px] tracking-widest shadow-none"
+                     className="flex-1 h-10 rounded-[0.75rem] font-bold uppercase text-[10px] tracking-widest shadow-none"
                    >
                      <Play className="mr-2 h-3 w-3 fill-current" /> Launch
                    </Button>

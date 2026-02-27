@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -15,11 +14,8 @@ export default function Home() {
   const [joinCode, setJoinCode] = useState("");
   const router = useRouter();
 
-  // Interactive Mockup States
   const [heroSelected, setHeroSelected] = useState<number | null>(null);
   const [stageVotes, setStageVotes] = useState([90, 40, 70, 55]);
-  const [activeTool, setActiveTool] = useState<number | null>(null);
-  const [rankScores, setRankScores] = useState([85, 45, 65]);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +35,6 @@ export default function Home() {
       <Header variant="brand" className="text-[#4c2f05]" />
 
       <main className="flex-grow">
-        {/* HERO SECTION */}
         <section className="studio-container min-h-[100dvh] flex items-center pt-32 pb-20">
           <div className="grid lg:grid-cols-2 gap-20 lg:gap-32 items-center w-full">
             <div className="space-y-12 animate-in fade-in slide-in-from-left-10 duration-1000">
@@ -59,32 +54,31 @@ export default function Home() {
                   <Input 
                     value={joinCode}
                     onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                    placeholder="JOIN CODE" 
+                    placeholder="Join code" 
                     maxLength={6}
                     className="border-none bg-transparent focus-visible:ring-0 text-4xl font-black p-0 placeholder:opacity-10 uppercase h-auto shadow-none text-[#4c2f05] w-full tracking-tighter placeholder:text-[#4c2f05] relative z-10"
                     aria-label="Enter 6-digit session code"
                   />
                 </div>
-                <button type="submit" disabled={joinCode.length < 6} className="h-20 px-10 rounded-[1.5rem] text-[12px] font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none uppercase flex items-center justify-center gap-3 tracking-[0.2em]">
-                  JOIN NOW <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                <button type="submit" disabled={joinCode.length < 6} className="h-20 px-10 rounded-[1.5rem] text-sm font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all group shrink-0 shadow-none uppercase flex items-center justify-center gap-3 tracking-widest">
+                  Join Now <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
                 </button>
               </form>
             </div>
 
-            {/* EXPANDED HERO MOCKUP */}
             <div className="relative group flex justify-center animate-in fade-in slide-in-from-right-10 duration-1000 py-20 px-4">
-              <div className="relative w-full max-w-[650px] aspect-video bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-10 shadow-[35px_35px_0px_0px_#4c2f05] transform -rotate-3 transition-all group-hover:rotate-0 duration-700 hidden md:flex flex-col z-0">
+              <div className="relative w-full max-w-[650px] aspect-video bg-white rounded-[2.5rem] border-4 border-[#4c2f05] p-10 transform -rotate-3 transition-all group-hover:rotate-0 duration-700 hidden md:flex flex-col z-0 shadow-none">
                 <div className="flex items-center justify-between mb-10 pb-6 border-b-2 border-[#4c2f05]/10">
                    <div className="flex items-center gap-4">
                      <Zap className="h-8 w-8 fill-current" />
-                     <span className="font-black text-[12px] uppercase tracking-[0.3em]">Studio Broadcast</span>
+                     <span className="font-black text-xs uppercase tracking-widest">Studio Broadcast</span>
                    </div>
                    <div className="flex items-center gap-6">
                      <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-red-500/10 text-red-600 border border-red-500/20">
                         <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                         <span className="text-[10px] font-black uppercase tracking-widest">Live Sync</span>
                      </div>
-                     <span className="text-[12px] font-black uppercase tracking-widest opacity-40">Code: X8Y9Z2</span>
+                     <span className="text-xs font-black uppercase tracking-widest opacity-40">Code: X8Y9Z2</span>
                    </div>
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center text-center space-y-8">
@@ -107,13 +101,12 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Mobile Mockup Overlay */}
-              <div className="relative md:absolute md:-bottom-16 md:-right-8 w-full max-w-[320px] aspect-[4/7] bg-white rounded-[3rem] border-4 border-[#4c2f05] p-10 shadow-[20px_20px_0px_0px_#4c2f05] transform rotate-6 transition-all group-hover:rotate-3 duration-700 flex flex-col z-20">
+              <div className="relative md:absolute md:-bottom-16 md:-right-8 w-full max-w-[320px] aspect-[4/7] bg-white rounded-[3rem] border-4 border-[#4c2f05] p-10 transform rotate-6 transition-all group-hover:rotate-3 duration-700 flex flex-col z-20 shadow-none">
                 <div className="w-24 h-2 bg-[#4c2f05]/10 rounded-full mx-auto mb-12 shrink-0" />
                 <div className="flex-1 space-y-10 overflow-hidden">
                   <div className="flex items-center justify-between opacity-40">
                     <Zap className="h-5 w-5" />
-                    <span className="font-black text-[12px] tracking-[0.3em] uppercase">Mobile Sync</span>
+                    <span className="font-black text-xs tracking-widest uppercase">Mobile Sync</span>
                   </div>
                   <h3 className="text-2xl font-black uppercase leading-tight tracking-tighter">Your choice?</h3>
                   <div className="space-y-4">
@@ -128,7 +121,7 @@ export default function Home() {
                             : "bg-[#4c2f05]/5 border-dashed border-[#4c2f05]/20 hover:bg-[#4c2f05]/10"
                         )}
                       >
-                        <span className={cn("font-black text-[12px] uppercase", heroSelected === i ? "opacity-100" : "opacity-40")}>{opt}</span>
+                        <span className={cn("font-bold text-sm", heroSelected === i ? "opacity-100" : "opacity-40")}>{opt}</span>
                       </div>
                     ))}
                   </div>
@@ -138,11 +131,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* WORKFLOW DEMO */}
         <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-x-clip">
           <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative px-6 flex justify-center lg:justify-start">
-              <div className="bg-white rounded-[2.5rem] border-4 border-[#ff9312] p-12 shadow-[25px_25px_0px_0px_rgba(255,147,18,0.2)] rotate-[-3deg] z-10 relative max-w-[420px] w-full">
+              <div className="bg-white rounded-[2.5rem] border-4 border-[#ff9312] p-12 rotate-[-3deg] z-10 relative max-w-[420px] w-full shadow-none">
                 <h4 className="text-3xl font-black uppercase tracking-tighter text-[#4c2f05] mb-10">Live Pulse Status</h4>
                 <div className="space-y-8">
                   <div className="h-14 bg-[#ff9312] rounded-[1.25rem] w-[85%] border-2 border-[#4c2f05] transition-all duration-1000" />
@@ -151,13 +143,7 @@ export default function Home() {
                 </div>
                 <div className="mt-12 flex justify-between items-center">
                    <div className="h-10 w-10 rounded-full bg-green-500 animate-pulse border-2 border-[#4c2f05]" />
-                   <span className="text-[12px] font-black uppercase tracking-widest text-[#4c2f05] opacity-40">Sync Active</span>
-                </div>
-              </div>
-              <div className="absolute -bottom-12 -right-6 w-56 bg-white rounded-[3rem] border-4 border-[#4c2f05] p-10 shadow-[20px_20px_0px_0px_#ff9312] rotate-[5deg] z-20 hidden sm:block group/bounce">
-                <div className="w-24 h-1.5 bg-[#4c2f05]/10 rounded-full mx-auto mb-10" />
-                <div className="h-14 bg-[#4c2f05] rounded-[1.25rem] flex items-center justify-center animate-bounce group-hover/bounce:animate-none group-active/bounce:scale-95 transition-transform">
-                  <span className="text-white font-black text-sm uppercase">Option A</span>
+                   <span className="text-xs font-black uppercase tracking-widest text-[#4c2f05] opacity-40">Sync Active</span>
                 </div>
               </div>
             </div>
@@ -180,7 +166,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                       <h4 className="text-3xl font-black uppercase tracking-tighter leading-none">{step.title}</h4>
-                      <p className="font-bold opacity-60 text-[16px] leading-snug">{step.desc}</p>
+                      <p className="font-bold opacity-60 text-lg leading-snug">{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -189,202 +175,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* GRAND STAGE DISPLAY */}
-        <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip">
-          <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
-             <div className="space-y-12 px-4">
-                <h2 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[0.85] uppercase tracking-tighter">
-                  Command the <br />
-                  Grand Stage.
-                </h2>
-                <p className="text-2xl font-bold opacity-70 leading-tight max-w-sm">
-                   Absolute visual clarity for thousands. Designed for the high-resolution boardrooms and grand stages.
-                </p>
-             </div>
-
-             <div className="relative group px-4">
-                <div className="bg-[#4c2f05] rounded-[3rem] border-4 border-[#4c2f05] p-16 shadow-[40px_40px_0px_0px_rgba(76,47,5,0.1)] rotate-3 group-hover:rotate-0 transition-transform duration-700">
-                   <div className="flex items-center justify-between mb-16 border-b-2 border-white/10 pb-12">
-                      <Zap className="h-12 w-12 text-[#ff9312] fill-current" />
-                      <div className="flex items-center gap-8">
-                         <div className="flex items-center gap-4">
-                            <div className="w-4 h-4 rounded-full bg-red-500 animate-pulse" />
-                            <span className="text-[14px] font-black text-white uppercase tracking-[0.4em]">Live Studio</span>
-                         </div>
-                         <div className="flex items-center gap-4 bg-white/5 px-6 py-2 rounded-full">
-                            <Users className="h-5 w-5 text-[#ff9312]" />
-                            <span className="text-xl font-black text-white">4.2K</span>
-                         </div>
-                      </div>
-                   </div>
-                   <div className="space-y-12">
-                      <h4 className="text-3xl font-black text-white uppercase tracking-tight leading-tight">How likely are you to recommend?</h4>
-                      <div className="h-56 flex items-end gap-8 pt-12 px-10 bg-white/5 rounded-[2rem] border-2 border-dashed border-white/10">
-                         {stageVotes.map((v, i) => (
-                           <div 
-                            key={i} 
-                            onClick={() => handleStageVote(i)}
-                            className={cn(
-                              "w-full rounded-t-[1.5rem] transition-all duration-700 cursor-pointer active:scale-95",
-                              i === 0 ? "bg-[#ff9312]" : i === 1 ? "bg-[#ff9312]/30" : i === 2 ? "bg-[#ff9312]/60" : "bg-[#ff9312]/40"
-                            )} 
-                            style={{ height: `${v}%` }} 
-                           />
-                         ))}
-                      </div>
-                      <p className="text-[10px] text-white opacity-20 uppercase text-center font-black tracking-widest">Click bars to simulate voting</p>
-                   </div>
-                </div>
-             </div>
-          </div>
-        </section>
-
-        {/* STUDIO ARCHITECT */}
-        <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip border-t-2 border-foreground/5">
-          <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
-             <div className="space-y-12 px-4">
-                <h2 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[0.85] uppercase tracking-tighter">
-                  Studio <br />
-                  Architect. <br />
-                  <span className="opacity-30">Zero Friction.</span>
-                </h2>
-                <p className="text-2xl font-bold opacity-70 leading-tight max-w-sm">
-                   A surgical, frameless interface for high-stakes survey creation. Build complex interactions in minutes.
-                </p>
-             </div>
-
-             <div className="relative group px-4">
-                <div className="bg-white rounded-[3rem] border-4 border-[#4c2f05] p-16 shadow-[45px_45px_0px_0px_rgba(76,47,5,0.05)] rotate-2 group-hover:rotate-0 transition-transform duration-700 relative overflow-hidden">
-                   <div className="space-y-16">
-                      <div className="space-y-8">
-                         <div className="flex items-center gap-4">
-                            <Activity className="h-6 w-6 text-primary" />
-                            <div className="h-6 bg-[#4c2f05]/10 rounded-full w-48" />
-                         </div>
-                         <div className="h-32 bg-[#4c2f05]/5 rounded-[1.5rem] border-2 border-dashed border-[#4c2f05]/10 flex items-center px-12">
-                            <span className="text-4xl font-black uppercase tracking-tighter opacity-20">CORE VALUE?</span>
-                         </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-10">
-                         <div className="h-20 bg-[#4c2f05]/5 rounded-[1.5rem] border-2 border-[#4c2f05]/10" />
-                         <div className="h-20 bg-[#ff9312] rounded-[1.5rem] border-2 border-[#4c2f05]" />
-                      </div>
-                   </div>
-                </div>
-
-                <div className="absolute -top-20 -right-8 bg-[#4c2f05] p-12 rounded-[2.5rem] border-4 border-[#ff9312] shadow-[25px_25px_0px_0px_#4c2f05] -rotate-6 group-hover:rotate-0 transition-all duration-700 z-20">
-                   <div className="grid grid-cols-2 gap-6">
-                      {[Cloud, ListChecks, SlidersHorizontal, MessageSquare, Star, Ruler, ListOrdered, Hash].map((Icon, i) => (
-                         <div 
-                          key={i} 
-                          onClick={() => setActiveTool(i)}
-                          className={cn(
-                            "w-16 h-16 rounded-[1.5rem] flex items-center justify-center border-2 transition-all cursor-pointer group/tool active:scale-90",
-                            activeTool === i 
-                              ? "bg-[#ff9312] border-[#4c2f05] text-[#4c2f05]" 
-                              : "bg-white/10 border-white/5 hover:bg-white/20 text-white"
-                          )}
-                        >
-                            <Icon className={cn("h-8 w-8 transition-transform", activeTool === i ? "scale-110" : "group-hover/tool:scale-110")} />
-                         </div>
-                      ))}
-                   </div>
-                   <div className="mt-12 pt-10 border-t-2 border-white/5 flex flex-col items-center gap-4">
-                      <Zap className="h-10 w-10 text-[#ff9312] animate-pulse" />
-                      <span className="text-[10px] font-black uppercase text-white tracking-[0.5em] opacity-40">Command Ready</span>
-                   </div>
-                </div>
-             </div>
-          </div>
-        </section>
-
-        {/* AUDIENCE SENTIMENT */}
-        <section className="py-40 bg-[#4c2f05] text-[#ff9312] overflow-x-clip">
-          <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
-             <div className="space-y-12 px-4 order-2 lg:order-1">
-                <div className="relative h-[500px] w-full bg-white/5 rounded-[3rem] border-4 border-dashed border-[#ff9312]/20 p-12 flex flex-wrap items-center justify-center gap-12 overflow-hidden group">
-                   {[
-                     { text: "INNOVATION", size: "text-7xl", rotate: "-rotate-6", opacity: "opacity-100" },
-                     { text: "FAST", size: "text-4xl", rotate: "rotate-3", opacity: "opacity-60" },
-                     { text: "ENERGY", size: "text-6xl", rotate: "-rotate-2", opacity: "opacity-90" },
-                     { text: "SCALE", size: "text-5xl", rotate: "rotate-6", opacity: "opacity-70" },
-                     { text: "SYMBOLS", size: "text-3xl", rotate: "-rotate-12", opacity: "opacity-40" },
-                     { text: "DYNAMIC", size: "text-5xl", rotate: "rotate-1", opacity: "opacity-80" }
-                   ].map((word, i) => (
-                     <span 
-                        key={i} 
-                        className={cn(
-                          "font-black uppercase tracking-tighter transition-all duration-700 cursor-default hover:text-white hover:scale-125", 
-                          word.size, word.rotate, word.opacity
-                        )}
-                      >
-                       {word.text}
-                     </span>
-                   ))}
-                </div>
-             </div>
-             <div className="space-y-12 px-4 order-1 lg:order-2">
-                <h2 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[0.85] uppercase tracking-tighter">
-                  Audience <br />
-                  Sentiment. <br />
-                  <span className="opacity-30">In Motion.</span>
-                </h2>
-                <p className="text-2xl font-bold opacity-70 leading-tight max-w-sm">
-                   Visualize the collective thought of thousands in high-fidelity word clouds and sentiment streams.
-                </p>
-             </div>
-          </div>
-        </section>
-
-        {/* PRIORITY RANKING */}
-        <section className="py-40 bg-[#f3f3f1] text-[#4c2f05] overflow-x-clip border-t-2 border-foreground/5">
-           <div className="studio-container grid lg:grid-cols-2 gap-24 items-center">
-              <div className="space-y-12 px-4">
-                 <h2 className="text-6xl md:text-7xl lg:text-8xl font-black leading-[0.85] uppercase tracking-tighter">
-                   Prioritize <br />
-                   Ideas. <br />
-                   <span className="opacity-30">Live.</span>
-                 </h2>
-                 <p className="text-2xl font-bold opacity-70 leading-tight max-w-sm">
-                    Let the audience reshape the data. Real-time ranking and voting for high-stakes decision making.
-                 </p>
-              </div>
-              <div className="relative group px-4">
-                 <div className="bg-white rounded-[3rem] border-4 border-[#4c2f05] p-16 shadow-[40px_40px_0px_0px_rgba(76,47,5,0.05)] rotate-[-2deg] group-hover:rotate-0 transition-transform duration-700">
-                    <div className="space-y-8">
-                       {[
-                         { title: "INNOVATIVE GROWTH", color: "bg-[#ff9312]" },
-                         { title: "STABILITY FIRST", color: "bg-[#4c2f05]/20" },
-                         { title: "USER EXPERIENCE", color: "bg-[#ff9312]/60" }
-                       ].map((item, i) => (
-                         <div key={i} className="space-y-4">
-                            <div className="flex justify-between items-center">
-                               <span className="text-xl font-black uppercase tracking-tighter">{item.title}</span>
-                               <span className="text-[14px] font-black opacity-40 uppercase tracking-widest">{rankScores[i]}% SYNC</span>
-                            </div>
-                            <div 
-                              className="h-14 bg-[#4c2f05]/5 rounded-[1.25rem] border-2 border-[#4c2f05]/10 overflow-hidden relative cursor-pointer group/bar"
-                              onClick={() => {
-                                const newScores = [...rankScores];
-                                newScores[i] = Math.min(100, newScores[i] + 5);
-                                setRankScores(newScores);
-                              }}
-                            >
-                               <div 
-                                 className={cn("absolute left-0 h-full transition-all duration-1000 group-active/bar:opacity-80", item.color)} 
-                                 style={{ width: `${rankScores[i]}%` }}
-                               />
-                            </div>
-                         </div>
-                       ))}
-                    </div>
-                    <p className="text-[10px] opacity-20 uppercase font-black text-center mt-10 tracking-[0.4em]">Touch bars to increase priority</p>
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* FINAL CTA */}
         <section className="py-60 text-center bg-[#ff9312] text-[#4c2f05] border-t-8 border-[#4c2f05]">
           <div className="studio-container space-y-24 px-4">
             <h2 className="text-8xl md:text-9xl lg:text-[12rem] font-black uppercase tracking-tighter leading-[0.75]">
@@ -392,11 +182,11 @@ export default function Home() {
               Launch?
             </h2>
             <div className="flex flex-col sm:flex-row justify-center gap-10">
-              <Link href="/login" className="h-28 px-20 rounded-[2rem] text-[16px] font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all flex items-center justify-center uppercase tracking-[0.3em]">
-                START DASHBOARD
+              <Link href="/login" className="h-28 px-20 rounded-[2rem] text-lg font-black bg-[#4c2f05] text-[#ff9312] border-4 border-[#4c2f05] hover:bg-transparent hover:text-[#4c2f05] transition-all flex items-center justify-center uppercase tracking-widest">
+                Start Dashboard
               </Link>
-              <Link href="/join" className="h-28 px-20 rounded-[2rem] text-[16px] font-black border-4 border-[#4c2f05] text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312] transition-all flex items-center justify-center uppercase tracking-[0.3em]">
-                JOIN SESSION
+              <Link href="/join" className="h-28 px-20 rounded-[2rem] text-lg font-black border-4 border-[#4c2f05] text-[#4c2f05] hover:bg-[#4c2f05] hover:text-[#ff9312] transition-all flex items-center justify-center uppercase tracking-widest">
+                Join Session
               </Link>
             </div>
           </div>

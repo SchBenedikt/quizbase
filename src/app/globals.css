@@ -79,13 +79,13 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border shadow-none !shadow-none;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased transition-colors duration-500 shadow-none;
+    @apply bg-background text-foreground font-body antialiased transition-colors duration-500;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-headline font-bold tracking-tight uppercase;
+    @apply font-headline font-bold tracking-tight;
   }
 }
 
@@ -118,15 +118,6 @@
   padding-right: 1.5rem;
 }
 
-/* Custom Studio Brutalist Utilities */
 .studio-border {
   border: 2px solid currentColor;
-}
-
-.studio-shadow {
-  box-shadow: 10px 10px 0px 0px currentColor;
-}
-
-.studio-shadow-hover:hover {
-  box-shadow: 15px 15px 0px 0px currentColor;
 }
