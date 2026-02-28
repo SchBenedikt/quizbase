@@ -413,7 +413,7 @@ function ResponseMatrix({ questions, responses, participants, isQuiz }: {
       return { display: label.length > 16 ? label.slice(0, 16) + "…" : label, correct };
     }
     if (question.type === 'ranking' && Array.isArray(val)) {
-      return { display: (val as number[]).map(i => question.options?.[i] ?? i).join(" > ").slice(0, 18), correct: null };
+      return { display: (val as unknown as number[]).map(i => question.options?.[Number(i)] ?? i).join(" > ").slice(0, 18), correct: null };
     }
     const strVal = String(val).slice(0, 18);
     return { display: strVal, correct: null };
@@ -523,7 +523,7 @@ function exportCSV(session: PollSession, questions: PollQuestion[], responses: P
     const cells = questions.map(q => {
       const r = responses.find(r => r.userId === p.id && r.questionId === q.id);
       if (!r) return "";
-      if (Array.isArray(r.value)) return (r.value as number[]).map(i => q.options?.[i] ?? i).join(" > ");
+      if (Array.isArray(r.value)) return (r.value as unknown as number[]).map(i => q.options?.[Number(i)] ?? i).join(" > ");
       if ((q.type === 'multiple-choice' || q.type === 'true-false') && q.options) return q.options[Number(r.value)] ?? String(r.value);
       return String(r.value);
     });

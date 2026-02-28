@@ -19,6 +19,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
+import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -43,7 +44,30 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     return query(collection(db, `users/${session.userId}/surveys/${session.pollId}/questions`), orderBy("order", "asc"));
   }, [db, session?.userId, session?.pollId]);
   
-  const { data: questions } = useCollection<PollQuestion>(questionsQuery);
+  const { data: rawQuestions } = useCollection<PollQuestion>(questionsQuery);
+
+  const pollRef = useMemoFirebase(() => {
+    if (!session?.userId || !session?.pollId) return null;
+    return doc(db, `users/${session.userId}/surveys/${session.pollId}`);
+  }, [db, session?.userId, session?.pollId]);
+  const { data: pollData } = useDoc(pollRef);
+
+  // Shuffle questions once per session if shuffleQuestions is enabled
+  const [shuffledOrder, setShuffledOrder] = useState<number[] | null>(null);
+  useEffect(() => {
+    if (rawQuestions && rawQuestions.length > 0 && pollData?.shuffleQuestions && !shuffledOrder) {
+      const indices = rawQuestions.map((_, i) => i);
+      for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+      }
+      setShuffledOrder(indices);
+    }
+  }, [rawQuestions, pollData?.shuffleQuestions, shuffledOrder]);
+
+  const questions = rawQuestions && shuffledOrder
+    ? shuffledOrder.map(i => rawQuestions[i])
+    : rawQuestions;
 
   const responsesQuery = useMemoFirebase(() => {
     if (!resolvedParams.sessionId) return null;
@@ -91,6 +115,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const autoAdvanceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (allResponses && session?.currentQuestionId) {
@@ -128,6 +153,36 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [session?.currentQuestionId, questions]);
 
+  // Auto-advance when timer reaches 0 (after 5s delay to show results)
+  useEffect(() => {
+    if (autoAdvanceRef.current) { clearTimeout(autoAdvanceRef.current); autoAdvanceRef.current = null; }
+    if (timeLeft === 0 && session?.currentQuestionId && session.currentQuestionId !== 'lobby' && session.currentQuestionId !== 'podium' && questions && sessionRef) {
+      autoAdvanceRef.current = setTimeout(() => {
+        const currentIdx = questions.findIndex(q => q.id === session.currentQuestionId);
+        if (currentIdx < questions.length - 1) {
+          updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[currentIdx + 1].id });
+        } else {
+          updateDocumentNonBlocking(sessionRef, { currentQuestionId: 'podium' });
+        }
+      }, 5000);
+    }
+    return () => { if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current); };
+  }, [timeLeft, session?.currentQuestionId, questions, sessionRef]);
+
+  // Confetti celebration on podium
+  useEffect(() => {
+    if (session?.currentQuestionId === 'podium') {
+      const duration = 3000;
+      const end = Date.now() + duration;
+      const frame = () => {
+        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.7 } });
+        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.7 } });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      };
+      frame();
+    }
+  }, [session?.currentQuestionId]);
+
   const handleStartQuiz = () => {
     if (!questions || questions.length === 0 || !sessionRef) return;
     updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[0].id, isStarted: true });
@@ -155,6 +210,12 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     } else {
       updateDocumentNonBlocking(sessionRef, { currentQuestionId: 'lobby' });
     }
+  };
+
+  const handleEndSession = () => {
+    if (!sessionRef) return;
+    updateDocumentNonBlocking(sessionRef, { status: 'ended' });
+    toast({ title: "Session ended", description: "All participants have been notified." });
   };
 
   const handleKick = (participantId: string) => {
@@ -289,6 +350,16 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                    </div>
                 </div>
              </div>
+              <div className="flex items-center gap-4 pt-4">
+                <Link href={`/presenter/${resolvedParams.sessionId}/stats`}>
+                  <Button className="h-12 px-8 rounded-xl font-semibold text-sm gap-2" style={{ backgroundColor: finalFg, color: finalBg }}>
+                    <BarChart3 className="h-4 w-4" /> View Statistics
+                  </Button>
+                </Link>
+                <Button variant="outline" onClick={handleEndSession} className="h-12 px-8 rounded-xl font-semibold text-sm border-2" style={{ borderColor: finalFg + '44', color: finalFg }}>
+                  End Session
+                </Button>
+              </div>
           </div>
         ) : (
           <div className="w-full max-w-[1600px] h-full flex flex-col gap-6">

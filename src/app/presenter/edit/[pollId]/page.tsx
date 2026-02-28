@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion } from "@/app/types/poll";
-import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon, Trophy, BarChart3 } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon, Trophy, BarChart3, Shuffle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
@@ -38,6 +38,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   const [theme, setTheme] = useState<string>("orange");
   const [customColor, setCustomColor] = useState<string | null>(null);
   const [isQuiz, setIsQuiz] = useState<boolean>(false);
+  const [shuffleQuestions, setShuffleQuestions] = useState<boolean>(false);
   const [currentQuestions, setCurrentQuestions] = useState<PollQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<number | null>(null);
@@ -48,6 +49,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       setTheme(poll.theme || "orange");
       setCustomColor(poll.customColor || null);
       setIsQuiz(poll.isQuiz ?? false);
+      setShuffleQuestions(poll.shuffleQuestions ?? false);
     }
   }, [poll]);
 
@@ -63,7 +65,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
   }, [user, isUserLoading, router]);
 
-  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null, isQuizToSave: boolean) => {
+  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null, isQuizToSave: boolean, shuffleSave?: boolean) => {
     if (!user || !pollRef) return;
     
     try {
@@ -72,6 +74,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         theme: themeToSave, 
         customColor: customColorToSave,
         isQuiz: isQuizToSave,
+        shuffleQuestions: shuffleSave ?? false,
         updatedAt: serverTimestamp() 
       }, { merge: true });
 
@@ -113,16 +116,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
 
     const timer = setTimeout(() => {
       if (currentQuestions.length > 0) {
-        performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz);
+        performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions);
       }
     }, 2000); 
 
     return () => clearTimeout(timer);
-  }, [currentQuestions, sessionTitle, theme, customColor, isQuiz, initialQuestions, performSave]);
+  }, [currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions, initialQuestions, performSave]);
 
   const handleManualSave = async () => {
     setLoading(true);
-    await performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz);
+    await performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions);
     toast({ title: "Survey Saved", description: "All changes have been synced." });
     setLoading(false);
   };
@@ -195,6 +198,14 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
                     <Trophy className="h-4 w-4" /> Quiz
                   </button>
                 </div>
+
+                {/* Shuffle Questions toggle */}
+                <button
+                  onClick={() => setShuffleQuestions(!shuffleQuestions)}
+                  className={`flex items-center gap-2 h-12 px-5 rounded-lg border text-sm font-medium transition-all ${shuffleQuestions ? 'bg-foreground text-background border-foreground' : 'border-foreground/10 hover:bg-foreground/5'}`}
+                >
+                  <Shuffle className="h-4 w-4" /> Shuffle
+                </button>
 
                 <Popover>
                   <PopoverTrigger asChild>

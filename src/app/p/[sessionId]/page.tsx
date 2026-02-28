@@ -40,6 +40,12 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
   const { data: participantData } = useDoc<PollParticipant>(participantRef);
 
+  const allParticipantsQuery = useMemoFirebase(() => {
+    if (!session?.id) return null;
+    return query(collection(db, `sessions/${session.id}/participants`), where("status", "==", "active"));
+  }, [db, session?.id]);
+  const { data: allParticipants } = useCollection<PollParticipant>(allParticipantsQuery);
+
   const [currentQuestion, setCurrentQuestion] = useState<PollQuestion | null>(null);
   const [voted, setVoted] = useState(false);
   const [selection, setSelection] = useState<number | null>(null);
@@ -281,27 +287,54 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     </div>
   );
 
-  if (session.currentQuestionId === 'podium') return (
-    <div className="min-h-screen flex flex-col p-6 transition-colors duration-700 font-body items-center justify-center" style={dynamicStyles}>
-      <div className="space-y-6 text-center max-w-sm w-full">
-        <Trophy className="h-16 w-16 mx-auto animate-bounce text-yellow-500" />
-        <h1 className="text-4xl font-bold">Session finished!</h1>
-        {isQuizMode && (
-          <div className="bg-black/10 px-8 py-6 rounded-2xl" style={{ borderColor: finalFg + '33' }}>
-             <p className="text-xs font-semibold uppercase tracking-widest mb-2 opacity-40">Your score</p>
-             <p className="text-5xl font-black tabular-nums">{participantData?.score || 0}</p>
-          </div>
-        )}
-        <Button 
-          onClick={() => window.location.href = '/join'} 
-          className="h-12 px-10 rounded-xl font-semibold" 
-          style={{ backgroundColor: finalFg, color: finalBg }}
-        >
-          Join another session
-        </Button>
+  if (session.currentQuestionId === 'podium') {
+    const sorted = [...(allParticipants || [])].sort((a, b) => (b.score || 0) - (a.score || 0));
+    const myRank = sorted.findIndex(p => p.id === user?.uid) + 1;
+    const totalP = sorted.length;
+
+    return (
+      <div className="min-h-screen flex flex-col p-6 transition-colors duration-700 font-body items-center justify-center" style={dynamicStyles}>
+        <div className="space-y-6 text-center max-w-sm w-full">
+          <Trophy className="h-16 w-16 mx-auto animate-bounce text-yellow-500" />
+          <h1 className="text-4xl font-bold">Session finished!</h1>
+          {isQuizMode && (
+            <>
+              <div className="bg-black/10 px-8 py-6 rounded-2xl" style={{ borderColor: finalFg + '33' }}>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-2 opacity-40">Your score</p>
+                <p className="text-5xl font-black tabular-nums">{participantData?.score || 0}</p>
+              </div>
+              {myRank > 0 && (
+                <div className="bg-black/10 px-6 py-4 rounded-xl">
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-1 opacity-40">Your rank</p>
+                  <p className="text-3xl font-bold">#{myRank} <span className="text-base font-medium opacity-50">of {totalP}</span></p>
+                </div>
+              )}
+              {/* Top 3 mini-leaderboard */}
+              {sorted.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <p className="text-xs font-semibold uppercase tracking-widest opacity-40">Top Players</p>
+                  {sorted.slice(0, 3).map((p, i) => (
+                    <div key={p.id} className={cn("flex items-center gap-3 px-4 py-3 rounded-xl", p.id === user?.uid ? "border-2" : "bg-black/5")} style={p.id === user?.uid ? { borderColor: finalFg } : {}}>
+                      <span className="text-sm font-bold w-6">{i + 1}.</span>
+                      <span className="flex-1 text-sm font-semibold truncate text-left">{p.nickname || "Anonymous"}</span>
+                      <span className="text-sm font-bold tabular-nums">{p.score || 0}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+          <Button 
+            onClick={() => window.location.href = '/join'} 
+            className="h-12 px-10 rounded-xl font-semibold" 
+            style={{ backgroundColor: finalFg, color: finalBg }}
+          >
+            Join another session
+          </Button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   if (session.currentQuestionId === 'lobby') return (
     <div className="min-h-screen flex flex-col p-6 transition-colors duration-700 font-body items-center justify-center" style={dynamicStyles}>

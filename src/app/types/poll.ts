@@ -56,6 +56,7 @@ export interface Survey {
   title: string;
   isPublic?: boolean;
   isQuiz?: boolean;
+  shuffleQuestions?: boolean;
   theme?: string;
   customColor?: string;
   createdAt: any;

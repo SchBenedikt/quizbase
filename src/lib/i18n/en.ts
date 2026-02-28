@@ -30,7 +30,7 @@ export const en = {
       freeForever: { title: "Free Forever", desc: "All core features are free with no session limits, no paywalls, no watermarks." },
       realTime: { title: "Real-Time Results", desc: "Responses appear live on the presenter screen as participants submit them." },
       anonymous: { title: "Anonymous Voting", desc: "Participants don't need an account — they pick a nickname and they're in." },
-      multipleTypes: { title: "10 Question Types", desc: "Polls, quizzes, sliders, ratings, word clouds, ranking, true/false, guess the number and more." },
+      multipleTypes: { title: "9 Question Types", desc: "Polls, quizzes, sliders, ratings, word clouds, ranking, true/false, guess the number and more." },
       openSource: { title: "Open Platform", desc: "Discover and host surveys created by the community in the public library." },
     },
   },

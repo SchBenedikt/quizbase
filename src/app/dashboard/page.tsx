@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Compass, Lock, History, ExternalLink } from "lucide-react";
+import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Compass, Lock, History, ExternalLink, Copy } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc, where, limit } from "firebase/firestore";
@@ -101,6 +101,37 @@ export default function DashboardPage() {
   const handleCreateNew = () => {
     const surveyId = Math.random().toString(36).substr(2, 9);
     router.push(`/presenter/edit/${surveyId}`);
+  };
+
+  const handleDuplicateSurvey = async (survey: any) => {
+    if (!user) return;
+    try {
+      const newId = Math.random().toString(36).substr(2, 9);
+      const newSurveyRef = doc(db, `users/${user.uid}/surveys/${newId}`);
+      setDocumentNonBlocking(newSurveyRef, {
+        title: `${survey.title || "Untitled"} (Copy)`,
+        isPublic: false,
+        isQuiz: survey.isQuiz || false,
+        theme: survey.theme || 'orange',
+        customColor: survey.customColor || null,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+
+      const questionsSnap = await getDocs(
+        query(collection(db, `users/${user.uid}/surveys/${survey.id}/questions`), orderBy("order", "asc"))
+      );
+      for (const qDoc of questionsSnap.docs) {
+        const qData = qDoc.data();
+        const newQId = Math.random().toString(36).substr(2, 9);
+        const newQRef = doc(db, `users/${user.uid}/surveys/${newId}/questions/${newQId}`);
+        setDocumentNonBlocking(newQRef, { ...qData, id: newQId }, { merge: true });
+      }
+
+      toast({ title: "Survey duplicated", description: `"${survey.title || "Untitled"}" has been copied.` });
+    } catch {
+      toast({ title: "Duplicate failed", description: "Could not duplicate the survey." });
+    }
   };
 
   const filteredSurveys = surveys?.filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -213,6 +244,14 @@ export default function DashboardPage() {
                      className="flex-1 h-9 rounded-lg font-semibold text-sm shadow-none"
                    >
                      <Play className="mr-1.5 h-3 w-3 fill-current" /> {t.dashboard.launch}
+                   </Button>
+                   <Button 
+                     variant="outline" 
+                     onClick={() => handleDuplicateSurvey(survey)}
+                     className="h-9 w-9 rounded-lg border border-foreground/10 flex items-center justify-center shadow-none p-0"
+                     aria-label={`Duplicate ${survey.title || "Untitled Survey"}`}
+                   >
+                     <Copy className="h-3.5 w-3.5" />
                    </Button>
                    <Button 
                      variant="outline" 

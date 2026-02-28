@@ -32,7 +32,7 @@ export const de: Translations = {
       freeForever: { title: "Dauerhaft kostenlos", desc: "Alle Kernfunktionen sind kostenlos — ohne Sitzungslimits, Paywalls oder Wasserzeichen." },
       realTime: { title: "Echtzeit-Ergebnisse", desc: "Antworten erscheinen live auf dem Präsentationsbildschirm, sobald sie eingereicht werden." },
       anonymous: { title: "Anonyme Abstimmung", desc: "Teilnehmer brauchen kein Konto — sie wählen einen Spitznamen und sind dabei." },
-      multipleTypes: { title: "10 Fragetypen", desc: "Umfragen, Quizze, Schieberegler, Bewertungen, Wortwolken, Ranking, Wahr/Falsch, Schätzfragen und mehr." },
+      multipleTypes: { title: "9 Fragetypen", desc: "Umfragen, Quizze, Schieberegler, Bewertungen, Wortwolken, Ranking, Wahr/Falsch, Schätzfragen und mehr." },
       openSource: { title: "Offene Plattform", desc: "Entdecke und hoste Umfragen der Community in der öffentlichen Bibliothek." },
     },
   },
