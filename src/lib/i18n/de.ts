@@ -5,6 +5,7 @@ export const de: Translations = {
   nav: {
     discover: "Entdecken",
     dashboard: "Dashboard",
+    analytics: "Analytik",
     settings: "Einstellungen",
     logout: "Abmelden",
     login: "Anmelden",

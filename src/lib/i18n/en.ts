@@ -3,6 +3,7 @@ export const en = {
   nav: {
     discover: "Discover",
     dashboard: "Dashboard",
+    analytics: "Analytics",
     settings: "Settings",
     logout: "Logout",
     login: "Login",

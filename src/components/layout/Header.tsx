@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
-import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Compass } from "lucide-react";
+import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Compass, BarChart3 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useTranslation, type Locale } from "@/contexts/LanguageContext";
@@ -91,6 +91,18 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                   >
                     <Link href="/dashboard">
                       <LayoutDashboard className="h-3 w-3 mr-1.5" /> {t.nav.dashboard}
+                    </Link>
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    asChild 
+                    className={cn(
+                      "rounded-md px-3 font-semibold text-xs h-8 transition-all",
+                      pathname === '/analytics' ? "bg-foreground text-background" : "hover:bg-foreground/10"
+                    )}
+                  >
+                    <Link href="/analytics">
+                      <BarChart3 className="h-3 w-3 mr-1.5" /> {t.nav.analytics}
                     </Link>
                   </Button>
                   <Button 
