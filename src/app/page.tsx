@@ -5,10 +5,31 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Zap, ArrowRight, Monitor, Share2, Smartphone, Users, Timer } from "lucide-react";
+import { Zap, ArrowRight, Monitor, Share2, Smartphone, Users, Timer, CheckSquare, AlignLeft, Hash, SlidersHorizontal, Star, List, ToggleLeft, Target, Gauge } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { cn } from "@/lib/utils";
+
+// ─── Stats numbers ──────────────────────────────────────────────────────────
+const STATS = [
+  { value: "9", label: "Question types", suffix: "" },
+  { value: "100", label: "Free forever", suffix: "%" },
+  { value: "6", label: "Digit join code", suffix: "-" },
+  { value: "0", label: "App required", suffix: "" },
+];
+
+// ─── Question types showcase ────────────────────────────────────────────────
+const QUESTION_TYPES = [
+  { icon: CheckSquare, label: "Multiple Choice", desc: "Classic A/B/C/D with live vote bars" },
+  { icon: ToggleLeft, label: "True / False", desc: "Quick ✓/✗ check — ideal for icebreakers" },
+  { icon: Star, label: "Star Rating", desc: "Animated 1–5 ★ average in real time" },
+  { icon: AlignLeft, label: "Open Text", desc: "Free-form responses shown as a live feed" },
+  { icon: Hash, label: "Word Cloud", desc: "Most-said words appear largest" },
+  { icon: SlidersHorizontal, label: "Slider", desc: "Continuous numeric vote on a range" },
+  { icon: Gauge, label: "Scale", desc: "Discrete step rating with a custom label" },
+  { icon: List, label: "Ranking", desc: "Drag-to-rank with consensus order result" },
+  { icon: Target, label: "Guess the Number", desc: "Closest answer wins — great for quizzes" },
+];
 
 export default function Home() {
   const [joinCode, setJoinCode] = useState("");
@@ -130,6 +151,26 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── Stats strip ── */}
+        <section className="border-t-2 border-b-2 border-[#4c2f05] bg-[#4c2f05] text-[#ff9312]">
+          <div className="studio-container grid grid-cols-2 sm:grid-cols-4 divide-x-2 divide-[#ff9312]/20">
+            {STATS.map((s, i) => (
+              <div key={i} className="py-8 px-6 text-center space-y-1">
+                <p className="text-4xl md:text-5xl font-black tabular-nums tracking-tighter leading-none">
+                  {s.suffix === '-' ? (
+                    <>{s.value}<span className="text-2xl opacity-50 ml-0.5">-digit</span></>
+                  ) : s.suffix === '%' ? (
+                    <>{s.value}<span className="text-2xl opacity-50">%</span></>
+                  ) : (
+                    s.value
+                  )}
+                </p>
+                <p className="text-xs font-bold uppercase tracking-widest opacity-50">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section className="py-24 bg-[#4c2f05] text-[#ff9312] overflow-x-clip">
           <div className="studio-container grid lg:grid-cols-2 gap-16 items-center">
             <div className="relative px-6 flex justify-center lg:justify-start">
@@ -198,6 +239,33 @@ export default function Home() {
                   <span className="text-4xl">{feat.emoji}</span>
                   <h3 className="text-lg font-bold tracking-tight">{feat.title}</h3>
                   <p className="text-sm font-medium opacity-60 leading-relaxed">{feat.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Question Types Showcase ── */}
+        <section className="py-24 bg-[#4c2f05] text-[#ff9312] border-t-2 border-[#ff9312]/10">
+          <div className="studio-container px-4">
+            <div className="text-center mb-14">
+              <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-[0.9] mb-4">
+                9 Question Types
+              </h2>
+              <p className="text-base font-semibold opacity-50 max-w-xl mx-auto">
+                Every engagement format you need — all in one place.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {QUESTION_TYPES.map((qt, i) => (
+                <div key={i} className="bg-[#ff9312]/5 border border-[#ff9312]/15 rounded-2xl p-5 space-y-3 hover:bg-[#ff9312]/10 hover:border-[#ff9312]/30 transition-all group">
+                  <div className="w-9 h-9 rounded-lg bg-[#ff9312] text-[#4c2f05] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                    <qt.icon className="h-4 w-4" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold leading-tight">{qt.label}</h3>
+                    <p className="text-xs font-medium opacity-40 leading-snug">{qt.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
