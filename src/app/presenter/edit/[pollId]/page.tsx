@@ -99,6 +99,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         if (q.timeLimit !== undefined) qData.timeLimit = q.timeLimit;
         if (q.range) qData.range = q.range;
         if (q.labels) qData.labels = q.labels;
+        if (q.description) qData.description = q.description;
 
         batch.set(qRef, qData, { merge: true });
       }

@@ -222,6 +222,16 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
                             </div>
                           </div>
 
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium opacity-60">Description (optional)</Label>
+                            <Input 
+                              value={q.description || ""} 
+                              onChange={(e) => updateQuestion(q.id, { description: e.target.value })}
+                              placeholder="Add a hint or context..."
+                              className="h-10 border border-foreground/10 bg-card rounded-lg px-4 focus-visible:ring-1 focus-visible:ring-primary shadow-none text-sm"
+                            />
+                          </div>
+
                               {(q.type === 'multiple-choice' || q.type === 'ranking' || q.type === 'true-false') && q.options && (
                             <div className="space-y-5">
                               <div className="flex items-center justify-between">

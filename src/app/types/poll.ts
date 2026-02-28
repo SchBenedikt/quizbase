@@ -5,6 +5,7 @@ export interface PollQuestion {
   id: string;
   type: PollType;
   question: string;
+  description?: string; // Optional subtitle / hint
   options?: string[]; // For multiple choice, ranking
   correctOptionIndices?: number[]; // For Quiz Mode (Multiple Correct Answers)
   timeLimit?: number; // In seconds, 0 = unlimited

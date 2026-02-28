@@ -453,6 +453,9 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   </div>
                 )}
                 <h2 className="text-2xl md:text-3xl font-bold leading-tight">{currentQuestion.question}</h2>
+                {currentQuestion.description && (
+                  <p className="text-sm font-medium opacity-50">{currentQuestion.description}</p>
+                )}
               </div>
               {timeLeft !== null && (
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl border-2 shrink-0" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>

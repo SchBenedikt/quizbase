@@ -183,6 +183,17 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   }, [session?.currentQuestionId]);
 
+  // Keyboard shortcuts for navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); handleNext(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev(); }
+      if (e.key === 'f' || e.key === 'F') { document.documentElement.requestFullscreen?.(); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  });
+
   const handleStartQuiz = () => {
     if (!questions || questions.length === 0 || !sessionRef) return;
     updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[0].id, isStarted: true });
@@ -368,6 +379,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                 <div className="text-center shrink-0 space-y-4 relative">
                   <div className="flex items-center justify-center gap-5">
                     <div className="px-6 py-3 rounded-xl text-3xl font-bold" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions.length}</div>
+                    <div className="px-5 py-3 rounded-xl border-2 flex items-center gap-2 text-xl font-bold" style={{ borderColor: finalFg + '33' }}>
+                      <Users className="h-5 w-5" />
+                      <span className="tabular-nums">{allResponses?.filter(r => r.questionId === session?.currentQuestionId).length || 0}</span>
+                      <span className="text-sm font-medium opacity-40">/ {activeParticipants.length}</span>
+                    </div>
                     {session?.isQuiz && currentQuestion?.isDoublePoints && (
                       <div className="px-6 py-3 rounded-xl text-2xl font-bold bg-yellow-400 text-yellow-900 animate-bounce flex items-center gap-2">
                         <Zap className="h-6 w-6 fill-current" /> 2× Points
@@ -381,6 +397,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                     )}
                   </div>
                   <h2 className="text-4xl md:text-5xl font-bold leading-tight max-w-5xl mx-auto">{currentQuestion?.question}</h2>
+                  {currentQuestion?.description && (
+                    <p className="text-lg font-medium opacity-50 max-w-3xl mx-auto">{currentQuestion.description}</p>
+                  )}
                 </div>
                 
                 <div className="flex-1 min-h-0 w-full flex flex-col lg:flex-row gap-6">
