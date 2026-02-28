@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Compass, Lock } from "lucide-react";
+import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Compass, Lock, History, ExternalLink } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc } from "firebase/firestore";
+import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc, where, limit } from "firebase/firestore";
 import { deleteDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from "@/firebase/error-emitter";
@@ -38,6 +38,13 @@ export default function DashboardPage() {
   }, [user, db, isUserLoading]);
 
   const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
+
+  // Past sessions query (last 20)
+  const sessionsQuery = useMemoFirebase(() => {
+    if (!user || !user.uid || isUserLoading) return null;
+    return query(collection(db, "sessions"), where("userId", "==", user.uid), orderBy("createdAt", "desc"), limit(20));
+  }, [user, db, isUserLoading]);
+  const { data: pastSessions } = useCollection<{ id: string; title: string; code: string; createdAt: any; isQuiz?: boolean; status?: string }>(sessionsQuery);
 
   const handleDeleteSurvey = (surveyId: string) => {
     if (!user) return;
@@ -199,6 +206,48 @@ export default function DashboardPage() {
                 </div>
               </article>
             ))}
+          </div>
+        )}
+
+        {/* ── Past Sessions ── */}
+        {pastSessions && pastSessions.length > 0 && (
+          <div className="space-y-4 pt-4 border-t">
+            <div className="flex items-center gap-3">
+              <History className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold tracking-tight">Past Sessions</h2>
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full font-semibold">{pastSessions.length}</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {pastSessions.map((session) => (
+                <div key={session.id} className="bg-card rounded-xl border border-foreground/8 p-4 flex flex-col gap-3 hover:border-primary/30 transition-all shadow-none group">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate leading-tight">{session.title || "Untitled Session"}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded font-bold">{session.code}</span>
+                        {session.isQuiz ? (
+                          <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">Quiz</span>
+                        ) : (
+                          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">Survey</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
+                    <span>{mounted && session.createdAt ? new Date(session.createdAt.seconds * 1000).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "—"}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full h-8 rounded-lg gap-1.5 text-xs font-semibold shadow-none"
+                    onClick={() => router.push(`/presenter/${session.id}/stats`)}
+                  >
+                    <BarChart3 className="h-3.5 w-3.5" /> View Analytics
+                  </Button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </main>
