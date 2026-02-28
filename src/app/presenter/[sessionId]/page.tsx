@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, use, useRef } from "react";
+import { useState, useEffect, use, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { 
@@ -183,23 +183,12 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     }
   }, [session?.currentQuestionId]);
 
-  // Keyboard shortcuts for navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); handleNext(); }
-      if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev(); }
-      if (e.key === 'f' || e.key === 'F') { document.documentElement.requestFullscreen?.(); }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  });
-
   const handleStartQuiz = () => {
     if (!questions || questions.length === 0 || !sessionRef) return;
     updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[0].id, isStarted: true });
   };
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (!questions || !session || !sessionRef) return;
     const currentIdx = questions.findIndex(q => q.id === session.currentQuestionId);
     if (currentIdx < questions.length - 1) {
@@ -207,9 +196,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     } else {
       updateDocumentNonBlocking(sessionRef, { currentQuestionId: 'podium' });
     }
-  };
+  }, [questions, session, sessionRef]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (!questions || !session || !sessionRef) return;
     if (session.currentQuestionId === 'podium') {
       updateDocumentNonBlocking(sessionRef, { currentQuestionId: questions[questions.length - 1].id });
@@ -221,7 +210,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     } else {
       updateDocumentNonBlocking(sessionRef, { currentQuestionId: 'lobby' });
     }
-  };
+  }, [questions, session, sessionRef]);
 
   const handleEndSession = () => {
     if (!sessionRef) return;
@@ -235,6 +224,17 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     updateDocumentNonBlocking(pRef, { status: 'kicked' });
     toast({ title: "Removed", description: "User disconnected." });
   };
+
+  // Keyboard shortcuts for navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); handleNext(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); handlePrev(); }
+      if (e.key === 'f' || e.key === 'F') { document.documentElement.requestFullscreen?.(); }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleNext, handlePrev]);
 
   const getContrastColor = (hex: string) => {
     if (!hex) return '#000000';

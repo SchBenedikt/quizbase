@@ -112,6 +112,7 @@ export default function DashboardPage() {
         title: `${survey.title || "Untitled"} (Copy)`,
         isPublic: false,
         isQuiz: survey.isQuiz || false,
+        shuffleQuestions: survey.shuffleQuestions || false,
         theme: survey.theme || 'orange',
         customColor: survey.customColor || null,
         createdAt: serverTimestamp(),
