@@ -4,9 +4,9 @@ import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  BarChart3, Users, MessageSquare, Trophy, Calendar, TrendingUp,
-  ChevronRight, Clock, Loader2, ArrowUpRight, Activity, Zap,
-  Search
+  BarChart3, Users, Trophy, Calendar, TrendingUp,
+  ChevronRight, Loader2, ArrowUpRight, Activity, Zap,
+  Search, CalendarDays, Flame, ArrowUp, ArrowDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,35 +36,33 @@ function fmtTime(ts: any) {
   return new Date(ts.seconds * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 }
 
-function weekKey(ts: any): string {
-  if (!ts?.seconds) return "?";
-  const d = new Date(ts.seconds * 1000);
-  const startOfYear = new Date(d.getFullYear(), 0, 1);
-  const week = Math.ceil(((d.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7);
-  return `W${week} ${d.getFullYear()}`;
-}
-
 function monthKey(ts: any): string {
   if (!ts?.seconds) return "?";
   const d = new Date(ts.seconds * 1000);
   return d.toLocaleDateString(undefined, { month: "short", year: "numeric" });
 }
 
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 // ─── Summary Card ─────────────────────────────────────────────────────────────
-function KpiCard({ label, value, icon: Icon, sub, color }: {
+function KpiCard({ label, value, icon: Icon, sub, trend }: {
   label: string; value: string | number;
   icon: React.ComponentType<{ className?: string }>;
-  sub?: string; color?: string;
+  sub?: string; trend?: 'up' | 'down' | null;
 }) {
   return (
     <div className="rounded-2xl border bg-card p-5 space-y-3 shadow-none">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-        <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", color ?? "bg-primary/10")}>
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
           <Icon className="h-4 w-4 text-primary" />
         </div>
       </div>
-      <p className="text-4xl font-black tabular-nums tracking-tight">{value}</p>
+      <div className="flex items-end gap-2">
+        <p className="text-4xl font-black tabular-nums tracking-tight">{value}</p>
+        {trend === 'up' && <ArrowUp className="h-4 w-4 text-green-500 mb-1 shrink-0" />}
+        {trend === 'down' && <ArrowDown className="h-4 w-4 text-red-400 mb-1 shrink-0" />}
+      </div>
       {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
     </div>
   );
@@ -76,7 +74,7 @@ export default function AnalyticsPage() {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"date" | "participants" | "responses">("date");
+  const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [filterType, setFilterType] = useState<"all" | "quiz" | "survey">("all");
   const [mounted, setMounted] = useState(false);
 
@@ -102,20 +100,54 @@ export default function AnalyticsPage() {
     isQuiz?: boolean; status?: string; pollId?: string;
   }>(sessionsQuery);
 
-  // Load all responses across sessions (via sessionIds)
-  // We use per-session subcollection — we'll count by joining response collections
-  // For aggregate, we do a top-level query by sessionId not available — approximate from session docs
+  // ── Date helpers ──
+  const now = useMemo(() => new Date(), []);
+  const startOfWeek = useMemo(() => {
+    const d = new Date(now); d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - d.getDay()); return d;
+  }, [now]);
+  const startOfMonth = useMemo(() => new Date(now.getFullYear(), now.getMonth(), 1), [now]);
+  const startOfPrevMonth = useMemo(() => new Date(now.getFullYear(), now.getMonth() - 1, 1), [now]);
 
-  const filteredSessions = useMemo(() => {
-    if (!sessions) return [];
-    return sessions
-      .filter(s => {
-        if (filterType === 'quiz') return !!s.isQuiz;
-        if (filterType === 'survey') return !s.isQuiz;
-        return true;
-      })
-      .filter(s => !search || s.title?.toLowerCase().includes(search.toLowerCase()) || s.code?.includes(search));
-  }, [sessions, filterType, search]);
+  const tsDate = (ts: any) => ts?.seconds ? new Date(ts.seconds * 1000) : null;
+
+  // ── Aggregate KPIs ──
+  const totalSessions = sessions?.length ?? 0;
+  const quizCount = sessions?.filter(s => s.isQuiz).length ?? 0;
+  const surveyCount = totalSessions - quizCount;
+  const endedCount = sessions?.filter(s => s.status === 'ended').length ?? 0;
+  const activeCount = totalSessions - endedCount;
+
+  const thisWeekCount = useMemo(() =>
+    sessions?.filter(s => { const d = tsDate(s.createdAt); return d && d >= startOfWeek; }).length ?? 0,
+    [sessions, startOfWeek]
+  );
+  const thisMonthCount = useMemo(() =>
+    sessions?.filter(s => { const d = tsDate(s.createdAt); return d && d >= startOfMonth; }).length ?? 0,
+    [sessions, startOfMonth]
+  );
+  const prevMonthCount = useMemo(() =>
+    sessions?.filter(s => { const d = tsDate(s.createdAt); return d && d >= startOfPrevMonth && d < startOfMonth; }).length ?? 0,
+    [sessions, startOfMonth, startOfPrevMonth]
+  );
+
+  // Average sessions per month (over all months that have data)
+  const avgPerMonth = useMemo(() => {
+    if (!sessions?.length) return 0;
+    const months = new Set(sessions.map(s => monthKey(s.createdAt)));
+    const oneDecimal = 10;
+    return Math.round((sessions.length / Math.max(months.size, 1)) * oneDecimal) / oneDecimal;
+  }, [sessions]);
+
+  // Most active weekday
+  const weekdayData = useMemo(() => {
+    if (!sessions) return WEEKDAYS.map((d, i) => ({ day: d, count: 0, isTop: false }));
+    const counts = [0, 0, 0, 0, 0, 0, 0];
+    sessions.forEach(s => { const d = tsDate(s.createdAt); if (d) counts[d.getDay()]++; });
+    const max = Math.max(...counts);
+    return WEEKDAYS.map((d, i) => ({ day: d, count: counts[i], isTop: counts[i] === max && max > 0 }));
+  }, [sessions]);
+  const mostActiveDay = weekdayData.find(d => d.isTop)?.day ?? "—";
 
   // ── Activity timeline (sessions per month) ──
   const activityData = useMemo(() => {
@@ -131,14 +163,23 @@ export default function AnalyticsPage() {
     return Object.values(counts).reverse();
   }, [sessions]);
 
-  // ── Aggregate KPIs ──
-  const totalSessions = sessions?.length ?? 0;
-  const quizCount = sessions?.filter(s => s.isQuiz).length ?? 0;
-  const surveyCount = totalSessions - quizCount;
-  const endedCount = sessions?.filter(s => s.status === 'ended').length ?? 0;
-  const activeCount = totalSessions - endedCount;
+  // ── Filtered & sorted session list ──
+  const filteredSessions = useMemo(() => {
+    if (!sessions) return [];
+    const list = sessions
+      .filter(s => {
+        if (filterType === 'quiz') return !!s.isQuiz;
+        if (filterType === 'survey') return !s.isQuiz;
+        return true;
+      })
+      .filter(s => !search || s.title?.toLowerCase().includes(search.toLowerCase()) || s.code?.includes(search));
+    if (sortDir === 'asc') return [...list].reverse();
+    return list;
+  }, [sessions, filterType, search, sortDir]);
 
   if (isUserLoading || !user) return null;
+
+  const monthTrend = thisMonthCount > prevMonthCount ? 'up' : thisMonthCount < prevMonthCount ? 'down' : null;
 
   return (
     <div className="min-h-screen bg-background font-body flex flex-col">
@@ -163,12 +204,26 @@ export default function AnalyticsPage() {
           </Button>
         </div>
 
-        {/* ── KPI Cards ── */}
+        {/* ── KPI Row 1: totals ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <KpiCard label="Total Sessions" value={totalSessions} icon={Activity} sub="all time" />
           <KpiCard label="Quiz Sessions" value={quizCount} icon={Trophy} sub={`${pct(quizCount, totalSessions)}% of total`} />
           <KpiCard label="Survey Sessions" value={surveyCount} icon={BarChart3} sub={`${pct(surveyCount, totalSessions)}% of total`} />
           <KpiCard label="Ended Sessions" value={endedCount} icon={TrendingUp} sub={`${activeCount} still active`} />
+        </div>
+
+        {/* ── KPI Row 2: temporal insights ── */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <KpiCard label="This Week" value={thisWeekCount} icon={CalendarDays} sub="sessions since Sunday" />
+          <KpiCard
+            label="This Month"
+            value={thisMonthCount}
+            icon={Calendar}
+            trend={monthTrend}
+            sub={prevMonthCount > 0 ? `vs ${prevMonthCount} last month` : "first month"}
+          />
+          <KpiCard label="Avg / Month" value={avgPerMonth} icon={TrendingUp} sub={`over ${activityData.length} months`} />
+          <KpiCard label="Most Active Day" value={mostActiveDay} icon={Flame} sub="day with most sessions" />
         </div>
 
         {/* ── Activity Timeline ── */}
@@ -202,51 +257,50 @@ export default function AnalyticsPage() {
           </div>
         )}
 
-        {/* ── Type breakdown bar ── */}
+        {/* ── Weekday + Type breakdown side by side ── */}
         {totalSessions > 0 && (
-          <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-primary" /> Session Type Breakdown
-            </h2>
-            <div className="grid sm:grid-cols-2 gap-6">
-              <div>
-                <ResponsiveContainer width="100%" height={120}>
-                  <BarChart
-                    data={[
-                      { name: "Quiz", count: quizCount },
-                      { name: "Survey", count: surveyCount },
-                      { name: "Ended", count: endedCount },
-                      { name: "Active", count: activeCount },
-                    ]}
-                    margin={{ left: -10, right: 10 }}
-                  >
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} />
-                    <YAxis hide />
-                    <Tooltip content={({ active, payload }) => active && payload?.length ? (
-                      <div className="bg-foreground text-background px-3 py-1.5 rounded-xl text-sm font-bold">{payload[0]?.value}</div>
-                    ) : null} />
-                    <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                      {[quizCount, surveyCount, endedCount, activeCount].map((_, i) => (
-                        <Cell key={i} fill="currentColor" fillOpacity={0.9 - i * 0.15} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="space-y-3 my-auto">
+          <div className="grid sm:grid-cols-2 gap-4">
+
+            {/* Weekday bar */}
+            <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-primary" /> Sessions by Weekday
+              </h2>
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={weekdayData} margin={{ left: -10, right: 5 }}>
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} />
+                  <YAxis hide allowDecimals={false} />
+                  <Tooltip content={({ active, payload }) => active && payload?.length ? (
+                    <div className="bg-foreground text-background px-3 py-1.5 rounded-xl text-sm font-bold">{payload[0]?.value} sessions</div>
+                  ) : null} />
+                  <Bar dataKey="count" radius={[5, 5, 0, 0]} barSize={24}>
+                    {weekdayData.map((d, i) => (
+                      <Cell key={i} fill="currentColor" fillOpacity={d.isTop ? 1 : 0.35} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Type breakdown */}
+            <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-primary" /> Session Type Breakdown
+              </h2>
+              <div className="space-y-3 mt-2">
                 {[
-                  { label: "Quiz sessions", value: quizCount, pct: pct(quizCount, totalSessions) },
-                  { label: "Survey sessions", value: surveyCount, pct: pct(surveyCount, totalSessions) },
-                  { label: "Ended", value: endedCount, pct: pct(endedCount, totalSessions) },
-                  { label: "Still active", value: activeCount, pct: pct(activeCount, totalSessions) },
+                  { label: "Quiz sessions", value: quizCount, percent: pct(quizCount, totalSessions) },
+                  { label: "Survey sessions", value: surveyCount, percent: pct(surveyCount, totalSessions) },
+                  { label: "Ended", value: endedCount, percent: pct(endedCount, totalSessions) },
+                  { label: "Still active", value: activeCount, percent: pct(activeCount, totalSessions) },
                 ].map((row, i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground font-medium">{row.label}</span>
-                      <span className="font-bold tabular-nums">{row.value} <span className="text-muted-foreground font-normal text-xs">({row.pct}%)</span></span>
+                      <span className="font-bold tabular-nums">{row.value} <span className="text-muted-foreground font-normal text-xs">({row.percent}%)</span></span>
                     </div>
                     <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${row.pct}%` }} />
+                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${row.percent}%` }} />
                     </div>
                   </div>
                 ))}
@@ -290,6 +344,16 @@ export default function AnalyticsPage() {
                   </button>
                 ))}
               </div>
+              {/* Sort direction */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSortDir(d => d === 'desc' ? 'asc' : 'desc')}
+                className="h-9 px-3 rounded-xl gap-1.5 text-xs font-semibold shadow-none"
+              >
+                {sortDir === 'desc' ? <ArrowDown className="h-3.5 w-3.5" /> : <ArrowUp className="h-3.5 w-3.5" />}
+                {sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
+              </Button>
             </div>
           </div>
 

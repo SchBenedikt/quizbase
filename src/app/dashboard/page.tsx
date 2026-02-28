@@ -137,6 +137,25 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* ── Quick stats strip ── */}
+        {(surveys || pastSessions) && (
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: "Surveys", value: surveys?.length ?? 0, icon: BarChart3 },
+              { label: "Sessions", value: pastSessions?.length ?? 0, icon: Play },
+              { label: "Latest Session", value: pastSessions?.[0]?.title ? pastSessions[0].title.slice(0, 18) + (pastSessions[0].title.length > 18 ? "…" : "") : "—", icon: Calendar },
+            ].map((item, i) => (
+              <div key={i} className="bg-card border rounded-xl px-4 py-3 flex items-center gap-3 shadow-none">
+                <item.icon className="h-4 w-4 text-primary shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground font-medium truncate">{item.label}</p>
+                  <p className="text-sm font-bold truncate tabular-nums">{item.value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {surveysLoading ? (
           <div className="py-32 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto opacity-20" /></div>
         ) : !filteredSurveys || filteredSurveys.length === 0 ? (

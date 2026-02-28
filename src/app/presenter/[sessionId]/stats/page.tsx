@@ -15,7 +15,8 @@ import { Header } from "@/components/layout/Header";
 import { cn } from "@/lib/utils";
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip,
-  RadarChart, Radar, PolarGrid, PolarAngleAxis
+  RadarChart, Radar, PolarGrid, PolarAngleAxis,
+  LineChart, Line, CartesianGrid
 } from "recharts";
 
 // ─── Stat helpers ─────────────────────────────────────────────────────────────
@@ -538,6 +539,127 @@ function exportCSV(session: PollSession, questions: PollQuestion[], responses: P
   URL.revokeObjectURL(url);
 }
 
+// ─── Quiz Question Performance Trend ─────────────────────────────────────────
+function findByRate(data: { label: string; correctRate: number }[], dir: 'max' | 'min') {
+  return data.reduce((a, b) => dir === 'max' ? (a.correctRate >= b.correctRate ? a : b) : (a.correctRate <= b.correctRate ? a : b), data[0]);
+}
+
+function QuizPerformanceTrend({ questions, responses, participants }: {
+  questions: PollQuestion[];
+  responses: PollResponse[];
+  participants: PollParticipant[];
+}) {
+  const mcQuestions = questions.filter(
+    q => (q.type === 'multiple-choice' || q.type === 'true-false') && q.correctOptionIndices?.length
+  );
+  if (mcQuestions.length < 2) return null;
+
+  const data = mcQuestions.map((q, i) => {
+    const qResps = responses.filter(r => r.questionId === q.id);
+    const total = qResps.length;
+    const correct = qResps.filter(r => q.correctOptionIndices?.includes(Number(r.value))).length;
+    const rate = total > 0 ? Math.round((correct / total) * 100) : 0;
+    return { label: `Q${questions.indexOf(q) + 1}`, correctRate: rate, responses: total };
+  });
+
+  const avgRate = Math.round(data.reduce((sum, d) => sum + d.correctRate, 0) / data.length);
+
+  return (
+    <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-primary" /> Question Performance Trend
+        </h3>
+        <span className="text-xs font-semibold bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
+          avg {avgRate}% correct
+        </span>
+      </div>
+      <ResponsiveContainer width="100%" height={180}>
+        <LineChart data={data} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+          <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} />
+          <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11 }} domain={[0, 100]} unit="%" />
+          <Tooltip content={({ active, payload, label }) => active && payload?.length ? (
+            <div className="bg-card border rounded-xl px-4 py-2 shadow-lg text-sm space-y-1">
+              <p className="font-bold">{label}</p>
+              <p className="text-green-600 dark:text-green-400 font-semibold">{payload[0]?.value}% correct</p>
+              <p className="text-muted-foreground text-xs">{data.find(d => d.label === label)?.responses} responses</p>
+            </div>
+          ) : null} />
+          <Line
+            type="monotone"
+            dataKey="correctRate"
+            stroke="hsl(var(--primary))"
+            strokeWidth={2.5}
+            dot={{ fill: "hsl(var(--primary))", r: 4, strokeWidth: 0 }}
+            activeDot={{ r: 6, strokeWidth: 0 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+      <div className="grid grid-cols-3 gap-3 pt-1 border-t border-border/50">
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">Easiest</p>
+          <p className="text-sm font-black">{findByRate(data, 'max').label}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">Avg Correct</p>
+          <p className="text-sm font-black text-primary">{avgRate}%</p>
+        </div>
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">Hardest</p>
+          <p className="text-sm font-black">{findByRate(data, 'min').label}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Engagement Score ─────────────────────────────────────────────────────────
+const PARTICIPATION_WEIGHT = 0.6;
+const RESPONSE_RATE_WEIGHT = 0.4;
+
+function EngagementScore({ participationRate, questions, responses, participants, isQuiz }: {
+  participationRate: number;
+  questions: PollQuestion[];
+  responses: PollResponse[];
+  participants: PollParticipant[];
+  isQuiz: boolean;
+}) {
+  // Composite score: PARTICIPATION_WEIGHT × participation + RESPONSE_RATE_WEIGHT × avg per-question response rate
+  const avgQResponseRate = useMemo(() => {
+    if (!questions.length || !participants.length) return 0;
+    const rates = questions.map(q => {
+      const count = responses.filter(r => r.questionId === q.id).length;
+      return participants.length > 0 ? (count / participants.length) * 100 : 0;
+    });
+    return Math.round(rates.reduce((a, b) => a + b, 0) / rates.length);
+  }, [questions, responses, participants]);
+
+  const score = Math.round(participationRate * PARTICIPATION_WEIGHT + avgQResponseRate * RESPONSE_RATE_WEIGHT);
+  const level = score >= 80 ? { label: "Excellent", cls: "text-green-600 dark:text-green-400", bg: "bg-green-100 dark:bg-green-900/20" }
+    : score >= 60 ? { label: "Good", cls: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/20" }
+    : score >= 40 ? { label: "Fair", cls: "text-yellow-600 dark:text-yellow-400", bg: "bg-yellow-100 dark:bg-yellow-900/20" }
+    : { label: "Low", cls: "text-red-600 dark:text-red-400", bg: "bg-red-100 dark:bg-red-900/20" };
+
+  return (
+    <div className={cn("rounded-2xl border p-5 flex items-center gap-5", level.bg)}>
+      <div className="space-y-1 flex-1">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Engagement Score</p>
+        <div className="flex items-baseline gap-2">
+          <p className={cn("text-5xl font-black tabular-nums", level.cls)}>{score}</p>
+          <span className={cn("text-sm font-bold", level.cls)}>/ 100 · {level.label}</span>
+        </div>
+        <p className="text-xs text-muted-foreground">Based on participation rate ({participationRate}%) and avg response rate ({avgQResponseRate}%)</p>
+      </div>
+      <div className="shrink-0">
+        <div className="w-16 h-16 rounded-full flex items-center justify-center border-4 border-current" style={{ borderColor: `currentColor` }}>
+          <Activity className={cn("h-7 w-7", level.cls)} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function SessionStatsPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const { sessionId } = use(params);
@@ -627,6 +749,26 @@ export default function SessionStatsPage({ params }: { params: Promise<{ session
           <StatCard label="Total Responses" value={totalResponses} icon={MessageSquare} />
           <StatCard label="Participation Rate" value={`${overallParticipationRate}%`} icon={Activity} highlight={overallParticipationRate >= 80} warn={overallParticipationRate < 50} />
         </div>
+
+        {/* ── Engagement Score ── */}
+        {activeParticipants.length > 0 && questions && questions.length > 0 && (
+          <EngagementScore
+            participationRate={overallParticipationRate}
+            questions={questions}
+            responses={allResponses ?? []}
+            participants={activeParticipants}
+            isQuiz={isQuiz}
+          />
+        )}
+
+        {/* ── Quiz question performance trend ── */}
+        {isQuiz && questions && questions.length >= 2 && allResponses && (
+          <QuizPerformanceTrend
+            questions={questions}
+            responses={allResponses}
+            participants={activeParticipants}
+          />
+        )}
 
         {/* ── Quiz leaderboard ── */}
         {isQuiz && activeParticipants.length > 0 && (
