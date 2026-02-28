@@ -26,10 +26,10 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-widest text-[#4c2f05]/40 dark:text-white/30">Product</h4>
             <ul className="space-y-3 text-sm font-medium text-[#4c2f05]/60 dark:text-white/50">
-              <li><Link href="/dashboard" className="hover:text-[#ff9312] hover:opacity-100 transition-colors">Dashboard</Link></li>
-              <li><Link href="/discover" className="hover:text-[#ff9312] hover:opacity-100 transition-colors">Discover</Link></li>
-              <li><Link href="/analytics" className="hover:text-[#ff9312] hover:opacity-100 transition-colors">Analytics</Link></li>
-              <li><Link href="/join" className="hover:text-[#ff9312] hover:opacity-100 transition-colors">Join Session</Link></li>
+              <li><Link href="/dashboard">Dashboard</Link></li>
+              <li><Link href="/discover">Discover</Link></li>
+              <li><Link href="/analytics">Analytics</Link></li>
+              <li><Link href="/join">Join Session</Link></li>
             </ul>
           </div>
 
@@ -37,10 +37,10 @@ export function Footer() {
           <div className="space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-widest text-[#4c2f05]/40 dark:text-white/30">Resources</h4>
             <ul className="space-y-3 text-sm font-medium text-[#4c2f05]/60 dark:text-white/50">
-              <li><Link href="/design" className="hover:text-[#ff9312] hover:opacity-100 transition-colors">Design System</Link></li>
-              <li><Link href="/legal" className="hover:text-[#ff9312] hover:opacity-100 transition-colors">Legal Notice</Link></li>
-              <li><Link href="/privacy" className="hover:text-[#ff9312] hover:opacity-100 transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/datenschutz" className="hover:text-[#ff9312] hover:opacity-100 transition-colors">Datenschutz</Link></li>
+              <li><Link href="/design">Design System</Link></li>
+              <li><Link href="/legal">Legal Notice</Link></li>
+              <li><Link href="/privacy">Privacy Policy</Link></li>
+              <li><Link href="/datenschutz">Datenschutz</Link></li>
             </ul>
           </div>
 

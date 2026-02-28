@@ -258,8 +258,8 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {QUESTION_TYPES.map((qt, i) => (
-                <div key={i} className="bg-[#ff9312]/5 border border-[#ff9312]/15 rounded-2xl p-5 space-y-3 hover:bg-[#ff9312]/10 hover:border-[#ff9312]/30 transition-all group">
-                  <div className="w-9 h-9 rounded-lg bg-[#ff9312] text-[#4c2f05] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <div key={i} className="bg-[#ff9312]/5 border border-[#ff9312]/15 rounded-2xl p-5 space-y-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#ff9312] text-[#4c2f05] flex items-center justify-center shrink-0">
                     <qt.icon className="h-4 w-4" />
                   </div>
                   <div className="space-y-1">
