@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion } from "@/app/types/poll";
-import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon, Trophy, BarChart3, Shuffle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
@@ -37,6 +37,8 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   const [sessionTitle, setSessionTitle] = useState("");
   const [theme, setTheme] = useState<string>("orange");
   const [customColor, setCustomColor] = useState<string | null>(null);
+  const [isQuiz, setIsQuiz] = useState<boolean>(false);
+  const [shuffleQuestions, setShuffleQuestions] = useState<boolean>(false);
   const [currentQuestions, setCurrentQuestions] = useState<PollQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<number | null>(null);
@@ -46,6 +48,8 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       setSessionTitle(poll.title || "");
       setTheme(poll.theme || "orange");
       setCustomColor(poll.customColor || null);
+      setIsQuiz(poll.isQuiz ?? false);
+      setShuffleQuestions(poll.shuffleQuestions ?? false);
     }
   }, [poll]);
 
@@ -61,7 +65,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
   }, [user, isUserLoading, router]);
 
-  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null) => {
+  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null, isQuizToSave: boolean, shuffleSave?: boolean) => {
     if (!user || !pollRef) return;
     
     try {
@@ -69,6 +73,8 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         title: titleToSave, 
         theme: themeToSave, 
         customColor: customColorToSave,
+        isQuiz: isQuizToSave,
+        shuffleQuestions: shuffleSave ?? false,
         updatedAt: serverTimestamp() 
       }, { merge: true });
 
@@ -93,6 +99,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         if (q.timeLimit !== undefined) qData.timeLimit = q.timeLimit;
         if (q.range) qData.range = q.range;
         if (q.labels) qData.labels = q.labels;
+        if (q.description) qData.description = q.description;
 
         batch.set(qRef, qData, { merge: true });
       }
@@ -110,16 +117,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
 
     const timer = setTimeout(() => {
       if (currentQuestions.length > 0) {
-        performSave(currentQuestions, sessionTitle, theme, customColor);
+        performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions);
       }
     }, 2000); 
 
     return () => clearTimeout(timer);
-  }, [currentQuestions, sessionTitle, theme, customColor, initialQuestions, performSave]);
+  }, [currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions, initialQuestions, performSave]);
 
   const handleManualSave = async () => {
     setLoading(true);
-    await performSave(currentQuestions, sessionTitle, theme, customColor);
+    await performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions);
     toast({ title: "Survey Saved", description: "All changes have been synced." });
     setLoading(false);
   };
@@ -138,83 +145,128 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   }
 
   return (
-    <div className="min-h-screen bg-background font-body selection:bg-primary selection:text-primary-foreground">
+    <div className="min-h-screen bg-[#f8f8f7] dark:bg-background font-body selection:bg-primary selection:text-primary-foreground">
       <Header variant="minimal" />
-      <div className="studio-container py-12 pb-40">
-        <div className="flex flex-col sm:flex-row items-center gap-6 mt-32 mb-12">
-          <div className="flex items-center gap-6 w-full">
-            <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard')} className="rounded-[1.25rem] h-12 w-12 border-2 shrink-0">
-              <ArrowLeft className="h-5 w-5" />
+      <div className="studio-container py-28 pb-40">
+        <div className="flex flex-col gap-8 mb-16">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" onClick={() => router.push('/dashboard')} className="h-10 w-10 rounded-lg border border-foreground/10 bg-card hover:bg-muted shadow-none">
+              <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter truncate">Edit Survey</h1>
+              <h1 className="text-4xl font-bold tracking-tight">Edit Survey</h1>
               {lastSaved && (
-                <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] opacity-40 mt-1 flex items-center gap-2">
-                  <CheckCircle2 className="h-3 w-3 text-green-500" /> Autosaved {new Date(lastSaved).toLocaleTimeString()}
+                <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" /> Autosaved {new Date(lastSaved).toLocaleTimeString()}
                 </p>
               )}
             </div>
           </div>
         </div>
         
-        <div className="flex flex-col gap-6 mb-12">
-          <div className="space-y-3 w-full">
-            <label className="text-xs font-black uppercase tracking-[0.5em] opacity-40 ml-4">Survey Identity</label>
-            <div className="flex flex-col md:flex-row gap-4">
-              <Input 
-                value={sessionTitle} 
-                onChange={(e) => setSessionTitle(e.target.value)}
-                placeholder="SURVEY TITLE..."
-                className="text-xl font-black h-14 border-2 bg-card rounded-[1.25rem] px-8 focus-visible:ring-1 border-foreground/10 uppercase shadow-none tracking-tighter flex-1"
-                aria-label="Survey Title"
-              />
-              <div className="flex gap-4">
+        <div className="space-y-8">
+          <div className="bg-card p-6 rounded-xl border border-foreground/8 space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold tracking-tight">Survey Details</h2>
+              <p className="text-base text-muted-foreground">Configure your survey identity and presentation style</p>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-base font-medium">Title</label>
+                <Input 
+                  value={sessionTitle} 
+                  onChange={(e) => setSessionTitle(e.target.value)}
+                  placeholder="Enter survey title..."
+                  className="h-12 border border-foreground/10 bg-background rounded-lg px-4 focus-visible:ring-1 focus-visible:ring-primary font-medium text-base"
+                  aria-label="Survey Title"
+                />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Survey vs Quiz toggle */}
+                <div className="flex rounded-lg border border-foreground/10 overflow-hidden h-12 bg-muted/30">
+                  <button
+                    onClick={() => setIsQuiz(false)}
+                    className={`flex-1 px-5 flex items-center justify-center gap-2 text-sm font-medium transition-all ${!isQuiz ? 'bg-foreground text-background' : 'hover:bg-foreground/5'}`}
+                  >
+                    <BarChart3 className="h-4 w-4" /> Survey
+                  </button>
+                  <button
+                    onClick={() => setIsQuiz(true)}
+                    className={`flex-1 px-5 flex items-center justify-center gap-2 text-sm font-medium transition-all ${isQuiz ? 'bg-primary text-primary-foreground' : 'hover:bg-foreground/5'}`}
+                  >
+                    <Trophy className="h-4 w-4" /> Quiz
+                  </button>
+                </div>
+
+                {/* Shuffle Questions toggle */}
+                <button
+                  onClick={() => setShuffleQuestions(!shuffleQuestions)}
+                  className={`flex items-center gap-2 h-12 px-5 rounded-lg border text-sm font-medium transition-all ${shuffleQuestions ? 'bg-foreground text-background border-foreground' : 'border-foreground/10 hover:bg-foreground/5'}`}
+                >
+                  <Shuffle className="h-4 w-4" /> Shuffle
+                </button>
+
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="h-14 px-6 rounded-[1.25rem] border-2 font-black uppercase text-xs tracking-widest gap-3 shadow-none flex-1 md:flex-none">
-                      <Palette className="h-5 w-5" /> Vibe
+                    <Button variant="outline" className="h-12 px-6 rounded-lg border border-foreground/10 font-medium gap-2 bg-card hover:bg-muted shadow-none text-base">
+                      <Palette className="h-5 w-5" /> Theme
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-6 rounded-[1.5rem] border-2 bg-background flex flex-col gap-4 text-foreground shadow-none" align="end">
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Presentation Style</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button onClick={() => updateVibe('orange')} className="bg-[#ff9312] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px] shadow-none">Orange</Button>
-                      <Button onClick={() => updateVibe('red')} className="bg-[#780c16] text-[#e9c0e9] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px] shadow-none">Red</Button>
-                      <Button onClick={() => updateVibe('green')} className="bg-[#d2e822] text-[#254e1a] rounded-[1rem] font-black h-12 border-2 uppercase text-[10px] shadow-none">Acid</Button>
-                      <Button onClick={() => updateVibe('blue')} className="bg-[#0d99ff] text-white rounded-[1rem] font-black h-12 border-2 uppercase text-[10px] shadow-none">Blue</Button>
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-2">Minimalist Presets</p>
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button onClick={() => updateVibe('minimal-light')} className="bg-[#f4f4f5] text-zinc-950 rounded-[1rem] font-black h-12 border-2 border-zinc-200 uppercase text-[10px] shadow-none"><Sun className="w-3 h-3 mr-2" /> Studio Light</Button>
-                      <Button onClick={() => updateVibe('minimal-dark')} className="bg-[#18181b] text-zinc-100 rounded-[1rem] font-black h-12 border-2 border-zinc-800 uppercase text-[10px] shadow-none"><Moon className="w-3 h-3 mr-2" /> Studio Dark</Button>
-                    </div>
-                    <div className="space-y-3 pt-3 border-t-2">
-                      <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Custom Theme</p>
-                      <Input 
-                        type="color" 
-                        value={customColor || "#ff9312"}
-                        className="h-12 w-full rounded-[1rem] border-2 p-1 cursor-pointer shadow-none"
-                        onChange={(e) => updateVibe('custom', e.target.value)}
-                      />
+                  <PopoverContent className="w-80 p-6 rounded-xl border border-foreground/8 bg-card" align="end">
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-base font-medium mb-4">Presentation Style</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Button onClick={() => updateVibe('orange')} className="h-10 px-4 bg-[#ff9312] text-white rounded-lg font-medium text-sm border-0 hover:bg-[#ff9312]/90">Orange</Button>
+                          <Button onClick={() => updateVibe('red')} className="h-10 px-4 bg-[#780c16] text-[#e9c0e9] rounded-lg font-medium text-sm border-0 hover:bg-[#780c16]/90">Red</Button>
+                          <Button onClick={() => updateVibe('green')} className="h-10 px-4 bg-[#d2e822] text-[#254e1a] rounded-lg font-medium text-sm border-0 hover:bg-[#d2e822]/90">Acid</Button>
+                          <Button onClick={() => updateVibe('blue')} className="h-10 px-4 bg-[#0d99ff] text-white rounded-lg font-medium text-sm border-0 hover:bg-[#0d99ff]/90">Blue</Button>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-base font-medium mb-4">Minimalist</h3>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Button onClick={() => updateVibe('minimal-light')} className="h-10 px-4 bg-[#f4f4f5] text-zinc-950 rounded-lg font-medium text-sm border border-zinc-200 hover:bg-zinc-100"><Sun className="w-4 h-4 mr-2" /> Light</Button>
+                          <Button onClick={() => updateVibe('minimal-dark')} className="h-10 px-4 bg-[#18181b] text-zinc-100 rounded-lg font-medium text-sm border border-zinc-800 hover:bg-zinc-700"><Moon className="w-4 h-4 mr-2" /> Dark</Button>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-base font-medium mb-3">Custom</h3>
+                        <Input 
+                          type="color" 
+                          value={customColor || "#ff9312"}
+                          className="h-10 w-full rounded-lg border border-foreground/10 p-1 cursor-pointer"
+                          onChange={(e) => updateVibe('custom', e.target.value)}
+                        />
+                      </div>
                     </div>
                   </PopoverContent>
                 </Popover>
+                
                 <Button 
                   onClick={handleManualSave}
                   disabled={loading}
-                  className="h-14 px-8 rounded-[1.25rem] bg-foreground text-background font-black uppercase tracking-widest text-xs border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all flex-1 md:flex-none shadow-none"
+                  className="h-12 px-6 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors shadow-none text-base"
                 >
-                  {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Save"}
+                  {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : null}
+                  Save
                 </Button>
               </div>
             </div>
           </div>
         </div>
-
-        <PollCreator 
-          initialQuestions={initialQuestions} 
-          onChange={setCurrentQuestions}
-        />
+        
+        <div className="mt-8">
+          <PollCreator 
+            initialQuestions={initialQuestions} 
+            onChange={setCurrentQuestions}
+            isQuiz={isQuiz}
+          />
+        </div>
       </div>
     </div>
   );

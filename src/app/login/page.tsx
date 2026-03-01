@@ -62,71 +62,71 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#f3f3f1] font-body">
       {/* Left Branding Side */}
-      <div className="lg:w-1/2 bg-[#ff9312] p-12 lg:p-24 flex flex-col justify-center text-[#4c2f05]">
-        <div className="space-y-8 max-w-xl">
-          <h1 className="text-8xl lg:text-[10rem] font-black leading-[0.8] tracking-tighter uppercase">
+      <div className="lg:w-1/2 bg-[#ff9312] p-10 lg:p-16 flex flex-col justify-center text-[#4c2f05]">
+        <div className="space-y-6 max-w-xl">
+          <h1 className="text-5xl lg:text-7xl font-black leading-[0.9] tracking-tighter uppercase">
             Quizbase
           </h1>
-          <div className="space-y-4">
-            <p className="text-3xl lg:text-4xl font-bold uppercase leading-none tracking-tight">
+          <div className="space-y-3">
+            <p className="text-xl lg:text-2xl font-bold leading-tight">
               Your voice, amplified. <br />
               One simple pulse.
             </p>
-            <p className="text-xl font-bold opacity-70 uppercase leading-tight">
-              Transform classrooms and boardrooms into living energy fields in seconds.
+            <p className="text-base font-medium opacity-60 leading-relaxed">
+              Transform classrooms and boardrooms into living engagement hubs in seconds.
             </p>
           </div>
         </div>
       </div>
 
       {/* Right Form Side */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-24 bg-[#f3f3f1] dark:bg-zinc-950">
-        <div className="w-full max-w-md space-y-12">
-          <div className="flex bg-white/50 dark:bg-white/5 p-2 rounded-[1.5rem] border-2 border-foreground/10 mb-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-16 bg-[#f3f3f1] dark:bg-zinc-950">
+        <div className="w-full max-w-md space-y-8">
+          <div className="flex bg-white/50 dark:bg-white/5 p-1.5 rounded-xl border border-foreground/10 mb-6">
             <button 
               onClick={() => setIsSignUp(false)}
-              className={`flex-1 py-4 rounded-[1.5rem] font-black uppercase text-sm transition-all ${!isSignUp ? 'bg-foreground text-primary' : 'text-foreground opacity-40'}`}
+              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${!isSignUp ? 'bg-foreground text-primary' : 'text-foreground opacity-40'}`}
             >
               Login
             </button>
             <button 
               onClick={() => setIsSignUp(true)}
-              className={`flex-1 py-4 rounded-[1.5rem] font-black uppercase text-sm transition-all ${isSignUp ? 'bg-foreground text-primary' : 'text-foreground opacity-40'}`}
+              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${isSignUp ? 'bg-foreground text-primary' : 'text-foreground opacity-40'}`}
             >
               Sign Up
             </button>
           </div>
 
-          <div className="space-y-4">
-            <h2 className="text-5xl font-black text-foreground uppercase tracking-tighter">
-              {isSignUp ? "Join the pulse." : "Welcome back."}
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold text-foreground">
+              {isSignUp ? "Create an account" : "Welcome back"}
             </h2>
-            <p className="text-sm font-bold text-foreground opacity-40 uppercase tracking-widest leading-none">
-              {isSignUp ? "Create your personal hub in minutes." : "Log in to your account to continue."}
+            <p className="text-sm text-foreground/50">
+              {isSignUp ? "Get started in minutes." : "Sign in to continue."}
             </p>
           </div>
 
-          <form onSubmit={handleAuth} className="space-y-6">
+          <form onSubmit={handleAuth} className="space-y-4">
             <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-[0.4em] opacity-40 ml-2 text-foreground">Email Address</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold opacity-50 ml-1 text-foreground">Email Address</label>
                 <Input 
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="m@example.com"
-                  className="h-16 px-6 rounded-[1.5rem] border-2 border-foreground/10 bg-white dark:bg-zinc-900 focus-visible:ring-0 font-bold text-foreground shadow-none"
+                  className="h-12 px-4 rounded-lg border bg-white dark:bg-zinc-900 focus-visible:ring-1 focus-visible:ring-primary font-medium text-foreground shadow-none"
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-[0.4em] opacity-40 ml-2 text-foreground">Password</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold opacity-50 ml-1 text-foreground">Password</label>
                 <Input 
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="h-16 px-6 rounded-[1.5rem] border-2 border-foreground/10 bg-white dark:bg-zinc-900 focus-visible:ring-0 font-bold text-foreground shadow-none"
+                  className="h-12 px-4 rounded-lg border bg-white dark:bg-zinc-900 focus-visible:ring-1 focus-visible:ring-primary font-medium text-foreground shadow-none"
                   required
                 />
               </div>
@@ -135,24 +135,24 @@ export default function LoginPage() {
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full h-20 text-xl font-black rounded-[1.5rem] bg-foreground text-primary border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all uppercase tracking-tighter shadow-none"
+              className="w-full h-12 font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-none"
             >
-              {isSignUp ? "Create Account" : "Login"} 
-              <ArrowRight className="ml-3 h-6 w-6" />
+              {isSignUp ? "Create Account" : "Sign In"} 
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </form>
 
           <div className="relative">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t-2 border-foreground/10"></span></div>
-            <div className="relative flex justify-center text-xs font-black uppercase tracking-[0.4em] text-foreground"><span className="bg-[#f3f3f1] dark:bg-zinc-950 px-4">Or continue with</span></div>
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-foreground/10"></span></div>
+            <div className="relative flex justify-center text-xs font-medium text-foreground opacity-40"><span className="bg-[#f3f3f1] dark:bg-zinc-950 px-3">Or continue with</span></div>
           </div>
 
           <Button 
             variant="outline" 
             onClick={handleGoogleSignIn}
-            className="w-full h-16 rounded-[1.5rem] border-2 border-foreground/10 bg-white dark:bg-zinc-900 font-black uppercase tracking-widest text-foreground hover:bg-foreground/5 transition-all shadow-none"
+            className="w-full h-12 rounded-lg border bg-white dark:bg-zinc-900 font-semibold text-foreground hover:bg-foreground/5 transition-all shadow-none"
           >
-            <Zap className="mr-2 h-5 w-5 fill-current" /> Google
+            <Zap className="mr-2 h-4 w-4 fill-current" /> Continue with Google
           </Button>
         </div>
       </div>

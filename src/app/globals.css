@@ -23,28 +23,28 @@
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 33 100% 50%;
-    --radius: 1.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --background: 224 15% 8%;
+    --foreground: 220 15% 96%;
+    --card: 224 15% 12%;
+    --card-foreground: 220 15% 96%;
+    --popover: 224 15% 10%;
+    --popover-foreground: 220 15% 96%;
     --primary: 33 100% 50%;
     --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --secondary: 224 15% 16%;
+    --secondary-foreground: 220 15% 90%;
+    --muted: 224 15% 15%;
+    --muted-foreground: 220 10% 55%;
+    --accent: 224 15% 18%;
+    --accent-foreground: 220 15% 96%;
+    --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
+    --border: 224 15% 20%;
+    --input: 224 15% 16%;
     --ring: 33 100% 50%;
   }
 
@@ -109,8 +109,18 @@
   100% { transform: translateY(0px); }
 }
 
+.animate-float-up {
+  animation: floatUp 3.5s ease-out forwards;
+}
+
+@keyframes floatUp {
+  0%   { transform: translateY(0)    scale(1);   opacity: 1; }
+  60%  { transform: translateY(-180px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-320px) scale(0.8); opacity: 0; }
+}
+
 .studio-container {
-  max-width: 1400px;
+  max-width: 1800px;
   margin-left: auto;
   margin-right: auto;
   width: 100%;

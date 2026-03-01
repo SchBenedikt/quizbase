@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
-import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Globe } from "lucide-react";
+import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Compass, BarChart3 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useTranslation, type Locale } from "@/contexts/LanguageContext";
 
 interface HeaderProps {
   className?: string;
@@ -23,6 +24,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
   const pathname = usePathname();
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { t, locale, setLocale } = useTranslation();
 
   useEffect(() => {
     setMounted(true);
@@ -37,39 +39,43 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
   };
 
+  const toggleLocale = () => {
+    setLocale(locale === 'en' ? 'de' : 'en');
+  };
+
   return (
     <header className={cn(
-      "fixed top-0 left-0 right-0 z-50 py-6 transition-all duration-300",
+      "fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-300",
       className
     )}>
       <div className="studio-container">
         <nav className={cn(
-          "border-2 rounded-[1.5rem] px-8 py-4 flex items-center justify-between backdrop-blur-md transition-all shadow-none",
+          "border rounded-xl px-6 py-3 flex items-center justify-between backdrop-blur-md transition-all shadow-none",
           variant === 'brand' 
             ? "bg-white/10 border-foreground/5 dark:bg-black/20" 
             : "bg-background/90 border-foreground/10"
         )}>
           {/* Branding */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
-            <div className="bg-primary p-2 rounded-[1rem] transition-transform group-hover:scale-110">
-              <Zap className="h-5 w-5 text-primary-foreground fill-current" />
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <div className="bg-primary p-1.5 rounded-lg transition-transform group-hover:scale-110">
+              <Zap className="h-4 w-4 text-primary-foreground fill-current" />
             </div>
-            <span className="text-2xl font-black font-headline tracking-tighter uppercase">Quizbase</span>
+            <span className="text-lg font-bold font-headline tracking-tight">Quizbase</span>
           </Link>
           
           {/* Navigation */}
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 bg-foreground/5 p-1 rounded-[1.25rem] border-2 border-foreground/5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-foreground/5 p-1 rounded-lg border border-foreground/5">
               <Button 
                 variant="ghost" 
                 asChild 
                 className={cn(
-                  "rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all",
+                  "rounded-md px-3 font-semibold text-xs h-8 transition-all",
                   pathname === '/discover' ? "bg-foreground text-background" : "hover:bg-foreground/10"
                 )}
               >
                 <Link href="/discover">
-                  <Globe className="h-3 w-3 mr-2" /> Discover
+                  <Compass className="h-3 w-3 mr-1.5" /> {t.nav.discover}
                 </Link>
               </Button>
 
@@ -79,60 +85,90 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
                     variant="ghost" 
                     asChild 
                     className={cn(
-                      "rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all",
+                      "rounded-md px-3 font-semibold text-xs h-8 transition-all",
                       pathname === '/dashboard' ? "bg-foreground text-background" : "hover:bg-foreground/10"
                     )}
                   >
                     <Link href="/dashboard">
-                      <LayoutDashboard className="h-3 w-3 mr-2" /> Dashboard
+                      <LayoutDashboard className="h-3 w-3 mr-1.5" /> {t.nav.dashboard}
                     </Link>
                   </Button>
                   <Button 
                     variant="ghost" 
                     asChild 
                     className={cn(
-                      "rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all",
+                      "rounded-md px-3 font-semibold text-xs h-8 transition-all",
+                      pathname === '/analytics' ? "bg-foreground text-background" : "hover:bg-foreground/10"
+                    )}
+                  >
+                    <Link href="/analytics">
+                      <BarChart3 className="h-3 w-3 mr-1.5" /> {t.nav.analytics}
+                    </Link>
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    asChild 
+                    className={cn(
+                      "rounded-md px-3 font-semibold text-xs h-8 transition-all",
                       pathname === '/profile' ? "bg-foreground text-background" : "hover:bg-foreground/10"
                     )}
                   >
                     <Link href="/profile">
-                      <Settings className="h-3 w-3 mr-2" /> Settings
+                      <Settings className="h-3 w-3 mr-1.5" /> {t.nav.settings}
                     </Link>
                   </Button>
                   <Button 
                     onClick={handleSignOut} 
                     variant="ghost" 
-                    className="rounded-[1rem] px-4 font-black uppercase text-[10px] tracking-widest h-9 transition-all hover:bg-foreground/10"
+                    className="rounded-md px-3 font-semibold text-xs h-8 transition-all hover:bg-foreground/10"
                   >
-                    <LogOut className="h-3 w-3 mr-2" /> Logout
+                    <LogOut className="h-3 w-3 mr-1.5" /> {t.nav.logout}
                   </Button>
                 </>
               ) : (
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" asChild className="rounded-[1.25rem] px-6 h-11 font-black uppercase text-xs tracking-widest hover:bg-foreground/5 shadow-none">
-                    <Link href="/login">Login</Link>
+                <div className="flex items-center gap-1.5">
+                  <Button variant="ghost" asChild className="rounded-lg px-4 h-9 font-semibold text-xs hover:bg-foreground/5 shadow-none">
+                    <Link href="/login">{t.nav.login}</Link>
                   </Button>
-                  <Button asChild className="hidden sm:inline-flex rounded-[1.25rem] px-8 h-11 font-black uppercase text-xs tracking-widest bg-foreground text-background border-2 border-foreground hover:bg-transparent hover:text-foreground transition-all shadow-none">
-                    <Link href="/login?signup=true">Sign Up</Link>
+                  <Button asChild className="hidden sm:inline-flex rounded-lg px-5 h-9 font-semibold text-xs bg-foreground text-background border border-foreground hover:bg-transparent hover:text-foreground transition-all shadow-none">
+                    <Link href="/login?signup=true">{t.nav.signUp}</Link>
                   </Button>
                 </div>
               )}
             </div>
 
-            {mounted && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={toggleTheme}
-                className="rounded-[1rem] h-11 w-11 border-2 border-foreground/10 hover:bg-foreground/5 transition-all shadow-none"
-                aria-label="Toggle theme"
-              >
-                {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </Button>
-            )}
+            <div className="flex items-center gap-1.5">
+              {/* Language toggle */}
+              {mounted && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleLocale}
+                  className="rounded-lg h-9 w-9 border border-foreground/10 hover:bg-foreground/5 transition-all shadow-none text-xs font-bold"
+                  aria-label="Toggle language"
+                  title={locale === 'en' ? 'Deutsch' : 'English'}
+                >
+                  {locale === 'en' ? 'DE' : 'EN'}
+                </Button>
+              )}
+
+              {/* Theme toggle */}
+              {mounted && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={toggleTheme}
+                  className="rounded-lg h-9 w-9 border border-foreground/10 hover:bg-foreground/5 transition-all shadow-none"
+                  aria-label="Toggle theme"
+                >
+                  {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </Button>
+              )}
+            </div>
           </div>
         </nav>
       </div>
     </header>
   );
 }
+

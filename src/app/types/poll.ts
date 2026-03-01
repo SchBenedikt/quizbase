@@ -1,10 +1,11 @@
 
-export type PollType = 'multiple-choice' | 'open-text' | 'rating' | 'slider' | 'word-cloud' | 'guess-number' | 'ranking' | 'scale';
+export type PollType = 'multiple-choice' | 'true-false' | 'open-text' | 'rating' | 'slider' | 'word-cloud' | 'guess-number' | 'ranking' | 'scale';
 
 export interface PollQuestion {
   id: string;
   type: PollType;
   question: string;
+  description?: string; // Optional subtitle / hint
   options?: string[]; // For multiple choice, ranking
   correctOptionIndices?: number[]; // For Quiz Mode (Multiple Correct Answers)
   timeLimit?: number; // In seconds, 0 = unlimited
@@ -25,6 +26,7 @@ export interface PollSession {
   currentQuestionId: string | 'lobby' | 'podium' | null;
   status: 'active' | 'ended';
   isStarted?: boolean;
+  isQuiz?: boolean;
   theme?: 'orange' | 'red' | 'green' | 'blue' | 'custom' | 'minimal-light' | 'minimal-dark';
   customColor?: string; // Hex color code
   showResultsToParticipants: boolean;
@@ -54,6 +56,8 @@ export interface Survey {
   userId: string;
   title: string;
   isPublic?: boolean;
+  isQuiz?: boolean;
+  shuffleQuestions?: boolean;
   theme?: string;
   customColor?: string;
   createdAt: any;
