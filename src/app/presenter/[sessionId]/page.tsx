@@ -19,7 +19,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
-import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -172,14 +171,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   // Confetti celebration on podium
   useEffect(() => {
     if (session?.currentQuestionId === 'podium') {
-      const duration = 3000;
-      const end = Date.now() + duration;
-      const frame = () => {
-        confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.7 } });
-        confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.7 } });
-        if (Date.now() < end) requestAnimationFrame(frame);
+      const loadConfetti = async () => {
+        const confetti = (await import('canvas-confetti')).default;
+        const duration = 3000;
+        const end = Date.now() + duration;
+        const frame = () => {
+          confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0, y: 0.7 } });
+          confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1, y: 0.7 } });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        };
+        frame();
       };
-      frame();
+      loadConfetti();
     }
   }, [session?.currentQuestionId]);
 

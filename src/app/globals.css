@@ -10,7 +10,7 @@
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 33 100% 50%;
+    --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -22,30 +22,30 @@
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 33 100% 50%;
-    --radius: 0.75rem;
+    --ring: 0 0% 0%;
+    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 224 15% 8%;
-    --foreground: 220 15% 96%;
-    --card: 224 15% 12%;
-    --card-foreground: 220 15% 96%;
-    --popover: 224 15% 10%;
-    --popover-foreground: 220 15% 96%;
-    --primary: 33 100% 50%;
+    --background: 0 0% 9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
     --primary-foreground: 0 0% 9%;
-    --secondary: 224 15% 16%;
-    --secondary-foreground: 220 15% 90%;
-    --muted: 224 15% 15%;
-    --muted-foreground: 220 10% 55%;
-    --accent: 224 15% 18%;
-    --accent-foreground: 220 15% 96%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 224 15% 20%;
-    --input: 224 15% 16%;
-    --ring: 33 100% 50%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 98%;
   }
 
   [data-theme='orange'] {
