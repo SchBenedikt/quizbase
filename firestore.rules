@@ -16,8 +16,28 @@ service cloud.firestore {
     }
 
     // Support Global Discovery (Collection Group) — public surveys readable by anyone
+    // This rule must come first to avoid conflicts with more specific rules
     match /{path=**}/surveys/{surveyId} {
       allow read: if resource.data.isPublic == true;
+    }
+    
+    // Additional rule for collection group queries
+    match /surveys/{surveyId} {
+      allow read: if resource.data.isPublic == true;
+    }
+
+    // Categories - system-wide public categories
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.isPublic == true;
+      allow update, delete: if false; // Public categories are managed by system
+    }
+
+    // User-specific categories
+    match /users/{userId}/categories/{categoryId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update, delete: if isOwner(userId);
     }
 
     // User profiles — owners can manage, anyone can read for public profile pages
@@ -31,7 +51,7 @@ service cloud.firestore {
 
     match /users/{userId}/surveys/{surveyId} {
       allow get: if isOwner(userId) || resource.data.isPublic == true;
-      allow list: if isOwner(userId);
+      allow list: if isOwner(userId) || resource.data.isPublic == true;
       allow create: if isOwner(userId) && request.resource.data.userId == userId;
       allow update: if isOwner(userId) && isUnchanged('userId');
       allow delete: if isOwner(userId);

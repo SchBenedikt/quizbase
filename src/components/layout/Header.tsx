@@ -45,128 +45,107 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
 
   return (
     <header className={cn(
-      "fixed top-0 left-0 right-0 z-50 py-4 transition-all duration-300",
+      "fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
       className
     )}>
-      <div className="studio-container">
-        <nav className={cn(
-          "border rounded-xl px-6 py-3 flex items-center justify-between backdrop-blur-md transition-all shadow-none",
-          variant === 'brand' 
-            ? "bg-white/10 border-foreground/5 dark:bg-black/20" 
-            : "bg-background/90 border-foreground/10"
-        )}>
-          {/* Branding */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="bg-primary p-1.5 rounded-lg transition-transform group-hover:scale-110">
-              <Zap className="h-4 w-4 text-primary-foreground fill-current" />
-            </div>
-            <span className="text-lg font-bold font-headline tracking-tight">Quizbase</span>
-          </Link>
-          
-          {/* Navigation */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 bg-foreground/5 p-1 rounded-lg border border-foreground/5">
-              <Button 
-                variant="ghost" 
-                asChild 
-                className={cn(
-                  "rounded-md px-3 font-semibold text-xs h-8 transition-all",
-                  pathname === '/discover' ? "bg-foreground text-background" : "hover:bg-foreground/10"
-                )}
-              >
-                <Link href="/discover">
-                  <Compass className="h-3 w-3 mr-1.5" /> {t.nav.discover}
-                </Link>
-              </Button>
+      <div className="container mx-auto px-6 h-14 flex items-center justify-between max-w-screen-2xl">
+        {/* Branding */}
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="h-8 w-8 rounded-md bg-foreground flex items-center justify-center transition-transform group-hover:scale-105">
+            <Zap className="h-4 w-4 text-background" />
+          </div>
+          <span className="text-lg font-semibold">Quizbase</span>
+        </Link>
+        
+        {/* Navigation */}
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            asChild 
+            className={cn(
+              "h-9 px-3 text-sm font-medium",
+              pathname === '/discover' ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Link href="/discover">
+              <Compass className="h-4 w-4 mr-2" /> Discover
+            </Link>
+          </Button>
 
-              {user ? (
-                <>
-                  <Button 
-                    variant="ghost" 
-                    asChild 
-                    className={cn(
-                      "rounded-md px-3 font-semibold text-xs h-8 transition-all",
-                      pathname === '/dashboard' ? "bg-foreground text-background" : "hover:bg-foreground/10"
-                    )}
-                  >
-                    <Link href="/dashboard">
-                      <LayoutDashboard className="h-3 w-3 mr-1.5" /> {t.nav.dashboard}
-                    </Link>
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    asChild 
-                    className={cn(
-                      "rounded-md px-3 font-semibold text-xs h-8 transition-all",
-                      pathname === '/analytics' ? "bg-foreground text-background" : "hover:bg-foreground/10"
-                    )}
-                  >
-                    <Link href="/analytics">
-                      <BarChart3 className="h-3 w-3 mr-1.5" /> {t.nav.analytics}
-                    </Link>
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    asChild 
-                    className={cn(
-                      "rounded-md px-3 font-semibold text-xs h-8 transition-all",
-                      pathname === '/profile' ? "bg-foreground text-background" : "hover:bg-foreground/10"
-                    )}
-                  >
-                    <Link href="/profile">
-                      <Settings className="h-3 w-3 mr-1.5" /> {t.nav.settings}
-                    </Link>
-                  </Button>
-                  <Button 
-                    onClick={handleSignOut} 
-                    variant="ghost" 
-                    className="rounded-md px-3 font-semibold text-xs h-8 transition-all hover:bg-foreground/10"
-                  >
-                    <LogOut className="h-3 w-3 mr-1.5" /> {t.nav.logout}
-                  </Button>
-                </>
-              ) : (
-                <div className="flex items-center gap-1.5">
-                  <Button variant="ghost" asChild className="rounded-lg px-4 h-9 font-semibold text-xs hover:bg-foreground/5 shadow-none">
-                    <Link href="/login">{t.nav.login}</Link>
-                  </Button>
-                  <Button asChild className="hidden sm:inline-flex rounded-lg px-5 h-9 font-semibold text-xs bg-foreground text-background border border-foreground hover:bg-transparent hover:text-foreground transition-all shadow-none">
-                    <Link href="/login?signup=true">{t.nav.signUp}</Link>
-                  </Button>
-                </div>
+          {user && (
+            <Button 
+              variant="ghost" 
+              asChild 
+              className={cn(
+                "h-9 px-3 text-sm font-medium",
+                pathname === '/dashboard' ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               )}
-            </div>
+            >
+              <Link href="/dashboard">
+                <LayoutDashboard className="h-4 w-4 mr-2" /> Dashboard
+              </Link>
+            </Button>
+          )}
 
-            <div className="flex items-center gap-1.5">
-              {/* Language toggle */}
-              {mounted && (
+          <div className="h-6 w-px bg-border mx-1" />
+
+          {/* Actions */}
+          <div className="flex items-center gap-1">
+            {mounted && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="h-9 w-9"
+                title="Toggle theme"
+              >
+                {resolvedTheme === 'dark' ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleLocale}
+              className="h-9 w-9 text-xs font-medium"
+              title="Toggle language"
+            >
+              {locale === 'en' ? 'DE' : 'EN'}
+            </Button>
+
+            {user ? (
+              <>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  onClick={toggleLocale}
-                  className="rounded-lg h-9 w-9 border border-foreground/10 hover:bg-foreground/5 transition-all shadow-none text-xs font-bold"
-                  aria-label="Toggle language"
-                  title={locale === 'en' ? 'Deutsch' : 'English'}
+                  asChild
+                  className="h-9 px-3 text-sm font-medium"
                 >
-                  {locale === 'en' ? 'DE' : 'EN'}
+                  <Link href="/profile">
+                    <Settings className="h-4 w-4 mr-2" /> Profile
+                  </Link>
                 </Button>
-              )}
-
-              {/* Theme toggle */}
-              {mounted && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={toggleTheme}
-                  className="rounded-lg h-9 w-9 border border-foreground/10 hover:bg-foreground/5 transition-all shadow-none"
-                  aria-label="Toggle theme"
+                <Button
+                  variant="ghost"
+                  onClick={handleSignOut}
+                  className="h-9 px-3 text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
-                  {resolvedTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                  <LogOut className="h-4 w-4 mr-2" /> Sign out
                 </Button>
-              )}
-            </div>
+              </>
+            ) : (
+              <Button
+                asChild
+                className="h-9 px-4 text-sm font-medium bg-foreground text-background hover:bg-foreground/90"
+              >
+                <Link href="/login">Sign in</Link>
+              </Button>
+            )}
           </div>
-        </nav>
+        </div>
       </div>
     </header>
   );

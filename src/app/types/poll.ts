@@ -1,6 +1,18 @@
 
 export type PollType = 'multiple-choice' | 'true-false' | 'open-text' | 'rating' | 'slider' | 'word-cloud' | 'guess-number' | 'ranking' | 'scale';
 
+export interface ThemeCategory {
+  id: string;
+  name: string;
+  description?: string;
+  color?: string; // Hex color for UI
+  icon?: string; // Icon name
+  userId?: string; // If user-specific, null for system-wide
+  isPublic?: boolean; // Whether it's available to all users
+  createdAt: any;
+  updatedAt?: any;
+}
+
 export interface PollQuestion {
   id: string;
   type: PollType;
@@ -30,6 +42,7 @@ export interface PollSession {
   theme?: 'orange' | 'red' | 'green' | 'blue' | 'custom' | 'minimal-light' | 'minimal-dark';
   customColor?: string; // Hex color code
   showResultsToParticipants: boolean;
+  categoryIds?: string[]; // Array of theme/category IDs
   createdAt: any;
 }
 
@@ -60,6 +73,8 @@ export interface Survey {
   shuffleQuestions?: boolean;
   theme?: string;
   customColor?: string;
+  categoryIds?: string[]; // Array of theme/category IDs
+  icon?: string; // Icon name for survey card
   createdAt: any;
   updatedAt?: any;
 }

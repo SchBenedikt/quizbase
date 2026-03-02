@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Compass, Lock, History, ExternalLink, Copy } from "lucide-react";
 import { Header } from "@/components/layout/Header";
+import { SurveyIcon } from "@/components/ui/IconPicker";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc, where, limit } from "firebase/firestore";
 import { deleteDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
@@ -24,6 +25,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [showAllSessions, setShowAllSessions] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -39,12 +41,15 @@ export default function DashboardPage() {
 
   const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
 
-  // Past sessions query (last 20)
+  // Past sessions query (last 50 for potential expansion)
   const sessionsQuery = useMemoFirebase(() => {
     if (!user || !user.uid || isUserLoading) return null;
-    return query(collection(db, "sessions"), where("userId", "==", user.uid), orderBy("createdAt", "desc"), limit(20));
+    return query(collection(db, "sessions"), where("userId", "==", user.uid), orderBy("createdAt", "desc"), limit(50));
   }, [user, db, isUserLoading]);
   const { data: pastSessions } = useCollection<{ id: string; title: string; code: string; createdAt: any; isQuiz?: boolean; status?: string }>(sessionsQuery);
+
+  // Calculate displayed sessions based on showAllSessions state
+  const displayedSessions = showAllSessions ? pastSessions : pastSessions?.slice(0, 5);
 
   const handleDeleteSurvey = (surveyId: string) => {
     if (!user) return;
@@ -140,176 +145,220 @@ export default function DashboardPage() {
   if (isUserLoading || !user) return null;
 
   return (
-    <div className="min-h-screen bg-[#f8f8f7] dark:bg-background flex flex-col font-body selection:bg-primary selection:text-primary-foreground">
+    <div className="min-h-screen bg-background font-sans">
       <Header variant="minimal" />
-      
-      <main className="flex-1 studio-container py-28 space-y-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h1 className="text-4xl font-bold tracking-tight">{t.dashboard.title}</h1>
-            <p className="text-base opacity-70">{t.dashboard.subtitle}</p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-30" />
-              <Input 
-                placeholder={t.dashboard.searchPlaceholder}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 pl-9 pr-4 rounded-lg border bg-card focus-visible:ring-1 focus-visible:ring-primary font-medium text-base w-full shadow-none"
-              />
+      <div className="container mx-auto px-6 pt-20 pb-8 max-w-screen-2xl">
+        <div className="flex flex-col gap-8 mb-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+              <p className="text-muted-foreground mt-1">Manage your surveys and track performance</p>
             </div>
             <Button 
               onClick={handleCreateNew}
-              className="h-10 px-5 rounded-lg text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all uppercase tracking-wider shrink-0 w-full sm:w-auto shadow-none"
+              className="h-10 px-6 rounded-md text-sm font-medium bg-foreground text-background hover:bg-foreground/90"
             >
-              <Plus className="mr-2 h-4 w-4" /> {t.dashboard.newSurvey}
+              <Plus className="mr-2 h-4 w-4" /> New Survey
             </Button>
           </div>
         </div>
 
-        {/* ── Quick stats strip ── */}
+        {/* ── Quick stats ── */}
         {(surveys || pastSessions) && (
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {[
-              { label: "Surveys", value: surveys?.length ?? 0, icon: BarChart3 },
-              { label: "Sessions", value: pastSessions?.length ?? 0, icon: Play },
-              { label: "Latest Session", value: pastSessions?.[0]?.title ? pastSessions[0].title.slice(0, 18) + (pastSessions[0].title.length > 18 ? "…" : "") : "—", icon: Calendar },
+              { label: "Total Surveys", value: surveys?.length ?? 0, icon: BarChart3 },
+              { label: "Total Sessions", value: pastSessions?.length ?? 0, icon: Play },
+              { label: "Latest Session", value: pastSessions?.[0]?.title ? pastSessions[0].title.slice(0, 20) + (pastSessions[0].title.length > 20 ? "..." : "") : "—", icon: Calendar },
             ].map((item, i) => (
-              <div key={i} className="bg-card border rounded-xl px-4 py-3 flex items-center gap-3 shadow-none">
-                <item.icon className="h-4 w-4 text-primary shrink-0" />
+              <div key={i} className="bg-card border rounded-lg p-4 flex items-center gap-3">
+                <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center">
+                  <item.icon className="h-5 w-5 text-foreground" />
+                </div>
                 <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground font-medium truncate">{item.label}</p>
-                  <p className="text-sm font-bold truncate tabular-nums">{item.value}</p>
+                  <p className="text-sm text-muted-foreground">{item.label}</p>
+                  <p className="text-lg font-semibold text-foreground truncate">{item.value}</p>
                 </div>
               </div>
             ))}
           </div>
         )}
 
+        {/* ── Search ── */}
+        <div className="mb-8">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search surveys..."
+              className="pl-10 h-10 rounded-md border bg-background"
+            />
+          </div>
+        </div>
+
+        {/* ── Surveys Grid ── */}
         {surveysLoading ? (
-          <div className="py-32 text-center"><Loader2 className="h-6 w-6 animate-spin mx-auto opacity-20" /></div>
+          <div className="py-20 text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+          </div>
         ) : !filteredSurveys || filteredSurveys.length === 0 ? (
-          <div className="py-32 text-center border border-dashed rounded-xl bg-card/50 space-y-3 border-foreground/10 shadow-none">
-             <Sparkles className="h-8 w-8 mx-auto opacity-10" />
-             <p className="text-sm font-medium opacity-60 uppercase tracking-widest">{t.dashboard.noSurveys}</p>
+          <div className="py-20 text-center border border-dashed rounded-lg bg-muted/20">
+            <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">No surveys yet</h3>
+            <p className="text-muted-foreground mb-6">Create your first survey to get started</p>
+            <Button 
+              onClick={handleCreateNew}
+              className="bg-foreground text-background hover:bg-foreground/90"
+            >
+              <Plus className="mr-2 h-4 w-4" /> Create Survey
+            </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-12">
             {filteredSurveys.map((survey) => (
-              <article key={survey.id} className="bg-card p-5 rounded-xl border border-foreground/8 flex flex-col gap-4 group hover:border-primary/30 transition-all h-full relative shadow-none">
-                <div className="flex items-start justify-between">
+              <div key={survey.id} className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow group">
+                <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center border border-foreground/8 shrink-0 bg-muted/50 group-hover:bg-primary/10 transition-colors shadow-none">
-                       <BarChart3 className="h-4 w-4 text-primary" />
+                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
+                       <SurveyIcon iconName={survey.icon} className="h-4 w-4 text-foreground" />
                     </div>
                     <Button 
                        variant="ghost" 
                        size="icon" 
                        onClick={() => togglePublic(survey.id, !!survey.isPublic)}
-                       className={cn("h-7 w-7 rounded-md transition-colors shadow-none", survey.isPublic ? "text-primary" : "text-muted-foreground")}
-                       title={survey.isPublic ? t.dashboard.public : t.dashboard.private}
+                       className="h-6 w-6 hover:bg-muted"
+                       title={survey.isPublic ? "Public" : "Private"}
                      >
-                       {survey.isPublic ? <Compass className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+                       {survey.isPublic ? <Compass className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
                      </Button>
                   </div>
-                  <Button 
-                     variant="ghost" 
-                     size="icon" 
-                     onClick={() => handleDeleteSurvey(survey.id)}
-                     className="h-7 w-7 rounded-md hover:text-destructive hover:bg-destructive/5 transition-colors opacity-0 group-hover:opacity-100 shadow-none"
-                     aria-label={`Delete ${survey.title || "Untitled Survey"}`}
-                   >
-                     <Trash2 className="h-3.5 w-3.5" />
-                   </Button>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={() => handleDuplicateSurvey(survey)}
+                      className="h-6 w-6 hover:bg-muted"
+                      title="Duplicate"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                    <Button 
+                       variant="ghost" 
+                       size="icon" 
+                       onClick={() => handleDeleteSurvey(survey.id)}
+                       className="h-6 w-6 hover:bg-destructive hover:text-destructive-foreground"
+                       title="Delete"
+                     >
+                       <Trash2 className="h-3 w-3" />
+                     </Button>
+                  </div>
                 </div>
                 
-                <div className="flex-1 space-y-1.5">
-                  <h3 className="text-base font-semibold tracking-tight leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-                    {survey.title || "Untitled presentation"}
+                <div className="mb-4">
+                  <h3 className="font-medium text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                    {survey.title || "Untitled Survey"}
                   </h3>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    <time className="text-xs font-medium uppercase tracking-wider">
-                      {mounted && survey.createdAt ? new Date(survey.createdAt.seconds * 1000).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Draft"}
-                    </time>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
+                      {survey.isQuiz ? "Quiz" : "Survey"}
+                    </span>
+                    {survey.shuffleQuestions && (
+                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
+                        Shuffled
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-3 border-t border-foreground/5">
-                   <Button 
-                     variant="default"
-                     onClick={() => handleLaunchExisting(survey)}
-                     disabled={loading}
-                     className="flex-1 h-9 rounded-lg font-semibold text-sm shadow-none"
-                   >
-                     <Play className="mr-1.5 h-3 w-3 fill-current" /> {t.dashboard.launch}
-                   </Button>
-                   <Button 
-                     variant="outline" 
-                     onClick={() => handleDuplicateSurvey(survey)}
-                     className="h-9 w-9 rounded-lg border border-foreground/10 flex items-center justify-center shadow-none p-0"
-                     aria-label={`Duplicate ${survey.title || "Untitled Survey"}`}
-                   >
-                     <Copy className="h-3.5 w-3.5" />
-                   </Button>
-                   <Button 
-                     variant="outline" 
-                     onClick={() => router.push(`/presenter/edit/${survey.id}`)}
-                     className="h-9 w-9 rounded-lg border border-foreground/10 flex items-center justify-center shadow-none p-0"
-                     aria-label={`Edit ${survey.title || "Untitled Survey"}`}
-                   >
-                     <Edit2 className="h-3.5 w-3.5" />
-                   </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1 h-8 text-xs"
+                    onClick={() => router.push(`/presenter/edit/${survey.id}`)}
+                  >
+                    <Edit2 className="mr-1 h-3 w-3" /> Edit
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="flex-1 h-8 text-xs bg-foreground text-background hover:bg-foreground/90"
+                    onClick={() => handleLaunchExisting(survey)}
+                  >
+                    <Play className="mr-1 h-3 w-3" /> Launch
+                  </Button>
                 </div>
-              </article>
+              </div>
             ))}
           </div>
         )}
 
         {/* ── Past Sessions ── */}
         {pastSessions && pastSessions.length > 0 && (
-          <div className="space-y-4 pt-4 border-t">
-            <div className="flex items-center gap-3">
-              <History className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-bold tracking-tight">Past Sessions</h2>
-              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full font-semibold">{pastSessions.length}</span>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground">Recent Sessions</h2>
+                <p className="text-sm text-muted-foreground">Your latest survey sessions</p>
+              </div>
+              {pastSessions.length > 5 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAllSessions(!showAllSessions)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  {showAllSessions ? "Show less" : "Show more"}
+                </Button>
+              )}
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {pastSessions.map((session) => (
-                <div key={session.id} className="bg-card rounded-xl border border-foreground/8 p-4 flex flex-col gap-3 hover:border-primary/30 transition-all shadow-none group">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate leading-tight">{session.title || "Untitled Session"}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded font-bold">{session.code}</span>
-                        {session.isQuiz ? (
-                          <span className="text-[10px] font-bold uppercase tracking-wide text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">Quiz</span>
-                        ) : (
-                          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">Survey</span>
-                        )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {displayedSessions?.map((session) => (
+                <div key={session.id} className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-foreground truncate mb-1">{session.title || "Untitled Session"}</p>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">{session.code}</span>
+                        <span className="text-xs font-medium text-muted-foreground">
+                          {session.isQuiz ? "Quiz" : "Survey"}
+                        </span>
                       </div>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 hover:bg-muted"
+                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/p/${session.code}`).then(() => toast({ title: "Link copied", description: `Session code: ${session.code}` }))}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    <span>{mounted && session.createdAt ? new Date(session.createdAt.seconds * 1000).toLocaleDateString(locale === 'de' ? 'de-DE' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "—"}</span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 text-xs"
+                      onClick={() => router.push(`/p/${session.code}`)}
+                    >
+                      <Play className="mr-1 h-3 w-3" /> Join
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 h-8 text-xs"
+                      onClick={() => router.push(`/presenter/${session.id}/stats`)}
+                    >
+                      <BarChart3 className="mr-1 h-3 w-3" /> Analytics
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full h-8 rounded-lg gap-1.5 text-xs font-semibold shadow-none"
-                    onClick={() => router.push(`/presenter/${session.id}/stats`)}
-                  >
-                    <BarChart3 className="h-3.5 w-3.5" /> View Analytics
-                  </Button>
                 </div>
               ))}
             </div>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

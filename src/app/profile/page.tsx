@@ -106,7 +106,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-background font-body flex flex-col">
       <Header variant="minimal" />
       
-      <main className="flex-1 studio-container py-28 pb-16">
+      <main className="flex-1 container mx-auto px-6 py-28 pb-16 max-w-screen-2xl">
         {/* Page Header */}
         <div className="flex items-center gap-4 mb-10">
           <Button 

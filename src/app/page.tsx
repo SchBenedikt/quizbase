@@ -56,7 +56,7 @@ export default function Home() {
       <Header variant="brand" className="text-[#4c2f05]" />
 
       <main className="flex-grow">
-        <section className="studio-container min-h-[100dvh] flex items-center pt-28 pb-16">
+        <section className="container mx-auto px-6 min-h-[100dvh] flex items-center pt-28 pb-16 max-w-screen-2xl">
           <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center w-full">
             <div className="space-y-8 animate-in fade-in slide-in-from-left-10 duration-1000">
               <header className="space-y-4">
@@ -153,7 +153,7 @@ export default function Home() {
 
         {/* ── Stats strip ── */}
         <section className="border-t-2 border-b-2 border-[#4c2f05] bg-[#4c2f05] text-[#ff9312]">
-          <div className="studio-container grid grid-cols-2 sm:grid-cols-4 divide-x-2 divide-[#ff9312]/20">
+          <div className="container mx-auto px-6 grid grid-cols-2 sm:grid-cols-4 divide-x-2 divide-[#ff9312]/20 max-w-screen-2xl">
             {STATS.map((s, i) => (
               <div key={i} className="py-8 px-6 text-center space-y-1">
                 <p className="text-4xl md:text-5xl font-black tabular-nums tracking-tighter leading-none">
@@ -172,7 +172,7 @@ export default function Home() {
         </section>
 
         <section className="py-24 bg-[#4c2f05] text-[#ff9312] overflow-x-clip">
-          <div className="studio-container grid lg:grid-cols-2 gap-16 items-center">
+          <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center max-w-screen-2xl">
             <div className="relative px-6 flex justify-center lg:justify-start">
               <div className="bg-white rounded-2xl border-2 border-[#ff9312] p-10 rotate-[-2deg] z-10 relative max-w-[380px] w-full shadow-none">
                 <h4 className="text-xl font-bold text-[#4c2f05] mb-6">Live Pulse Status</h4>
@@ -217,7 +217,7 @@ export default function Home() {
 
         {/* Why Quizbase — unique features */}
         <section className="py-24 bg-[#ff9312] text-[#4c2f05]">
-          <div className="studio-container px-4">
+          <div className="container mx-auto px-6 max-w-screen-2xl">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-[0.9] mb-4">
                 Why Quizbase?
@@ -247,7 +247,7 @@ export default function Home() {
 
         {/* ── Question Types Showcase ── */}
         <section className="py-24 bg-[#4c2f05] text-[#ff9312] border-t-2 border-[#ff9312]/10">
-          <div className="studio-container px-4">
+          <div className="container mx-auto px-6 max-w-screen-2xl">
             <div className="text-center mb-14">
               <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-[0.9] mb-4">
                 9 Question Types
@@ -273,7 +273,7 @@ export default function Home() {
         </section>
 
         <section className="py-32 text-center bg-[#ff9312] text-[#4c2f05] border-t-2 border-[#4c2f05]/20">
-          <div className="studio-container space-y-12 px-4">
+          <div className="container mx-auto px-6 space-y-12 max-w-screen-2xl">
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-[0.85]">
               Ready to <br />
               Launch?

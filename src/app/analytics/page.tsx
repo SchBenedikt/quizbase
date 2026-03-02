@@ -185,7 +185,7 @@ export default function AnalyticsPage() {
     <div className="min-h-screen bg-background font-body flex flex-col">
       <Header variant="minimal" />
 
-      <main className="flex-1 studio-container pt-28 pb-16 space-y-10">
+      <main className="flex-1 container mx-auto px-6 pt-28 pb-16 space-y-10 max-w-screen-2xl">
 
         {/* ── Page Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">

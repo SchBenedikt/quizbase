@@ -8,6 +8,7 @@ import { PollCreator } from "@/components/poll/PollCreator";
 import { PollQuestion } from "@/app/types/poll";
 import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon, Trophy, BarChart3, Shuffle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
+import { IconPicker } from "@/components/ui/IconPicker";
 import { useUser, useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
 import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
@@ -39,6 +40,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   const [customColor, setCustomColor] = useState<string | null>(null);
   const [isQuiz, setIsQuiz] = useState<boolean>(false);
   const [shuffleQuestions, setShuffleQuestions] = useState<boolean>(false);
+  const [selectedIcon, setSelectedIcon] = useState<string>("BarChart3");
   const [currentQuestions, setCurrentQuestions] = useState<PollQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastSaved, setLastSaved] = useState<number | null>(null);
@@ -50,6 +52,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       setCustomColor(poll.customColor || null);
       setIsQuiz(poll.isQuiz ?? false);
       setShuffleQuestions(poll.shuffleQuestions ?? false);
+      setSelectedIcon(poll.icon || "BarChart3");
     }
   }, [poll]);
 
@@ -65,7 +68,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
   }, [user, isUserLoading, router]);
 
-  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null, isQuizToSave: boolean, shuffleSave?: boolean) => {
+  const performSave = useCallback(async (questionsToSave: PollQuestion[], titleToSave: string, themeToSave: string, customColorToSave: string | null, isQuizToSave: boolean, shuffleSave?: boolean, iconToSave?: string) => {
     if (!user || !pollRef) return;
     
     try {
@@ -75,6 +78,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         customColor: customColorToSave,
         isQuiz: isQuizToSave,
         shuffleQuestions: shuffleSave ?? false,
+        icon: iconToSave || "BarChart3",
         updatedAt: serverTimestamp() 
       }, { merge: true });
 
@@ -117,16 +121,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
 
     const timer = setTimeout(() => {
       if (currentQuestions.length > 0) {
-        performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions);
+        performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions, selectedIcon);
       }
     }, 2000); 
 
     return () => clearTimeout(timer);
-  }, [currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions, initialQuestions, performSave]);
+  }, [currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions, selectedIcon, initialQuestions, performSave]);
 
   const handleManualSave = async () => {
     setLoading(true);
-    await performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions);
+    await performSave(currentQuestions, sessionTitle, theme, customColor, isQuiz, shuffleQuestions, selectedIcon);
     toast({ title: "Survey Saved", description: "All changes have been synced." });
     setLoading(false);
   };
@@ -147,7 +151,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   return (
     <div className="min-h-screen bg-[#f8f8f7] dark:bg-background font-body selection:bg-primary selection:text-primary-foreground">
       <Header variant="minimal" />
-      <div className="studio-container py-28 pb-40">
+      <div className="container mx-auto px-6 py-28 pb-40 max-w-screen-2xl">
         <div className="flex flex-col gap-8 mb-16">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={() => router.push('/dashboard')} className="h-10 w-10 rounded-lg border border-foreground/10 bg-card hover:bg-muted shadow-none">
@@ -182,6 +186,12 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
                   aria-label="Survey Title"
                 />
               </div>
+
+              <IconPicker 
+                selectedIcon={selectedIcon}
+                onIconChange={setSelectedIcon}
+                className="mt-4"
+              />
               
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Survey vs Quiz toggle */}

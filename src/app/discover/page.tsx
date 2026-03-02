@@ -89,7 +89,7 @@ export default function DiscoverPage() {
     <div className="min-h-screen bg-background flex flex-col font-body">
       <Header variant="minimal" />
       
-      <main className="flex-1 studio-container pt-28 pb-16 space-y-10">
+      <main className="flex-1 container mx-auto px-6 pt-28 pb-16 space-y-10 max-w-screen-2xl">
         {/* Header */}
         <div className="space-y-3">
           <div className="flex items-center gap-2.5">

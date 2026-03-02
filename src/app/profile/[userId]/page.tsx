@@ -3,7 +3,7 @@
 import { use } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2, BarChart3, Play, Lock, Compass } from "lucide-react";
+import { ArrowLeft, Loader2, BarChart3, Play, Lock, Compass, Edit2 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { useFirestore, useDoc, useCollection, useMemoFirebase, useUser } from "@/firebase";
 import { doc, collection, query, where, orderBy, getDocs, serverTimestamp } from "firebase/firestore";
@@ -29,6 +29,11 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
     [db, userId]
   );
   const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
+
+  // Try to get the user's auth data as fallback for display name
+  const { user: currentUser } = useUser();
+  const displayName = profileUser?.name || currentUser?.displayName || t.profile.anonymous;
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   const handleLaunch = async (survey: any) => {
     if (!user) {
@@ -67,9 +72,6 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
     </div>
   );
 
-  const displayName = profileUser?.name || t.profile.anonymous;
-  const initials = displayName.slice(0, 2).toUpperCase();
-
   return (
     <div className="min-h-screen bg-background font-body flex flex-col">
       <Header variant="minimal" />
@@ -84,7 +86,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
           <div className="w-20 h-20 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center text-3xl font-bold shrink-0 select-none">
             {initials}
           </div>
-          <div className="space-y-1">
+          <div className="flex-1 space-y-1">
             <h1 className="text-2xl font-bold tracking-tight">{displayName}</h1>
             {profileUser?.username && (
               <p className="text-sm text-muted-foreground">@{profileUser.username}</p>
@@ -93,6 +95,17 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
               <p className="text-sm text-foreground/70 max-w-lg mt-2">{profileUser.bio}</p>
             )}
           </div>
+          {user?.uid === userId && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => router.push("/profile")}
+              className="rounded-lg h-8 px-3 border shadow-none"
+            >
+              <Edit2 className="h-3.5 w-3.5 mr-2" />
+              {"Edit"}
+            </Button>
+          )}
         </div>
 
         {/* Public surveys */}
