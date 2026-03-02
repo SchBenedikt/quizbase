@@ -14,3 +14,7 @@ command = "npm run build && cp -r .next/server/app .next/deploy/ && cp -r .next/
 [vars]
 # Add environment variables here for Cloudflare deployment.
 # Sensitive variables should be added via `wrangler secret put`.
+
+# Custom domains for the worker
+[[routes]]
+pattern = "quizbase.xn--schchner-2za.de/*"
