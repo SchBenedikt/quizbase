@@ -2,6 +2,12 @@ name = "quizbase"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+[assets]
+directory = ".next/static"
+
+[build]
+command = "npm run build"
+
 [vars]
 # Add environment variables here for Cloudflare deployment.
 # Sensitive variables should be added via `wrangler secret put`.

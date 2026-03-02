@@ -13,6 +13,8 @@ import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import { useAuth } from "@/firebase/provider";
 
+export const dynamic = 'force-dynamic';
+
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '🔥', '🎉'];
 const REACTION_COOLDOWN_MS = 1000;
 

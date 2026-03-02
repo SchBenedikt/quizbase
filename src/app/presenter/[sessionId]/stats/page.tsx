@@ -19,6 +19,8 @@ import {
   LineChart, Line, CartesianGrid
 } from "recharts";
 
+export const dynamic = 'force-dynamic';
+
 // ─── Stat helpers ─────────────────────────────────────────────────────────────
 function avg(values: number[]) {
   if (!values.length) return 0;

@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 
 import { useTranslation } from "@/contexts/LanguageContext";
 
+export const dynamic = 'force-dynamic';
+
 export default function PublicProfilePage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
   const router = useRouter();
