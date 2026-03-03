@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next';
 export const dynamic = 'force-static';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = 'https://quizbase.app';
+  const base = 'https://links.xn--schchner-2za.de';
   const currentDate = new Date();
   
   return [

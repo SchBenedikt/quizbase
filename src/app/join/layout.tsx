@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Join Live Poll - Quizbase',
     description: 'Join any live poll or quiz instantly with a 6-digit code.',
-    url: 'https://quizbase.app/join',
+    url: 'https://links.xn--schchner-2za.de/join',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Join Quizbase Session' }],
   },
   twitter: {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     description: 'Join live polls and quizzes instantly with a 6-digit code.',
   },
   alternates: {
-    canonical: 'https://quizbase.app/join',
+    canonical: 'https://links.xn--schchner-2za.de/join',
   },
 };
 

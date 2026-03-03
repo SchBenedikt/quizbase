@@ -1,6 +1,6 @@
 # Building Quizbase: A Free Alternative to Mentimeter with Next.js and Cloudflare Workers
 
-![Quizbase Banner](https://quizbase.app/og-image.png)
+![Quizbase Banner](https://links.xn--schchner-2za.de/og-image.png)
 
 Ever needed to run interactive polls or quizzes during a presentation but found tools like Mentimeter too expensive? I built **Quizbase** - a completely free, open-source alternative that works without any app downloads.
 
@@ -297,7 +297,7 @@ Quizbase proves that you can compete with established players by focusing on wha
 
 ---
 
-**Try Quizbase today**: [quizbase.app](https://quizbase.app)
+**Try Quizbase today**: [links.xn--schchner-2za.de](https://links.xn--schchner-2za.de)
 
 **Star on GitHub**: [github.com/SchBenedikt/quizbase](https://github.com/SchBenedikt/quizbase)
 

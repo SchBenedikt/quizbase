@@ -16,8 +16,8 @@ export default {
 Allow: /
 Crawl-delay: 1
 
-Sitemap: https://quizbase.app/sitemap.xml
-Host: https://quizbase.app`;
+Sitemap: https://links.xn--schchner-2za.de/sitemap.xml
+Host: https://links.xn--schchner-2za.de`;
 
       return new Response(robotsContent, {
         status: 200,
@@ -32,61 +32,61 @@ Host: https://quizbase.app`;
       const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://quizbase.app</loc>
+    <loc>https://links.xn--schchner-2za.de</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/join</loc>
+    <loc>https://links.xn--schchner-2za.de/join</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/login</loc>
+    <loc>https://links.xn--schchner-2za.de/login</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/discover</loc>
+    <loc>https://links.xn--schchner-2za.de/discover</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/analytics</loc>
+    <loc>https://links.xn--schchner-2za.de/analytics</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/legal</loc>
+    <loc>https://links.xn--schchner-2za.de/legal</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/privacy</loc>
+    <loc>https://links.xn--schchner-2za.de/privacy</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/impressum</loc>
+    <loc>https://links.xn--schchner-2za.de/impressum</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/datenschutz</loc>
+    <loc>https://links.xn--schchner-2za.de/datenschutz</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://quizbase.app/design</loc>
+    <loc>https://links.xn--schchner-2za.de/design</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

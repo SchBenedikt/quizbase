@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       { userAgent: '*', allow: '/', crawlDelay: 1 },
     ],
-    sitemap: 'https://quizbase.app/sitemap.xml',
-    host: 'https://quizbase.app',
+    sitemap: 'https://links.xn--schchner-2za.de/sitemap.xml',
+    host: 'https://links.xn--schchner-2za.de',
   };
 }
