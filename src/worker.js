@@ -129,17 +129,27 @@ Host: https://quizbase.xn--schchner-2za.de`;
         // Remove trailing slash for consistency (except for root)
         const cleanPath = url.pathname.replace(/\/$/, '') || '/';
         
-        // Try to fetch the HTML file for this specific path
-        const htmlPath = cleanPath === '/' ? '/index.html' : `${cleanPath}.html`;
-        const htmlUrl = new URL(htmlPath, url);
-        const htmlRequest = new Request(htmlUrl.toString(), {
-          method: request.method,
-          headers: request.headers,
-        });
+        // Try different path patterns for dynamic routes
+        const possiblePaths = [
+          // Direct path: /presenter/edit/[pollId] -> /presenter/edit/[pollId].html
+          `${cleanPath}.html`,
+          // Page directory: /presenter/edit/[pollId] -> /presenter/edit/[pollId]/page.html
+          `${cleanPath}/page.html`,
+          // Index fallback: /presenter -> /presenter/page.html
+          `${cleanPath}/page.html`
+        ];
         
-        const htmlResponse = await env.ASSETS.fetch(htmlRequest);
-        if (htmlResponse.status === 200) {
-          return htmlResponse;
+        for (const htmlPath of possiblePaths) {
+          const htmlUrl = new URL(htmlPath, url);
+          const htmlRequest = new Request(htmlUrl.toString(), {
+            method: request.method,
+            headers: request.headers,
+          });
+          
+          const htmlResponse = await env.ASSETS.fetch(htmlRequest);
+          if (htmlResponse.status === 200) {
+            return htmlResponse;
+          }
         }
       } catch {
         // HTML fetch failed; fall through to SPA fallback below
