@@ -3,42 +3,41 @@
  */
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
     const url = new URL(request.url);
-    const path = url.pathname;
 
-    console.log(`Request path: ${path}`);
-    console.log(`Available bindings:`, Object.keys(env));
-
-    // Test if ASSETS binding exists
-    if (env.ASSETS) {
-      console.log('ASSETS binding found');
-      try {
-        const assetResponse = await env.ASSETS.fetch(request);
-        console.log(`Asset response status: ${assetResponse.status}`);
-        
-        if (assetResponse.status === 200) {
-          console.log('Asset found, returning response');
-          return assetResponse;
-        } else {
-          console.log(`Asset not found, status: ${assetResponse.status}`);
-          console.log(`Response headers:`, Object.fromEntries(assetResponse.headers.entries()));
-        }
-      } catch (error) {
-        console.error('Asset fetch error:', error);
-      }
-    } else {
-      console.log('ASSETS binding not found');
+    if (!env.ASSETS) {
+      return new Response('Service unavailable', { status: 503 });
     }
 
-    // Return 404 if nothing matches
-    console.log(`Returning 404 for path: ${path}`);
-    return new Response(`Not Found: ${path}`, { 
-      status: 404,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'text/plain'
+    // Try to serve the requested asset directly
+    try {
+      const assetResponse = await env.ASSETS.fetch(request);
+      if (assetResponse.status !== 404) {
+        return assetResponse;
       }
-    });
+    } catch {
+      // Asset fetch failed; fall through to SPA fallback below
+    }
+
+    // SPA fallback: serve index.html for client-side routing (dynamic routes)
+    try {
+      const indexUrl = new URL('/', url);
+      const fallbackRequest = new Request(indexUrl.toString(), {
+        method: request.method,
+        headers: request.headers,
+      });
+      const fallbackResponse = await env.ASSETS.fetch(fallbackRequest);
+      if (fallbackResponse.status === 200) {
+        return new Response(fallbackResponse.body, {
+          status: 200,
+          headers: fallbackResponse.headers,
+        });
+      }
+    } catch {
+      // Fallback fetch failed; return 404 below
+    }
+
+    return new Response('Not Found', { status: 404 });
   }
 };

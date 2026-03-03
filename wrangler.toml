@@ -9,7 +9,7 @@ directory = ".next/deploy"
 binding = "ASSETS"
 
 [build]
-command = "npm run build && cp -r .next/server/app .next/deploy/ && cp -r .next/static .next/deploy/"
+command = "npm run build && rm -rf .next/deploy && mkdir -p .next/deploy/_next && cp -r .next/static .next/deploy/_next/ && cp -r .next/server/app/. .next/deploy/"
 
 [vars]
 # Add environment variables here for Cloudflare deployment.
