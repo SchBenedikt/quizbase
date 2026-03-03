@@ -14,8 +14,6 @@ import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } 
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export const dynamic = 'force-dynamic';
-
 export default function EditPollPage({ params }: { params: Promise<{ pollId: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();

@@ -21,8 +21,6 @@ import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export const dynamic = 'force-dynamic';
-
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
   const db = useFirestore();
