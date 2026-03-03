@@ -5,6 +5,7 @@ import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthManager } from '@/components/auth/AuthManager';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://quizbase.xn--schchner-2za.de'),
@@ -182,6 +183,7 @@ export default function RootLayout({
         >
           <FirebaseClientProvider>
               <LanguageProvider>
+                <AuthManager />
                 {children}
                 <Toaster />
               </LanguageProvider>
