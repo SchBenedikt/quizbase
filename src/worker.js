@@ -129,17 +129,45 @@ Host: https://quizbase.xn--schchner-2za.de`;
         // Remove trailing slash for consistency (except for root)
         const cleanPath = url.pathname.replace(/\/$/, '') || '/';
         
-        // Try different path patterns for dynamic routes
-        const possiblePaths = [
-          // Direct path: /presenter/edit/[pollId] -> /presenter/edit/[pollId].html
-          `${cleanPath}.html`,
-          // Page directory: /presenter/edit/[pollId] -> /presenter/edit/[pollId]/page.html
-          `${cleanPath}/page.html`,
-          // Index fallback: /presenter -> /presenter/page.html
-          `${cleanPath}/page.html`
-        ];
+        // For dynamic routes, we need to match the Next.js build pattern
+        // /presenter/edit/test123 should match /presenter/edit/[pollId]/page.html
+        let htmlPath;
         
-        for (const htmlPath of possiblePaths) {
+        if (cleanPath.includes('/presenter/edit/')) {
+          // Extract the pollId part and replace with [pollId]
+          const parts = cleanPath.split('/presenter/edit/');
+          if (parts.length > 1) {
+            htmlPath = `/presenter/edit/[pollId]/page.html`;
+          }
+        } else if (cleanPath.includes('/presenter/') && !cleanPath.endsWith('/presenter')) {
+          // Extract the sessionId part and replace with [sessionId]
+          const parts = cleanPath.split('/presenter/');
+          if (parts.length > 1) {
+            const remainingPath = parts[1];
+            if (remainingPath.includes('/stats')) {
+              htmlPath = `/presenter/[sessionId]/stats/page.html`;
+            } else {
+              htmlPath = `/presenter/[sessionId]/page.html`;
+            }
+          }
+        } else {
+          // For other routes, try direct path and page.html
+          htmlPath = `${cleanPath}.html`;
+          const htmlUrl = new URL(htmlPath, url);
+          const htmlRequest = new Request(htmlUrl.toString(), {
+            method: request.method,
+            headers: request.headers,
+          });
+          
+          const htmlResponse = await env.ASSETS.fetch(htmlRequest);
+          if (htmlResponse.status === 200) {
+            return htmlResponse;
+          }
+          
+          htmlPath = `${cleanPath}/page.html`;
+        }
+        
+        if (htmlPath) {
           const htmlUrl = new URL(htmlPath, url);
           const htmlRequest = new Request(htmlUrl.toString(), {
             method: request.method,
