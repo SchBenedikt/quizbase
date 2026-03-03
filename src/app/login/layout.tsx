@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Sign In - Quizbase',
     description: 'Sign in to create and manage your interactive polls and quizzes.',
-    url: 'https://links.xn--schchner-2za.de/login',
+    url: 'https://quizbase.xn--schchner-2za.de/login',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Quizbase Sign In' }],
   },
   twitter: {
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     description: 'Create and manage interactive polls and quizzes with Quizbase.',
   },
   alternates: {
-    canonical: 'https://links.xn--schchner-2za.de/login',
+    canonical: 'https://quizbase.xn--schchner-2za.de/login',
   },
 };
 

@@ -7,7 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://links.xn--schchner-2za.de'),
+  metadataBase: new URL('https://quizbase.xn--schchner-2za.de'),
   title: {
     default: 'Quizbase — Free Live Polls & Interactive Quizzes | No Download Required',
     template: '%s | Quizbase',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     'audience response system', 'live voting', 'quiz maker', 'polling software',
     'virtual engagement', 'online quizzes', 'classroom polling', 'meeting polls'
   ],
-  authors: [{ name: 'Quizbase Team', url: 'https://links.xn--schchner-2za.de' }],
+  authors: [{ name: 'Quizbase Team', url: 'https://quizbase.xn--schchner-2za.de' }],
   creator: 'Quizbase',
   publisher: 'Quizbase',
   category: 'Education',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     title: 'Quizbase — Free Live Polls & Interactive Quizzes',
     description: 'Create engaging live polls, quizzes, and word clouds. Join instantly with a 6-digit code - no download required. Perfect for classrooms, meetings, and events.',
     type: 'website',
-    url: 'https://links.xn--schchner-2za.de',
+    url: 'https://quizbase.xn--schchner-2za.de',
     siteName: 'Quizbase',
     locale: 'en_US',
     images: [
@@ -52,10 +52,10 @@ export const metadata: Metadata = {
     site: '@quizbase',
   },
   alternates: {
-    canonical: 'https://links.xn--schchner-2za.de',
+    canonical: 'https://quizbase.xn--schchner-2za.de',
     languages: {
-      'en': 'https://links.xn--schchner-2za.de',
-      'de': 'https://links.xn--schchner-2za.de',
+      'en': 'https://quizbase.xn--schchner-2za.de',
+      'de': 'https://quizbase.xn--schchner-2za.de',
     },
   },
   robots: {
@@ -80,7 +80,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   name: 'Quizbase',
-  url: 'https://links.xn--schchner-2za.de',
+  url: 'https://quizbase.xn--schchner-2za.de',
   description: 'Free live polling and quiz platform. Create interactive surveys, quizzes, word clouds, and audience polls. Join with a 6-digit code — no download required.',
   applicationCategory: 'EducationApplication',
   operatingSystem: 'Any',
@@ -89,7 +89,7 @@ const jsonLd = {
   author: {
     '@type': 'Organization',
     name: 'Quizbase',
-    url: 'https://links.xn--schchner-2za.de'
+    url: 'https://quizbase.xn--schchner-2za.de'
   },
   offers: { 
     '@type': 'Offer', 
@@ -115,7 +115,7 @@ const jsonLd = {
     '6-digit Join Codes',
     'Multiple Question Types'
   ],
-  screenshot: 'https://links.xn--schchner-2za.de/og-image.png',
+  screenshot: 'https://quizbase.xn--schchner-2za.de/og-image.png',
 };
 
 export default function RootLayout({
@@ -140,7 +140,7 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'Quizbase',
-              url: 'https://links.xn--schchner-2za.de',
+              url: 'https://quizbase.xn--schchner-2za.de',
               description: 'Free live polling and quiz platform for interactive audience engagement',
             })
           }}
