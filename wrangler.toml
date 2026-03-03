@@ -25,5 +25,5 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = ""
 
 # Custom domains for the worker
 routes = [
-  { pattern = "quizbase.xn--schchner-2za.de/*" }
+  { pattern = "links.xn--schchner-2za.de/*" }
 ]
