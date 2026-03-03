@@ -14,6 +14,16 @@ export default {
     try {
       const assetResponse = await env.ASSETS.fetch(request);
       if (assetResponse.status !== 404) {
+        // Fix MIME type for JavaScript files
+        if (url.pathname.endsWith('.js')) {
+          return new Response(assetResponse.body, {
+            status: assetResponse.status,
+            headers: {
+              ...Object.fromEntries(assetResponse.headers.entries()),
+              'Content-Type': 'application/javascript; charset=utf-8',
+            },
+          });
+        }
         return assetResponse;
       }
     } catch {
