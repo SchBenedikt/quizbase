@@ -102,28 +102,8 @@ Host: https://quizbase.xn--schchner-2za.de`;
       });
     }
 
-    // Try to serve the requested asset directly first
-    try {
-      const assetResponse = await env.ASSETS.fetch(request);
-      if (assetResponse.status !== 404) {
-        // Fix MIME type for JavaScript files
-        if (url.pathname.endsWith('.js')) {
-          return new Response(assetResponse.body, {
-            status: assetResponse.status,
-            headers: {
-              ...Object.fromEntries(assetResponse.headers.entries()),
-              'Content-Type': 'application/javascript; charset=utf-8',
-            },
-          });
-        }
-        return assetResponse;
-      }
-    } catch {
-      // Asset fetch failed; fall through to path handling below
-    }
-
-    // For dynamic routes, try to serve the HTML file directly
-    // This handles routes like /presenter/edit/[pollId] and /presenter/[sessionId]
+    // For dynamic routes, check HTML files FIRST before trying generic assets
+    // This prevents serving JS files instead of HTML for dynamic routes
     if (url.pathname !== '/') {
       try {
         // Remove trailing slash for consistency (except for root)
@@ -152,18 +132,6 @@ Host: https://quizbase.xn--schchner-2za.de`;
           }
         } else {
           // For other routes, try direct path and page.html
-          htmlPath = `${cleanPath}.html`;
-          const htmlUrl = new URL(htmlPath, url);
-          const htmlRequest = new Request(htmlUrl.toString(), {
-            method: request.method,
-            headers: request.headers,
-          });
-          
-          const htmlResponse = await env.ASSETS.fetch(htmlRequest);
-          if (htmlResponse.status === 200) {
-            return htmlResponse;
-          }
-          
           htmlPath = `${cleanPath}/page.html`;
         }
         
@@ -180,8 +148,28 @@ Host: https://quizbase.xn--schchner-2za.de`;
           }
         }
       } catch {
-        // HTML fetch failed; fall through to SPA fallback below
+        // HTML fetch failed; fall through to asset handling below
       }
+    }
+
+    // Try to serve the requested asset directly
+    try {
+      const assetResponse = await env.ASSETS.fetch(request);
+      if (assetResponse.status !== 404) {
+        // Fix MIME type for JavaScript files
+        if (url.pathname.endsWith('.js')) {
+          return new Response(assetResponse.body, {
+            status: assetResponse.status,
+            headers: {
+              ...Object.fromEntries(assetResponse.headers.entries()),
+              'Content-Type': 'application/javascript; charset=utf-8',
+            },
+          });
+        }
+        return assetResponse;
+      }
+    } catch {
+      // Asset fetch failed; fall through to SPA fallback below
     }
 
     // SPA fallback: serve index.html for client-side routing
@@ -199,7 +187,7 @@ Host: https://quizbase.xn--schchner-2za.de`;
         });
       }
     } catch {
-      // Fallback fetch failed; return 404 below
+      // Fallback fetch failed; return 404
     }
 
     return new Response('Not Found', { status: 404 });
