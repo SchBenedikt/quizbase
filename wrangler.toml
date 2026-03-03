@@ -12,7 +12,15 @@ binding = "ASSETS"
 command = "npm run build && rm -rf .next/deploy && mkdir -p .next/deploy/_next && cp -r .next/static .next/deploy/_next/ && cp -r .next/server/app/. .next/deploy/ && find .next/deploy -path '*/_next/static/*' -prune -o -name '*.js' -exec sh -c 'mv \"$1\" \"${1%.js}.html\"' _ {} \\;"
 
 [vars]
-# Add environment variables here for Cloudflare deployment.
+# Firebase configuration for Cloudflare Workers (Next.js public variables)
+NEXT_PUBLIC_FIREBASE_PROJECT_ID = "studio-6326175703-311d9"
+NEXT_PUBLIC_FIREBASE_APP_ID = "1:918015142594:web:3a0d746c9763311998295b"
+NEXT_PUBLIC_FIREBASE_API_KEY = "AIzaSyAk7RfMjM-hQ7hck2pcUQQ7zkV1lE2o5JA"
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = "studio-6326175703-311d9.firebaseapp.com"
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "918015142594"
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = ""
+
+# Add other environment variables here for Cloudflare deployment.
 # Sensitive variables should be added via `wrangler secret put`.
 
 # Custom domains for the worker
