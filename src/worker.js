@@ -14,20 +14,7 @@ export default {
     if (url.pathname === '/robots.txt') {
       const robotsContent = `User-agent: *
 Allow: /
-Disallow: /dashboard/
-Disallow: /presenter/
-Disallow: /profile/
-Disallow: /api/
-Disallow: /_next/
-Disallow: /admin/
-Allow: /discover
-Allow: /join
-Allow: /login
-Allow: /analytics
-Allow: /design
-Disallow: /*?
-Disallow: /search
-Disallow: /filter
+Crawl-delay: 1
 
 Sitemap: https://quizbase.app/sitemap.xml
 Host: https://quizbase.app`;
