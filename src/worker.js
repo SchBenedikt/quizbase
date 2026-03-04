@@ -113,23 +113,30 @@ Host: https://quizbase.xn--schchner-2za.de`;
         // Next.js static export creates folders with page.html inside
         let htmlPath;
 
-        if (cleanPath === '/presenter/edit' || cleanPath === '/presenter/edit/') {
-          htmlPath = '/presenter/edit/page.html';
-        } else if (cleanPath.startsWith('/presenter/edit/')) {
-          // Check for /presenter/edit/[pollId]
-          htmlPath = `/presenter/edit/[pollId]/page.html`;
-        } else if (cleanPath.startsWith('/presenter/')) {
-          // Check for /presenter/[sessionId]/stats or /presenter/[sessionId]
-          const parts = cleanPath.split('/');
-          // parts[0] is empty, parts[1] is 'presenter', parts[2] is [sessionId], parts[3] is 'stats'
-          if (parts.length >= 4 && parts[3] === 'stats') {
+        const parts = cleanPath.split('/').filter(Boolean);
+
+        if (cleanPath === '/') {
+          htmlPath = '/index.html';
+        } else if (parts[0] === 'presenter') {
+          if (parts[1] === 'edit' && parts.length >= 3) {
+            // /presenter/edit/[pollId]
+            htmlPath = `/presenter/edit/[pollId]/page.html`;
+          } else if (parts.length >= 3 && parts[2] === 'stats') {
+            // /presenter/[sessionId]/stats
             htmlPath = `/presenter/[sessionId]/stats/page.html`;
-          } else {
+          } else if (parts.length >= 2) {
+            // /presenter/[sessionId]
             htmlPath = `/presenter/[sessionId]/page.html`;
           }
+        } else if (parts[0] === 'p' && parts.length >= 2) {
+          // /p/[sessionId]
+          htmlPath = `/p/[sessionId]/page.html`;
+        } else if (parts[0] === 'profile' && parts.length >= 2) {
+          // /profile/[userId]
+          htmlPath = `/profile/[userId]/page.html`;
         } else {
-          // For other routes, try direct path and page.html
-          htmlPath = `${cleanPath}/page.html`;
+          // For most routes, try path.html directly (Next.js export style)
+          htmlPath = `${cleanPath}.html`;
         }
 
         if (htmlPath) {
@@ -139,7 +146,18 @@ Host: https://quizbase.xn--schchner-2za.de`;
             headers: request.headers,
           });
 
-          const htmlResponse = await env.ASSETS.fetch(htmlRequest);
+          let htmlResponse = await env.ASSETS.fetch(htmlRequest);
+
+          // If path.html failed, try path/page.html (the old way)
+          if (htmlResponse.status !== 200 && cleanPath !== '/') {
+            const altPath = `${cleanPath}/page.html`;
+            const altUrl = new URL(altPath, url);
+            htmlResponse = await env.ASSETS.fetch(new Request(altUrl.toString(), {
+              method: request.method,
+              headers: request.headers,
+            }));
+          }
+
           if (htmlResponse.status === 200) {
             return htmlResponse;
           }
