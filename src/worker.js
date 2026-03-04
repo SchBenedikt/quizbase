@@ -108,40 +108,37 @@ Host: https://quizbase.xn--schchner-2za.de`;
       try {
         // Remove trailing slash for consistency (except for root)
         const cleanPath = url.pathname.replace(/\/$/, '') || '/';
-        
+
         // For dynamic routes, we need to match the Next.js build pattern
-        // /presenter/edit/test123 should match /presenter/edit/[pollId]/page.html
+        // Next.js static export creates folders with page.html inside
         let htmlPath;
-        
-        if (cleanPath.includes('/presenter/edit/')) {
-          // Extract the pollId part and replace with [pollId]
-          const parts = cleanPath.split('/presenter/edit/');
-          if (parts.length > 1) {
-            htmlPath = `/presenter/edit/[pollId]/page.html`;
-          }
-        } else if (cleanPath.includes('/presenter/') && !cleanPath.endsWith('/presenter')) {
-          // Extract the sessionId part and replace with [sessionId]
-          const parts = cleanPath.split('/presenter/');
-          if (parts.length > 1) {
-            const remainingPath = parts[1];
-            if (remainingPath.includes('/stats')) {
-              htmlPath = `/presenter/[sessionId]/stats/page.html`;
-            } else {
-              htmlPath = `/presenter/[sessionId]/page.html`;
-            }
+
+        if (cleanPath === '/presenter/edit' || cleanPath === '/presenter/edit/') {
+          htmlPath = '/presenter/edit/page.html';
+        } else if (cleanPath.startsWith('/presenter/edit/')) {
+          // Check for /presenter/edit/[pollId]
+          htmlPath = `/presenter/edit/[pollId]/page.html`;
+        } else if (cleanPath.startsWith('/presenter/')) {
+          // Check for /presenter/[sessionId]/stats or /presenter/[sessionId]
+          const parts = cleanPath.split('/');
+          // parts[0] is empty, parts[1] is 'presenter', parts[2] is [sessionId], parts[3] is 'stats'
+          if (parts.length >= 4 && parts[3] === 'stats') {
+            htmlPath = `/presenter/[sessionId]/stats/page.html`;
+          } else {
+            htmlPath = `/presenter/[sessionId]/page.html`;
           }
         } else {
           // For other routes, try direct path and page.html
           htmlPath = `${cleanPath}/page.html`;
         }
-        
+
         if (htmlPath) {
           const htmlUrl = new URL(htmlPath, url);
           const htmlRequest = new Request(htmlUrl.toString(), {
             method: request.method,
             headers: request.headers,
           });
-          
+
           const htmlResponse = await env.ASSETS.fetch(htmlRequest);
           if (htmlResponse.status === 200) {
             return htmlResponse;
