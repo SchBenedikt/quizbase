@@ -34,14 +34,44 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   const [dataLoading, setDataLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState(false);
+  const [authStableTimer, setAuthStableTimer] = useState<NodeJS.Timeout | null>(null);
 
+  // Auth state stability detection - prevent premature redirects during Firebase auth resets
   useEffect(() => {
     console.log('[EditPollPage] Auth state check:', { user: user?.uid, isUserLoading });
+    
+    // Clear any existing timer
+    if (authStableTimer) {
+      clearTimeout(authStableTimer);
+      setAuthStableTimer(null);
+    }
+    
+    // Only redirect if auth state is stable and user is genuinely not authenticated
     if (!isUserLoading && !user) {
-      console.log('[EditPollPage] No user found, redirecting to login');
-      router.replace("/login");
+      console.log('[EditPollPage] No user found, waiting for auth stability...');
+      // Wait 1 second to ensure auth state has stabilized after potential reset
+      const timer = setTimeout(() => {
+        console.log('[EditPollPage] Auth stability timeout reached, checking again...');
+        // Check one more time - if still no user, then redirect
+        if (!user) {
+          console.log('[EditPollPage] Confirmed no user after stability check, redirecting to login');
+          router.replace("/login");
+        } else {
+          console.log('[EditPollPage] User found during stability check, staying on page');
+        }
+      }, 1000);
+      setAuthStableTimer(timer);
     }
   }, [user, isUserLoading, router]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (authStableTimer) {
+        clearTimeout(authStableTimer);
+      }
+    };
+  }, [authStableTimer]);
 
   useEffect(() => {
     if (!user || !pollId) {
@@ -91,23 +121,18 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     fetchData();
   }, [user, pollId, db]);
 
-  if (isUserLoading || (user && dataLoading)) {
-    console.log('[EditPollPage] Showing loading screen:', { isUserLoading, dataLoading, hasUser: !!user });
+  if (isUserLoading || (user && dataLoading) || authStableTimer) {
+    console.log('[EditPollPage] Showing loading screen:', { isUserLoading, dataLoading, hasUser: !!user, hasAuthTimer: !!authStableTimer });
     return (
       <div className="h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin" />
           <p className="text-sm text-muted-foreground">
-            {isUserLoading ? 'Loading user...' : 'Loading poll data...'}
+            {isUserLoading ? 'Loading user...' : authStableTimer ? 'Verifying authentication...' : 'Loading poll data...'}
           </p>
         </div>
       </div>
     );
-  }
-
-  if (!user) {
-    console.log('[EditPollPage] No user, returning null');
-    return null;
   }
 
   if (notFound) {
