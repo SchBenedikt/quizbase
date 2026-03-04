@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'appearance'>('profile');
+  const [authStableTimer, setAuthStableTimer] = useState<NodeJS.Timeout | null>(null);
 
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -53,15 +54,39 @@ export default function ProfilePage() {
   }, [db, user]);
   const { data: sessions } = useCollection(sessionsQuery);
 
+  // Auth state stability detection - prevent premature redirects during Firebase auth resets
   useEffect(() => {
     setMounted(true);
-    if (!isUserLoading && !user) {
-      router.push("/login");
+    
+    // Clear any existing timer
+    if (authStableTimer) {
+      clearTimeout(authStableTimer);
+      setAuthStableTimer(null);
     }
-    if (user) {
+    
+    // Only redirect if auth state is stable and user is genuinely not authenticated
+    if (!isUserLoading && !user) {
+      // Wait 1 second to ensure auth state has stabilized after potential reset
+      const timer = setTimeout(() => {
+        // Check one more time - if still no user, then redirect
+        if (!user) {
+          router.push("/login");
+        }
+      }, 1000);
+      setAuthStableTimer(timer);
+    } else if (user) {
       setName(user.displayName || "");
     }
   }, [user, isUserLoading, router]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (authStableTimer) {
+        clearTimeout(authStableTimer);
+      }
+    };
+  }, [authStableTimer]);
 
   useEffect(() => {
     if (userDoc) {

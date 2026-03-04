@@ -77,12 +77,39 @@ export default function AnalyticsPage() {
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
   const [filterType, setFilterType] = useState<"all" | "quiz" | "survey">("all");
   const [mounted, setMounted] = useState(false);
+  const [authStableTimer, setAuthStableTimer] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => { setMounted(true); }, []);
 
+  // Auth state stability detection - prevent premature redirects during Firebase auth resets
   useEffect(() => {
-    if (!isUserLoading && !user) router.push("/login");
+    // Clear any existing timer
+    if (authStableTimer) {
+      clearTimeout(authStableTimer);
+      setAuthStableTimer(null);
+    }
+    
+    // Only redirect if auth state is stable and user is genuinely not authenticated
+    if (!isUserLoading && !user) {
+      // Wait 1 second to ensure auth state has stabilized after potential reset
+      const timer = setTimeout(() => {
+        // Check one more time - if still no user, then redirect
+        if (!user) {
+          router.push("/login");
+        }
+      }, 1000);
+      setAuthStableTimer(timer);
+    }
   }, [user, isUserLoading, router]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (authStableTimer) {
+        clearTimeout(authStableTimer);
+      }
+    };
+  }, [authStableTimer]);
 
   // Load all sessions (up to 200)
   const sessionsQuery = useMemoFirebase(() => {
