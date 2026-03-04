@@ -7,15 +7,26 @@ import { getFirestore } from 'firebase/firestore'
 
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
+  console.log('[Firebase] Initializing Firebase...');
+  console.log('[Firebase] Current apps:', getApps().length);
+  console.log('[Firebase] Config:', {
+    projectId: firebaseConfig.projectId,
+    authDomain: firebaseConfig.authDomain,
+    hasApiKey: !!firebaseConfig.apiKey
+  });
+  
   if (!getApps().length) {
+    console.log('[Firebase] No existing apps, creating new Firebase app');
     // We favor initializing with the provided firebaseConfig to avoid the
     // "Firebase: Need to provide options" error that occurs when calling
     // initializeApp() without arguments in environments that don't support
     // automatic App Hosting configuration (like custom domains).
     const firebaseApp = initializeApp(firebaseConfig);
+    console.log('[Firebase] Firebase app created successfully');
     return getSdks(firebaseApp);
   }
 
+  console.log('[Firebase] Using existing Firebase app');
   // If already initialized, return the SDKs with the already initialized App
   return getSdks(getApp());
 }

@@ -49,12 +49,14 @@ export function useDoc<T = any>(
 
   useEffect(() => {
     if (!memoizedDocRef) {
+      console.log('[useDoc] No document reference provided');
       setData(null);
       setIsLoading(false);
       setError(null);
       return;
     }
 
+    console.log('[useDoc] Setting up listener for:', memoizedDocRef.path);
     setIsLoading(true);
     setError(null);
     // Optional: setData(null); // Clear previous data instantly
@@ -63,8 +65,14 @@ export function useDoc<T = any>(
       memoizedDocRef,
       (snapshot: DocumentSnapshot<DocumentData>) => {
         if (snapshot.exists()) {
+          console.log('[useDoc] Document exists:', {
+            path: memoizedDocRef.path,
+            id: snapshot.id,
+            hasData: !!snapshot.data()
+          });
           setData({ ...(snapshot.data() as T), id: snapshot.id });
         } else {
+          console.warn('[useDoc] Document does not exist:', memoizedDocRef.path);
           // Document does not exist
           setData(null);
         }
@@ -72,6 +80,12 @@ export function useDoc<T = any>(
         setIsLoading(false);
       },
       (error: FirestoreError) => {
+        console.error('[useDoc] Firestore error:', {
+          path: memoizedDocRef.path,
+          code: error.code,
+          message: error.message
+        });
+        
         const contextualError = new FirestorePermissionError({
           operation: 'get',
           path: memoizedDocRef.path,
@@ -86,7 +100,10 @@ export function useDoc<T = any>(
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      console.log('[useDoc] Cleaning up listener for:', memoizedDocRef.path);
+      unsubscribe();
+    };
   }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.
 
   return { data, isLoading, error };

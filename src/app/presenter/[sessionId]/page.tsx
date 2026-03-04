@@ -21,17 +21,47 @@ import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const resolvedParams = use(params);
   const db = useFirestore();
   const { toast } = useToast();
   
+  // Extended logging for debugging
+  useEffect(() => {
+    console.log('[SessionDisplayPage] Component mounted');
+    console.log('[SessionDisplayPage] resolvedParams:', resolvedParams);
+    console.log('[SessionDisplayPage] sessionId:', resolvedParams?.sessionId);
+    console.log('[SessionDisplayPage] db initialized:', !!db);
+    console.log('[SessionDisplayPage] window.location:', typeof window !== 'undefined' ? window.location.href : 'SSR');
+  }, [resolvedParams, db]);
+  
   const sessionRef = useMemoFirebase(() => {
-    if (!resolvedParams.sessionId) return null;
-    return doc(db, "sessions", resolvedParams.sessionId);
+    const ref = resolvedParams.sessionId ? doc(db, "sessions", resolvedParams.sessionId) : null;
+    console.log('[SessionDisplayPage] sessionRef created:', {
+      sessionId: resolvedParams.sessionId,
+      hasRef: !!ref,
+      refPath: ref?.path
+    });
+    return ref;
   }, [db, resolvedParams.sessionId]);
   
   const { data: session, isLoading: sessionLoading } = useDoc<PollSession>(sessionRef);
+
+  // Log session data for debugging
+  useEffect(() => {
+    console.log('[SessionDisplayPage] Session data updated:', {
+      session,
+      isLoading: sessionLoading,
+      hasSession: !!session,
+      sessionUserId: session?.userId,
+      sessionPollId: session?.pollId,
+      sessionStatus: session?.status
+    });
+  }, [session, sessionLoading]);
 
   const title = session?.title || "Live Presentation";
   const code = session?.code || "---";
@@ -39,11 +69,27 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const customColor = session?.customColor;
 
   const questionsQuery = useMemoFirebase(() => {
-    if (!session?.userId || !session?.pollId) return null;
-    return query(collection(db, `users/${session.userId}/surveys/${session.pollId}/questions`), orderBy("order", "asc"));
+    const q = (session?.userId && session?.pollId) 
+      ? query(collection(db, `users/${session.userId}/surveys/${session.pollId}/questions`), orderBy("order", "asc"))
+      : null;
+    console.log('[SessionDisplayPage] questionsQuery created:', {
+      hasQuery: !!q,
+      userId: session?.userId,
+      pollId: session?.pollId,
+      queryPath: q ? `users/${session.userId}/surveys/${session.pollId}/questions` : null
+    });
+    return q;
   }, [db, session?.userId, session?.pollId]);
   
   const { data: rawQuestions } = useCollection<PollQuestion>(questionsQuery);
+  
+  // Log questions data for debugging
+  useEffect(() => {
+    console.log('[SessionDisplayPage] Questions data updated:', {
+      rawQuestions,
+      questionsCount: rawQuestions?.length || 0
+    });
+  }, [rawQuestions]);
 
   const pollRef = useMemoFirebase(() => {
     if (!session?.userId || !session?.pollId) return null;
@@ -249,9 +295,27 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     return (yiq >= 128) ? '#000000' : '#ffffff';
   };
 
-  if (sessionLoading || !questions) return (
-    <div className="h-screen w-screen flex items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin opacity-20" /></div>
-  );
+  // Debug loading state
+  useEffect(() => {
+    console.log('[SessionDisplayPage] Loading state:', {
+      sessionLoading,
+      hasQuestions: !!questions,
+      questionsLength: questions?.length,
+      shouldShowLoading: sessionLoading || !questions
+    });
+  }, [sessionLoading, questions]);
+
+  if (sessionLoading || !questions) {
+    console.log('[SessionDisplayPage] Showing loading screen');
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin opacity-20" />
+          <p className="text-sm text-muted-foreground">Loading session... {sessionLoading ? '(Loading session data)' : '(Loading questions)'}</p>
+        </div>
+      </div>
+    );
+  }
 
   let finalBg = '#ffffff';
   if (currentTheme === 'orange') finalBg = '#ff9312';

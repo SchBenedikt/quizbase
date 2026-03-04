@@ -54,12 +54,26 @@ export function useCollection<T = any>(
 
   useEffect(() => {
     if (!memoizedTargetRefOrQuery) {
+      console.log('[useCollection] No query/collection reference provided');
       setData(null);
       setIsLoading(false);
       setError(null);
       return;
     }
 
+    let path: string = "/";
+    try {
+      if ('path' in memoizedTargetRefOrQuery) {
+        path = memoizedTargetRefOrQuery.path;
+      } else {
+        const q = memoizedTargetRefOrQuery as any;
+        path = q._query?.path?.canonicalString() || q.path || "/";
+      }
+    } catch (e) {
+      console.warn('[useCollection] Failed to extract query path:', e);
+    }
+
+    console.log('[useCollection] Setting up listener for:', path);
     setIsLoading(true);
     setError(null);
 
@@ -70,23 +84,20 @@ export function useCollection<T = any>(
         for (const doc of snapshot.docs) {
           results.push({ ...(doc.data() as T), id: doc.id });
         }
+        console.log('[useCollection] Data received:', {
+          path,
+          count: results.length
+        });
         setData(results);
         setError(null);
         setIsLoading(false);
       },
       (error: FirestoreError) => {
-        let path: string = "/";
-        try {
-          if ('path' in memoizedTargetRefOrQuery) {
-            path = memoizedTargetRefOrQuery.path;
-          } else {
-            const q = memoizedTargetRefOrQuery as any;
-            path = q._query?.path?.canonicalString() || q.path || "/";
-          }
-        } catch (e) {
-          // Fallback if path extraction fails for complex queries
-          console.warn('Failed to extract query path:', e);
-        }
+        console.error('[useCollection] Firestore error:', {
+          path,
+          code: error.code,
+          message: error.message
+        });
 
         // Log the full error for debugging
         console.error('Firestore permission error:', {
