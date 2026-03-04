@@ -10,22 +10,33 @@ export default {
       return new Response('Service unavailable', { status: 503 });
     }
 
-    // Handle special routes with specific content types
+    const isRSC = url.searchParams.has('_rsc');
+
+    // Helper to try fetching multiple asset paths
+    const tryAssets = async (paths) => {
+      for (const path of paths) {
+        try {
+          // IMPORTANT: Strip query parameters when fetching from static assets
+          // Static assets in Cloudflare are stored by their clean file path
+          const assetUrl = new URL(path, url.origin);
+          const assetRequest = new Request(assetUrl.toString(), {
+            method: request.method,
+            headers: request.headers,
+          });
+
+          const response = await env.ASSETS.fetch(assetRequest);
+          if (response.status === 200) return response;
+        } catch (e) {
+          // Continue to next path
+        }
+      }
+      return null;
+    };
+
+    // Handle special routes (robots, sitemap)
     if (url.pathname === '/robots.txt') {
-      const robotsContent = `User-agent: *
-Allow: /
-Crawl-delay: 1
-
-Sitemap: https://quizbase.xn--schchner-2za.de/sitemap.xml
-Host: https://quizbase.xn--schchner-2za.de`;
-
-      return new Response(robotsContent, {
-        status: 200,
-        headers: {
-          'Content-Type': 'text/plain',
-          'Cache-Control': 'public, max-age=86400',
-        },
-      });
+      const robotsContent = `User-agent: *\nAllow: /\nCrawl-delay: 1\n\nSitemap: https://quizbase.xn--schchner-2za.de/sitemap.xml\nHost: https://quizbase.xn--schchner-2za.de`;
+      return new Response(robotsContent, { headers: { 'Content-Type': 'text/plain' } });
     }
 
     if (url.pathname === '/sitemap.xml') {
@@ -102,108 +113,52 @@ Host: https://quizbase.xn--schchner-2za.de`;
       });
     }
 
-    // For dynamic routes, check HTML files FIRST before trying generic assets
-    // This prevents serving JS files instead of HTML for dynamic routes
-    if (url.pathname !== '/') {
-      try {
-        // Remove trailing slash for consistency (except for root)
-        const cleanPath = url.pathname.replace(/\/$/, '') || '/';
-
-        // For dynamic routes, we need to match the Next.js build pattern
-        // Next.js static export creates folders with page.html inside
-        let htmlPath;
-
-        const parts = cleanPath.split('/').filter(Boolean);
-
-        if (cleanPath === '/') {
-          htmlPath = '/index.html';
-        } else if (parts[0] === 'presenter') {
-          if (parts[1] === 'edit' && parts.length >= 3) {
-            // /presenter/edit/[pollId]
-            htmlPath = `/presenter/edit/[pollId]/page.html`;
-          } else if (parts.length >= 3 && parts[2] === 'stats') {
-            // /presenter/[sessionId]/stats
-            htmlPath = `/presenter/[sessionId]/stats/page.html`;
-          } else if (parts.length >= 2) {
-            // /presenter/[sessionId]
-            htmlPath = `/presenter/[sessionId]/page.html`;
-          }
-        } else if (parts[0] === 'p' && parts.length >= 2) {
-          // /p/[sessionId]
-          htmlPath = `/p/[sessionId]/page.html`;
-        } else if (parts[0] === 'profile' && parts.length >= 2) {
-          // /profile/[userId]
-          htmlPath = `/profile/[userId]/page.html`;
-        } else {
-          // For most routes, try path.html directly (Next.js export style)
-          htmlPath = `${cleanPath}.html`;
-        }
-
-        if (htmlPath) {
-          const htmlUrl = new URL(htmlPath, url);
-          const htmlRequest = new Request(htmlUrl.toString(), {
-            method: request.method,
-            headers: request.headers,
-          });
-
-          let htmlResponse = await env.ASSETS.fetch(htmlRequest);
-
-          // If path.html failed, try path/page.html (the old way)
-          if (htmlResponse.status !== 200 && cleanPath !== '/') {
-            const altPath = `${cleanPath}/page.html`;
-            const altUrl = new URL(altPath, url);
-            htmlResponse = await env.ASSETS.fetch(new Request(altUrl.toString(), {
-              method: request.method,
-              headers: request.headers,
-            }));
-          }
-
-          if (htmlResponse.status === 200) {
-            return htmlResponse;
-          }
-        }
-      } catch {
-        // HTML fetch failed; fall through to asset handling below
-      }
-    }
-
-    // Try to serve the requested asset directly
-    try {
-      const assetResponse = await env.ASSETS.fetch(request);
-      if (assetResponse.status !== 404) {
-        // Fix MIME type for JavaScript files
-        if (url.pathname.endsWith('.js')) {
-          return new Response(assetResponse.body, {
-            status: assetResponse.status,
-            headers: {
-              ...Object.fromEntries(assetResponse.headers.entries()),
-              'Content-Type': 'application/javascript; charset=utf-8',
-            },
-          });
-        }
-        return assetResponse;
-      }
-    } catch {
-      // Asset fetch failed; fall through to SPA fallback below
-    }
-
-    // SPA fallback: serve index.html for client-side routing
-    try {
-      const indexUrl = new URL('/', url);
-      const fallbackRequest = new Request(indexUrl.toString(), {
-        method: request.method,
-        headers: request.headers,
-      });
-      const fallbackResponse = await env.ASSETS.fetch(fallbackRequest);
-      if (fallbackResponse.status === 200) {
-        return new Response(fallbackResponse.body, {
+    // Try direct asset fetch first (for static files like .js, .css, .png)
+    // We strip the query string to find the exact file
+    const cleanRequest = new Request(new URL(url.pathname, url.origin).toString(), request);
+    const directAsset = await env.ASSETS.fetch(cleanRequest);
+    if (directAsset.status === 200) {
+      if (url.pathname.endsWith('.js')) {
+        return new Response(directAsset.body, {
           status: 200,
-          headers: fallbackResponse.headers,
+          headers: { ...Object.fromEntries(directAsset.headers), 'Content-Type': 'application/javascript' }
         });
       }
-    } catch {
-      // Fallback fetch failed; return 404
+      return directAsset;
     }
+
+    // Routing Logic for Pages
+    const cleanPath = url.pathname.replace(/\/$/, '') || '/';
+    const parts = cleanPath.split('/').filter(Boolean);
+    let potentialAssetPaths = [];
+
+    if (cleanPath === '/') {
+      potentialAssetPaths = isRSC ? ['/index.rsc', '/index.html'] : ['/index.html'];
+    } else if (parts[0] === 'presenter') {
+      if (parts[1] === 'edit' && parts.length >= 3) {
+        potentialAssetPaths = [`/presenter/edit/[pollId]/page.html`];
+      } else if (parts.length >= 3 && parts[2] === 'stats') {
+        potentialAssetPaths = [`/presenter/[sessionId]/stats/page.html`];
+      } else if (parts.length >= 2) {
+        potentialAssetPaths = [`/presenter/[sessionId]/page.html`];
+      }
+    } else if (parts[0] === 'p' && parts.length >= 2) {
+      potentialAssetPaths = [`/p/[sessionId]/page.html`];
+    } else if (parts[0] === 'profile' && parts.length >= 2) {
+      potentialAssetPaths = [`/profile/[userId]/page.html`];
+    } else {
+      // Standard static pages
+      potentialAssetPaths = isRSC
+        ? [`${cleanPath}.rsc`, `${cleanPath}.html`, `${cleanPath}/page.html`]
+        : [`${cleanPath}.html`, `${cleanPath}/page.html`];
+    }
+
+    const pageResponse = await tryAssets(potentialAssetPaths);
+    if (pageResponse) return pageResponse;
+
+    // SPA Fallback
+    const fallback = await tryAssets(['/index.html']);
+    if (fallback) return fallback;
 
     return new Response('Not Found', { status: 404 });
   }
