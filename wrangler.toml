@@ -9,7 +9,7 @@ directory = ".next/deploy"
 binding = "ASSETS"
 
 [build]
-command = "npm run build && rm -rf .next/deploy && mkdir -p .next/deploy/_next && cp -r .next/static .next/deploy/_next/ && cp -r .next/server/app/. .next/deploy/ && find .next/deploy -path '*/_next/static/*' -prune -o -name '*.js' -exec sh -c 'mv \"$1\" \"${1%.js}.html\"' _ {} \\;"
+command = "npm run build && rm -rf .next/deploy && mkdir -p .next/deploy/_next && cp -r .next/static .next/deploy/_next/ && cp -r .next/server/app/. .next/deploy/ && find .next/deploy -path '*/_next/static/*' -prune -o -name '*.js' -exec rm {} \\;"
 
 [vars]
 # Firebase configuration for Cloudflare Workers (Next.js public variables)
