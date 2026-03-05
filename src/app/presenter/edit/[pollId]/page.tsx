@@ -78,6 +78,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       console.log('[EditPollPage] Missing user or pollId, skipping fetch:', { hasUser: !!user, pollId });
       return;
     }
+
+    // Check if this is a new poll creation (pollId === '_')
+    if (pollId === '_') {
+      console.log('[EditPollPage] Creating new poll, skipping fetch');
+      setPoll(null);
+      setQuestions([]);
+      setDataLoading(false);
+      return;
+    }
+
     const uid = user.uid;
 
     async function fetchData() {
