@@ -25,7 +25,16 @@ export default {
           });
 
           const response = await env.ASSETS.fetch(assetRequest);
-          if (response.status === 200) return response;
+          if (response.status === 200) {
+            // Fix Content-Type for JavaScript files
+            if (path.endsWith('.js')) {
+              return new Response(response.body, {
+                status: 200,
+                headers: { ...Object.fromEntries(response.headers), 'Content-Type': 'application/javascript' }
+              });
+            }
+            return response;
+          }
         } catch (e) {
           // Continue to next path
         }
