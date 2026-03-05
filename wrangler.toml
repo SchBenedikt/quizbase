@@ -9,7 +9,7 @@ directory = ".next/deploy"
 binding = "ASSETS"
 
 [build]
-command = "npm run build && rm -rf .next/deploy && mkdir -p .next/deploy/_next && cp -r .next/static .next/deploy/_next/ && cp -r .next/server/app/. .next/deploy/ && find .next/deploy -name '*.js' -exec rm {} + && cp -r .next/server/app/presenter/edit/ .next/deploy/presenter/edit/ && cp -r .next/server/app/presenter/ .next/deploy/presenter/ && cp -r .next/server/app/p/ .next/deploy/p/ && cp -r .next/server/app/profile/ .next/deploy/profile/ && cp -r .next/static/chunks/app/presenter/ .next/deploy/_next/static/chunks/app/presenter/"
+command = "npm run build && rm -rf .next/deploy && mkdir -p .next/deploy/_next && cp -r .next/static .next/deploy/_next/ && cp -r .next/server/app/. .next/deploy/ && find .next/deploy -path '*/_next/static/*' -prune -o -name '*.js' -exec rm {} + && cp -r .next/server/app/presenter/edit/ .next/deploy/presenter/edit/ && cp -r .next/server/app/presenter/ .next/deploy/presenter/ && cp -r .next/server/app/p/ .next/deploy/p/ && cp -r .next/server/app/profile/ .next/deploy/profile/ && cp -r .next/static/chunks/app/presenter/ .next/deploy/_next/static/chunks/app/presenter/"
 
 [vars]
 # Firebase configuration for Cloudflare Workers (Next.js public variables)
