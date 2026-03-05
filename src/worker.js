@@ -137,17 +137,17 @@ export default {
       potentialAssetPaths = isRSC ? ['/index.rsc', '/index.html'] : ['/index.html'];
     } else if (parts[0] === 'presenter') {
       if (parts[1] === 'edit' && parts.length >= 3) {
-        // Dynamic route - try to serve the server-side page.js first
+        // Dynamic route - serve SPA to let client-side routing handle it
         isDynamicRoute = true;
-        potentialAssetPaths = [`/presenter/edit/[pollId]/page.js`, '/index.html'];
+        potentialAssetPaths = ['/index.html'];
       } else if (parts.length >= 3 && parts[2] === 'stats') {
-        // Dynamic route - try to serve the server-side page.js first
+        // Dynamic route - serve SPA to let client-side routing handle it
         isDynamicRoute = true;
-        potentialAssetPaths = [`/presenter/[sessionId]/stats/page.js`, '/index.html'];
+        potentialAssetPaths = ['/index.html'];
       } else if (parts.length >= 2) {
-        // Dynamic route - try to serve the server-side page.js first
+        // Dynamic route - serve SPA to let client-side routing handle it
         isDynamicRoute = true;
-        potentialAssetPaths = [`/presenter/[sessionId]/page.js`, '/index.html'];
+        potentialAssetPaths = ['/index.html'];
       }
     } else if (parts[0] === 'p' && parts.length >= 2) {
       // Dynamic route - serve SPA to let client-side routing handle it
@@ -166,30 +166,6 @@ export default {
 
     const pageResponse = await tryAssets(potentialAssetPaths);
     if (pageResponse) {
-      // For dynamic routes serving page.js files, we need to wrap them in HTML
-      if (pageResponse.url && pageResponse.url.includes('/page.js') && isDynamicRoute) {
-        const jsContent = await pageResponse.text();
-        const htmlResponse = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quizbase - Edit Poll</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-  <div id="root"></div>
-  <script>
-    // Execute the page.js content
-    ${jsContent}
-  </script>
-</body>
-</html>`;
-        return new Response(htmlResponse, {
-          status: 200,
-          headers: { 'Content-Type': 'text/html' }
-        });
-      }
       return pageResponse;
     }
 
