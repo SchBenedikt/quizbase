@@ -18,6 +18,7 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis,
   LineChart, Line, CartesianGrid
 } from "recharts";
+import { useResolvedParam } from "@/hooks/use-resolved-param";
 
 // ─── Stat helpers ─────────────────────────────────────────────────────────────
 function avg(values: number[]) {
@@ -662,7 +663,8 @@ function EngagementScore({ participationRate, questions, responses, participants
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function SessionStatsPage({ params }: { params: Promise<{ sessionId: string }> }) {
-  const { sessionId } = use(params);
+  const { sessionId: rawSessionId } = use(params);
+  const sessionId = useResolvedParam(rawSessionId, 1);
   const db = useFirestore();
 
   const sessionRef = useMemoFirebase(() => doc(db, "sessions", sessionId), [db, sessionId]);

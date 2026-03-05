@@ -12,12 +12,14 @@ import { doc, collection, serverTimestamp, getDoc, query, where, limit, setDoc, 
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { initiateAnonymousSignIn } from "@/firebase/non-blocking-login";
 import { useAuth } from "@/firebase/provider";
+import { useResolvedParam } from "@/hooks/use-resolved-param";
 
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '🔥', '🎉'];
 const REACTION_COOLDOWN_MS = 1000;
 
 export default function ParticipantView({ params }: { params: Promise<{ sessionId: string }> }) {
-  const resolvedParams = use(params);
+  const rawParams = use(params);
+  const resolvedParams = { ...rawParams, sessionId: useResolvedParam(rawParams.sessionId, 1) };
   const db = useFirestore();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();

@@ -12,9 +12,11 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 import { useTranslation } from "@/contexts/LanguageContext";
+import { useResolvedParam } from "@/hooks/use-resolved-param";
 
 export default function PublicProfilePage({ params }: { params: Promise<{ userId: string }> }) {
-  const { userId } = use(params);
+  const { userId: rawUserId } = use(params);
+  const userId = useResolvedParam(rawUserId, 1);
   const router = useRouter();
   const db = useFirestore();
   const { user } = useUser();

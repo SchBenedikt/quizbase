@@ -8,10 +8,12 @@ import { Header } from "@/components/layout/Header";
 import { PollEditor } from "@/components/poll/PollEditor";
 import { useUser, useFirestore } from "@/firebase";
 import { Loader2 } from "lucide-react";
+import { useResolvedParam } from "@/hooks/use-resolved-param";
 
 // Force dynamic rendering for this page
 export default function EditPollPage({ params }: { params: Promise<{ pollId: string }> }) {
-  const { pollId } = use(params);
+  const { pollId: rawPollId } = use(params);
+  const pollId = useResolvedParam(rawPollId, 2);
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const db = useFirestore();

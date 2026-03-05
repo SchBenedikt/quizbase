@@ -20,10 +20,12 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useResolvedParam } from "@/hooks/use-resolved-param";
 
 // Force dynamic rendering for this page
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
-  const resolvedParams = use(params);
+  const rawParams = use(params);
+  const resolvedParams = { ...rawParams, sessionId: useResolvedParam(rawParams.sessionId, 1) };
   const db = useFirestore();
   const { toast } = useToast();
   
