@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+export const runtime = 'edge';
+
 export const metadata: Metadata = {
   title: 'Join Live Poll - Enter Code | Quizbase',
   description: 'Join a live poll, quiz, or interactive session instantly with a 6-digit code. No download required - works on any device with a web browser.',
