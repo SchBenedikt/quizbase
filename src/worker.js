@@ -131,21 +131,32 @@ export default {
     const cleanPath = url.pathname.replace(/\/$/, '') || '/';
     const parts = cleanPath.split('/').filter(Boolean);
     let potentialAssetPaths = [];
+    let isDynamicRoute = false;
 
     if (cleanPath === '/') {
       potentialAssetPaths = isRSC ? ['/index.rsc', '/index.html'] : ['/index.html'];
     } else if (parts[0] === 'presenter') {
       if (parts[1] === 'edit' && parts.length >= 3) {
-        potentialAssetPaths = [`/presenter/edit/[pollId]/page.html`];
+        // Dynamic route - serve SPA to let client-side routing handle it
+        isDynamicRoute = true;
+        potentialAssetPaths = ['/index.html'];
       } else if (parts.length >= 3 && parts[2] === 'stats') {
-        potentialAssetPaths = [`/presenter/[sessionId]/stats/page.html`];
+        // Dynamic route - serve SPA to let client-side routing handle it
+        isDynamicRoute = true;
+        potentialAssetPaths = ['/index.html'];
       } else if (parts.length >= 2) {
-        potentialAssetPaths = [`/presenter/[sessionId]/page.html`];
+        // Dynamic route - serve SPA to let client-side routing handle it
+        isDynamicRoute = true;
+        potentialAssetPaths = ['/index.html'];
       }
     } else if (parts[0] === 'p' && parts.length >= 2) {
-      potentialAssetPaths = [`/p/[sessionId]/page.html`];
+      // Dynamic route - serve SPA to let client-side routing handle it
+      isDynamicRoute = true;
+      potentialAssetPaths = ['/index.html'];
     } else if (parts[0] === 'profile' && parts.length >= 2) {
-      potentialAssetPaths = [`/profile/[userId]/page.html`];
+      // Dynamic route - serve SPA to let client-side routing handle it
+      isDynamicRoute = true;
+      potentialAssetPaths = ['/index.html'];
     } else {
       // Standard static pages
       potentialAssetPaths = isRSC
@@ -154,9 +165,11 @@ export default {
     }
 
     const pageResponse = await tryAssets(potentialAssetPaths);
-    if (pageResponse) return pageResponse;
+    if (pageResponse) {
+      return pageResponse;
+    }
 
-    // SPA Fallback
+    // SPA Fallback for any remaining routes
     const fallback = await tryAssets(['/index.html']);
     if (fallback) return fallback;
 
