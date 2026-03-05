@@ -137,17 +137,14 @@ export default {
       potentialAssetPaths = isRSC ? ['/index.rsc', '/index.html'] : ['/index.html'];
     } else if (parts[0] === 'presenter') {
       if (parts[1] === 'edit' && parts.length >= 3) {
-        // Dynamic route - serve SPA to let client-side routing handle it
-        isDynamicRoute = true;
-        potentialAssetPaths = ['/index.html'];
+        // Dynamic route - try to serve the server-side page.js first
+        potentialAssetPaths = [`/presenter/edit/[pollId]/page.js`, '/index.html'];
       } else if (parts.length >= 3 && parts[2] === 'stats') {
-        // Dynamic route - serve SPA to let client-side routing handle it
-        isDynamicRoute = true;
-        potentialAssetPaths = ['/index.html'];
+        // Dynamic route - try to serve the server-side page.js first
+        potentialAssetPaths = [`/presenter/[sessionId]/stats/page.js`, '/index.html'];
       } else if (parts.length >= 2) {
-        // Dynamic route - serve SPA to let client-side routing handle it
-        isDynamicRoute = true;
-        potentialAssetPaths = ['/index.html'];
+        // Dynamic route - try to serve the server-side page.js first
+        potentialAssetPaths = [`/presenter/[sessionId]/page.js`, '/index.html'];
       }
     } else if (parts[0] === 'p' && parts.length >= 2) {
       // Dynamic route - serve SPA to let client-side routing handle it
