@@ -176,7 +176,8 @@ export default {
     const pageResponse = await tryAssets(potentialAssetPaths);
     if (pageResponse) {
       // Inject Firebase environment variables into HTML responses
-      if (pageResponse.url && pageResponse.url.includes('.html')) {
+      const contentType = pageResponse.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
         const htmlContent = await pageResponse.text();
         const firebaseConfig = `
           <script>
@@ -189,17 +190,14 @@ export default {
           </script>
         `;
         
-        // Inject Firebase config before the closing head tag or after the opening body tag
+        // Inject Firebase config before the closing head tag
         const modifiedHtml = htmlContent.replace(
           /<\/head>/,
           firebaseConfig + '</head>'
-        ).replace(
-          /<body[^>]*>/,
-          '$&' + firebaseConfig
         );
         
         return new Response(modifiedHtml, {
-          status: 200,
+          status: pageResponse.status,
           headers: { 'Content-Type': 'text/html' }
         });
       }
@@ -225,13 +223,10 @@ export default {
       const modifiedHtml = htmlContent.replace(
         /<\/head>/,
         firebaseConfig + '</head>'
-      ).replace(
-        /<body[^>]*>/,
-        '$&' + firebaseConfig
       );
       
       return new Response(modifiedHtml, {
-        status: 200,
+        status: fallback.status,
         headers: { 'Content-Type': 'text/html' }
       });
     }
