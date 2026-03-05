@@ -19,20 +19,35 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   const router = useRouter();
   const db = useFirestore();
 
+  // On Cloudflare Workers, dynamic routes may be served with '_' as a placeholder.
+  // Resolve the real poll ID from window.location in that case.
+  const [effectivePollId, setEffectivePollId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (pollId !== '_') {
+      setEffectivePollId(pollId);
+    } else {
+      // Extract real pollId from URL matching /presenter/edit/[pollId] pattern
+      const match = window.location.pathname.match(/\/presenter\/edit\/([^/?#]+)/);
+      const urlId = match ? match[1] : null;
+      setEffectivePollId(urlId && urlId !== '_' ? urlId : '_');
+    }
+  }, [pollId]);
+
   // Extended logging for debugging
   useEffect(() => {
     console.log('[EditPollPage] Component mounted');
     console.log('[EditPollPage] pollId:', pollId);
+    console.log('[EditPollPage] effectivePollId:', effectivePollId);
     console.log('[EditPollPage] user:', user?.uid);
     console.log('[EditPollPage] isUserLoading:', isUserLoading);
     console.log('[EditPollPage] db initialized:', !!db);
     console.log('[EditPollPage] window.location:', typeof window !== 'undefined' ? window.location.href : 'SSR');
-  }, [pollId, user, isUserLoading, db]);
+  }, [pollId, effectivePollId, user, isUserLoading, db]);
 
   const [poll, setPoll] = useState<any>(null);
   const [questions, setQuestions] = useState<PollQuestion[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState(false);
   const [authStableTimer, setAuthStableTimer] = useState<NodeJS.Timeout | null>(null);
 
@@ -74,13 +89,13 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   }, [authStableTimer]);
 
   useEffect(() => {
-    if (!user || !pollId) {
-      console.log('[EditPollPage] Missing user or pollId, skipping fetch:', { hasUser: !!user, pollId });
+    if (!user || !effectivePollId) {
+      console.log('[EditPollPage] Missing user or effectivePollId, skipping fetch:', { hasUser: !!user, effectivePollId });
       return;
     }
 
-    // Check if this is a new poll creation (pollId === '_')
-    if (pollId === '_') {
+    // '_' means new poll creation (either URL was '_' or Cloudflare placeholder wasn't resolved)
+    if (effectivePollId === '_') {
       console.log('[EditPollPage] Creating new poll, skipping fetch');
       setPoll(null);
       setQuestions([]);
@@ -92,14 +107,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
 
     async function fetchData() {
       try {
-        console.log('[EditPollPage] Fetching poll data:', { uid, pollId });
-        const pollRef = doc(db, `users/${uid}/surveys/${pollId}`);
+        console.log('[EditPollPage] Fetching poll data:', { uid, pollId: effectivePollId });
+        const pollRef = doc(db, `users/${uid}/surveys/${effectivePollId}`);
         console.log('[EditPollPage] Poll ref path:', pollRef.path);
         const pollDoc = await getDoc(pollRef);
 
         if (!pollDoc.exists()) {
-          console.log('[EditPollPage] Poll not found:', pollId);
-          setNotFound(true);
+          // Poll not found — treat as new poll creation (e.g. freshly generated ID from dashboard)
+          console.log('[EditPollPage] Poll not found:', effectivePollId, '- treating as new poll');
+          setPoll(null);
+          setQuestions([]);
           setDataLoading(false);
           return;
         }
@@ -108,10 +125,10 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         setPoll(pollDoc.data());
 
         const questionsQuery = query(
-          collection(db, `users/${uid}/surveys/${pollId}/questions`),
+          collection(db, `users/${uid}/surveys/${effectivePollId}/questions`),
           orderBy("order", "asc")
         );
-        console.log('[EditPollPage] Fetching questions from:', `users/${uid}/surveys/${pollId}/questions`);
+        console.log('[EditPollPage] Fetching questions from:', `users/${uid}/surveys/${effectivePollId}/questions`);
         const questionsSnapshot = await getDocs(questionsQuery);
         console.log('[EditPollPage] Questions loaded:', questionsSnapshot.docs.length);
         setQuestions(questionsSnapshot.docs.map((d) => d.data() as PollQuestion));
@@ -129,9 +146,9 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
 
     fetchData();
-  }, [user, pollId, db]);
+  }, [user, effectivePollId, db]);
 
-  if (isUserLoading || (user && dataLoading) || authStableTimer) {
+  if (isUserLoading || !effectivePollId || (user && dataLoading) || authStableTimer) {
     console.log('[EditPollPage] Showing loading screen:', { isUserLoading, dataLoading, hasUser: !!user, hasAuthTimer: !!authStableTimer });
     return (
       <div className="h-screen flex items-center justify-center bg-background">
@@ -140,19 +157,6 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
           <p className="text-sm text-muted-foreground">
             {isUserLoading ? 'Loading user...' : authStableTimer ? 'Verifying authentication...' : 'Loading poll data...'}
           </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (notFound) {
-    console.log('[EditPollPage] Showing not found error');
-    return (
-      <div className="h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Poll not found</h2>
-          <p className="text-muted-foreground">The poll you&apos;re trying to edit doesn&apos;t exist.</p>
-          <p className="text-xs text-muted-foreground mt-2">Poll ID: {pollId}</p>
         </div>
       </div>
     );
@@ -171,13 +175,15 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     );
   }
 
+  if (!effectivePollId) return null;
+
   return (
     <>
       <Header variant="minimal" />
       <PollEditor
         initialPoll={poll}
         initialQuestions={questions}
-        pollId={pollId}
+        pollId={effectivePollId}
       />
     </>
   );
