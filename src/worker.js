@@ -175,12 +175,66 @@ export default {
 
     const pageResponse = await tryAssets(potentialAssetPaths);
     if (pageResponse) {
+      // Inject Firebase environment variables into HTML responses
+      if (pageResponse.url && pageResponse.url.includes('.html')) {
+        const htmlContent = await pageResponse.text();
+        const firebaseConfig = `
+          <script>
+            window.NEXT_PUBLIC_FIREBASE_PROJECT_ID = "${env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || ''}";
+            window.NEXT_PUBLIC_FIREBASE_APP_ID = "${env.NEXT_PUBLIC_FIREBASE_APP_ID || ''}";
+            window.NEXT_PUBLIC_FIREBASE_API_KEY = "${env.NEXT_PUBLIC_FIREBASE_API_KEY || ''}";
+            window.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = "${env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || ''}";
+            window.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "${env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || ''}";
+            window.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = "${env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ''}";
+          </script>
+        `;
+        
+        // Inject Firebase config before the closing head tag or after the opening body tag
+        const modifiedHtml = htmlContent.replace(
+          /<\/head>/,
+          firebaseConfig + '</head>'
+        ).replace(
+          /<body[^>]*>/,
+          '$&' + firebaseConfig
+        );
+        
+        return new Response(modifiedHtml, {
+          status: 200,
+          headers: { 'Content-Type': 'text/html' }
+        });
+      }
       return pageResponse;
     }
 
     // SPA Fallback for any remaining routes
     const fallback = await tryAssets(['/index.html']);
-    if (fallback) return fallback;
+    if (fallback) {
+      // Inject Firebase environment variables into HTML fallback
+      const htmlContent = await fallback.text();
+      const firebaseConfig = `
+        <script>
+          window.NEXT_PUBLIC_FIREBASE_PROJECT_ID = "${env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || ''}";
+          window.NEXT_PUBLIC_FIREBASE_APP_ID = "${env.NEXT_PUBLIC_FIREBASE_APP_ID || ''}";
+          window.NEXT_PUBLIC_FIREBASE_API_KEY = "${env.NEXT_PUBLIC_FIREBASE_API_KEY || ''}";
+          window.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = "${env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || ''}";
+          window.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "${env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || ''}";
+          window.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = "${env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ''}";
+        </script>
+      `;
+      
+      const modifiedHtml = htmlContent.replace(
+        /<\/head>/,
+        firebaseConfig + '</head>'
+      ).replace(
+        /<body[^>]*>/,
+        '$&' + firebaseConfig
+      );
+      
+      return new Response(modifiedHtml, {
+        status: 200,
+        headers: { 'Content-Type': 'text/html' }
+      });
+    }
 
     return new Response('Not Found', { status: 404 });
   }
