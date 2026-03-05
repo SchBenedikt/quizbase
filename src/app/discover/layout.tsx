@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 
-export const runtime = 'edge';
-
 export const metadata: Metadata = {
   title: 'Discover Live Polls & Interactive Quizzes - Quizbase',
   description: 'Explore and join live polls, quizzes, and interactive sessions created by the Quizbase community. Find engaging content for education, meetings, and events.',

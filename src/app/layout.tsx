@@ -1,8 +1,6 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
-
-export const runtime = 'edge';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
