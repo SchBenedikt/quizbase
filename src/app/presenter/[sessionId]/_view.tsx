@@ -16,12 +16,11 @@ import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useResolvedParam } from "@/hooks/use-resolved-param";
-import { Header } from "@/components/layout/Header";
 
 // Force dynamic rendering for this page
 export default function SessionDisplayPage({ params }: { params: Promise<{ sessionId: string }> }) {
@@ -362,104 +361,78 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const currentQuestion = currentIdx >= 0 && questions && questions.length > 0 ? questions[currentIdx] : null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header variant="minimal" />
-      <div className="pt-14">
-        <div className="container mx-auto px-6 max-w-screen-2xl">
-          {/* Session Header */}
-          <div className="py-6 border-b">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-lg flex items-center justify-center border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-                  <Zap className="h-6 w-6" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold tracking-tight truncate max-w-xl">{title}</h1>
-                  <div className="flex items-center gap-4 mt-1">
-                    <p className="text-sm text-muted-foreground">Session Code: <span className="font-mono font-semibold">{code}</span></p>
-                    <span className="text-sm text-muted-foreground">•</span>
-                    <span className="text-sm text-muted-foreground capitalize">{currentTheme}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-end">
-                  <p className="text-[9px] font-semibold uppercase tracking-widest opacity-40 leading-none mb-1">Participants</p>
-                  <p className="text-2xl font-black tracking-tight leading-none">{activeParticipants.length}</p>
-                </div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button className="flex items-center gap-2 bg-muted px-4 py-2 rounded-lg border hover:bg-muted/80 transition-colors">
-                      <Users className="h-4 w-4" />
-                      <span className="font-medium">{activeParticipants.length}</span>
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-72 p-0 rounded-lg border shadow-lg overflow-hidden" align="end">
-                    <ScrollArea className="h-72">
-                      <div className="p-2 space-y-1">
-                        {activeParticipants.map(p => (
-                          <div key={p.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                            <span className="text-sm font-medium truncate pr-4">{p.nickname || "Anonymous"}</span>
-                            <Button variant="ghost" size="icon" onClick={() => handleKick(p.id)} className="h-7 w-7 rounded-md hover:bg-muted">
-                              <UserMinus className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
+    <div className="no-scroll h-screen w-screen flex flex-col font-body transition-colors duration-700 overflow-hidden" style={dynamicStyles}>
+      <header className="h-[12vh] px-8 flex items-center justify-between border-b shrink-0 z-20 bg-black/5" style={{ borderColor: finalFg + '15' }}>
+        <div className="flex items-center gap-4">
+          <Zap className="h-7 w-7 fill-current" />
+          <h1 className="text-xl font-bold tracking-tight truncate max-w-xl">{title}</h1>
+        </div>
+        
+        <div className="flex items-center gap-8">
+          <div className="flex flex-col items-end">
+            <p className="text-[9px] font-semibold uppercase tracking-widest opacity-40 leading-none mb-1">Session Code</p>
+            <p className="text-3xl font-black tracking-tight leading-none">{code}</p>
           </div>
-
-          {/* Main Content */}
-          <div className="py-6">
-            {/* Floating emoji reactions */}
-            {floatingReactions.map((r) => (
-              <span
-                key={r.id}
-                className="pointer-events-none absolute text-5xl select-none z-50 animate-float-up"
-                style={{ left: `${r.x}%`, bottom: '10%' }}
-              >
-                {r.emoji}
-              </span>
-            ))}
-            {session?.currentQuestionId === 'lobby' ? (
-              <div className="w-full max-w-5xl flex flex-col items-center justify-center space-y-12 animate-in zoom-in duration-700">
-                <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
-                  <div className="space-y-8">
-                    <h2 className="text-5xl font-bold leading-tight" style={{ color: finalFg }}>Join the session.</h2>
-                    <p className="text-lg font-medium opacity-70" style={{ color: finalFg }}>Participants can join at their browser and enter the code below</p>
-                    
-                    <div className="bg-card border rounded-lg p-8 space-y-6">
-                      <div className="text-center space-y-4">
-                        <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Session Code</p>
-                        <div className="bg-muted/50 rounded-lg border-2 px-8 py-6 inline-block" style={{ borderColor: finalFg + '33' }}>
-                          <p className="text-6xl font-black tracking-tight font-mono" style={{ color: finalFg }}>{code}</p>
-                        </div>
-                      </div>
-                      <Button onClick={handleStartQuiz} className="w-full h-14 text-lg font-semibold gap-3" style={{ backgroundColor: finalFg, color: finalBg }}>
-                        {session.isQuiz ? "Start Quiz" : "Start Survey"} <Play className="h-5 w-5" />
-                      </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-3 bg-black/5 px-4 py-2 rounded-xl border" style={{ borderColor: finalFg + '10' }}>
+                <Users className="h-5 w-5" />
+                <span className="text-2xl font-bold leading-none">{activeParticipants.length}</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-0 rounded-xl border-2 shadow-xl overflow-hidden" align="end" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+              <ScrollArea className="h-72">
+                <div className="p-2 space-y-1">
+                  {activeParticipants.map(p => (
+                    <div key={p.id} className="flex items-center justify-between p-3 rounded-lg" style={{ borderBottom: `1px solid ${finalBg}10` }}>
+                      <span className="text-sm font-medium truncate pr-4">{p.nickname || "Anonymous"}</span>
+                      <Button variant="ghost" size="icon" onClick={() => handleKick(p.id)} className="h-7 w-7 rounded-md hover:bg-black/20" style={{ color: finalBg }}><UserMinus className="h-3.5 w-3.5" /></Button>
                     </div>
-                  </div>
-                  
-                  <div className="flex justify-center">
-                    <div className="bg-card border rounded-lg p-8 shadow-lg">
-                      <QRCodeSVG value={joinUrl} size={280} level="H" />
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              </div>
-            ) : session?.currentQuestionId === 'podium' ? (
-              <div className="w-full max-w-3xl flex flex-col items-center space-y-10 animate-in slide-in-from-bottom-10 duration-700">
-                <Trophy className="h-24 w-24 text-yellow-500 animate-bounce" />
-                <h2 className="text-6xl font-bold text-center" style={{ color: finalFg }}>Final Results</h2>
-                <div className="grid grid-cols-3 gap-6 items-end w-full pt-12">
-                  <div className="flex flex-col items-center">
-                    <div className="w-full h-36 bg-black/20 rounded-t-2xl flex flex-col items-center justify-center border-x-2 border-t-2" style={{ borderColor: finalFg + '33', color: finalFg }}>
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </header>
+
+      <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center relative overflow-hidden">
+        {/* Floating emoji reactions */}
+        {floatingReactions.map((r) => (
+          <span
+            key={r.id}
+            className="pointer-events-none absolute text-5xl select-none z-50 animate-float-up"
+            style={{ left: `${r.x}%`, bottom: '10%' }}
+          >
+            {r.emoji}
+          </span>
+        ))}
+        {session?.currentQuestionId === 'lobby' ? (
+          <div className="w-full max-w-5xl flex flex-col items-center justify-center space-y-12 animate-in zoom-in duration-700">
+             <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
+                <div className="space-y-8">
+                   <h2 className="text-5xl font-bold leading-tight" style={{ color: finalFg }}>Join the session.</h2>
+                   <div className="space-y-4">
+                      <p className="text-base font-medium opacity-50" style={{ color: finalFg }}>Join at your browser · enter the code below</p>
+                      <div className="bg-black/10 px-10 py-6 rounded-2xl border-4 inline-block" style={{ borderColor: finalFg }}>
+                         <p className="text-7xl font-black tracking-tight" style={{ color: finalFg }}>{code}</p>
+                      </div>
+                   </div>
+                   <Button onClick={handleStartQuiz} className="h-16 px-12 rounded-xl text-xl font-bold gap-4" style={{ backgroundColor: finalFg, color: finalBg }}>
+                     {session.isQuiz ? "Start Quiz" : "Start Survey"} <Play className="h-6 w-6 fill-current" aria-hidden="true" />
+                   </Button>
+                </div>
+                <div className="bg-white p-6 rounded-3xl border-4 shadow-xl" style={{ borderColor: finalFg }}>
+                   <QRCodeSVG value={joinUrl} size={320} level="H" />
+                </div>
+             </div>
+          </div>
+        ) : session?.currentQuestionId === 'podium' ? (
+          <div className="w-full max-w-3xl flex flex-col items-center space-y-10 animate-in slide-in-from-bottom-10 duration-700">
+             <Trophy className="h-24 w-24 text-yellow-500 animate-bounce" />
+             <h2 className="text-6xl font-bold text-center" style={{ color: finalFg }}>Final Results</h2>
+             <div className="grid grid-cols-3 gap-6 items-end w-full pt-12">
+                <div className="flex flex-col items-center">
                    <div className="w-full h-36 bg-black/20 rounded-t-2xl flex flex-col items-center justify-center border-x-2 border-t-2" style={{ borderColor: finalFg + '33', color: finalFg }}>
                       <p className="text-base font-semibold opacity-40">2nd</p>
                       <p className="text-2xl font-bold truncate px-4">{activeParticipants[1]?.nickname || "---"}</p>
@@ -484,11 +457,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
              </div>
               <div className="flex items-center gap-4 pt-4">
                 <Link href={`/presenter/${resolvedParams.sessionId}/stats`}>
-                  <Button className="h-12 px-8 rounded-lg font-semibold text-sm gap-2" style={{ backgroundColor: finalFg, color: finalBg }}>
+                  <Button className="h-12 px-8 rounded-xl font-semibold text-sm gap-2" style={{ backgroundColor: finalFg, color: finalBg }}>
                     <BarChart3 className="h-4 w-4" /> View Statistics
                   </Button>
                 </Link>
-                <Button variant="outline" onClick={handleEndSession} className="h-12 px-8 rounded-lg font-semibold text-sm border-2" style={{ borderColor: finalFg + '44', color: finalFg, backgroundColor: 'transparent' }}>
+                <Button variant="outline" onClick={handleEndSession} className="h-12 px-8 rounded-xl font-semibold text-sm border-2" style={{ borderColor: finalFg + '44', color: finalFg, backgroundColor: 'transparent' }}>
                   End Session
                 </Button>
               </div>
@@ -499,19 +472,19 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <>
                 <div className="text-center shrink-0 space-y-4 relative">
                   <div className="flex items-center justify-center gap-5">
-                    <div className="px-6 py-3 rounded-lg text-3xl font-bold min-w-[120px] text-center" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions?.length || 0}</div>
-                    <div className="px-5 py-3 rounded-lg border-2 flex items-center gap-2 text-xl font-bold min-w-[120px] justify-center" style={{ borderColor: finalFg + '33', color: finalFg }}>
+                    <div className="px-6 py-3 rounded-xl text-3xl font-bold min-w-[120px] text-center" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions?.length || 0}</div>
+                    <div className="px-5 py-3 rounded-xl border-2 flex items-center gap-2 text-xl font-bold min-w-[120px] justify-center" style={{ borderColor: finalFg + '33', color: finalFg }}>
                       <Users className="h-5 w-5" />
                       <span className="tabular-nums">{allResponses?.filter(r => r.questionId === session?.currentQuestionId).length || 0}</span>
                       <span className="text-sm font-medium opacity-40">/ {activeParticipants.length}</span>
                     </div>
                     {session?.isQuiz && currentQuestion?.isDoublePoints && (
-                      <div className="px-6 py-3 rounded-lg text-2xl font-bold bg-yellow-400 text-yellow-900 animate-bounce flex items-center gap-2 min-w-[120px] justify-center">
+                      <div className="px-6 py-3 rounded-xl text-2xl font-bold bg-yellow-400 text-yellow-900 animate-bounce flex items-center gap-2 min-w-[120px] justify-center">
                         <Zap className="h-6 w-6 fill-current" /> 2× Points
                       </div>
                     )}
                     {timeLeft !== null && (
-                      <div className="px-8 py-3 rounded-lg border-4 flex items-center gap-3 animate-in zoom-in duration-500 min-w-[140px] justify-center" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                      <div className="px-8 py-3 rounded-xl border-4 flex items-center gap-3 animate-in zoom-in duration-500 min-w-[140px] justify-center" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
                         <Timer className="h-7 w-7" />
                         <span className="text-4xl font-black tabular-nums">{timeLeft}</span>
                       </div>
@@ -524,39 +497,32 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                 </div>
                 
                 <div className="flex-1 min-h-0 w-full flex flex-col lg:flex-row gap-6">
-                  {(currentQuestion?.imageUrl || currentQuestion?.imageHint) && (
-                    <div className="lg:w-1/3 h-full rounded-lg border-2 overflow-hidden" style={{ borderColor: finalFg + '20' }}>
-                       {currentQuestion.imageUrl ? (
-                         <img 
-                          src={currentQuestion.imageUrl} 
-                          alt="Question image" 
-                          className="w-full h-full object-cover" 
-                          onError={(e) => {
-                            // Fallback to imageHint if imageUrl fails
-                            if (currentQuestion.imageHint) {
-                              e.currentTarget.src = `https://picsum.photos/seed/${currentQuestion.imageHint}/1200/900`;
-                            }
-                          }}
-                         />
-                       ) : (
-                         <img 
-                          src={`https://picsum.photos/seed/${currentQuestion.imageHint}/1200/900`} 
-                          alt="Context" 
-                          className="w-full h-full object-cover" 
-                         />
-                       )}
+                  {currentQuestion?.imageHint && (
+                    <div className="lg:w-1/3 h-full rounded-2xl border-2 overflow-hidden" style={{ borderColor: finalFg + '20' }}>
+                       <img 
+                        src={`https://picsum.photos/seed/${currentQuestion.imageHint}/1200/900`} 
+                        alt="Context" 
+                        className="w-full h-full object-cover" 
+                       />
                     </div>
                   )}
                   {currentQuestion && (
-                  <Card className="flex-1 border-2 rounded-lg bg-black/5 p-8 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '08' }}>
-                    <ResultChart 
-                      question={currentQuestion} 
-                      results={results} 
-                      allResponses={allResponses?.filter(r => r.questionId === session?.currentQuestionId) || []} 
-                      isQuizMode={session?.isQuiz || false}
-                    />
-                  </Card>
-                )}
+                    (timeLeft === 0 || ((allResponses?.filter(r => r.questionId === session?.currentQuestionId).length || 0) >= (activeParticipants?.length || 0) && (activeParticipants?.length || 0) > 0)) ? (
+                      <Card className="flex-1 border-2 rounded-2xl bg-black/5 p-8 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '08' }}>
+                        <ResultChart question={currentQuestion} results={results} allResponses={allResponses?.filter(r => r.questionId === session?.currentQuestionId) || []} />
+                      </Card>
+                    ) : (
+                      <Card className="flex-1 border-2 rounded-2xl bg-black/5 p-8 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '08' }}>
+                        <div className="text-center space-y-4">
+                          <Loader2 className="h-12 w-12 animate-spin mx-auto opacity-30" />
+                          <p className="text-xl font-medium opacity-50">Waiting for responses...</p>
+                          <p className="text-sm opacity-30">
+                            {(allResponses?.filter(r => r.questionId === session?.currentQuestionId).length || 0)} / {(activeParticipants?.length || 0)} participants answered
+                          </p>
+                        </div>
+                      </Card>
+                    )
+                  )}
                 </div>
               </>
             ) : (
@@ -564,7 +530,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                  <h2 className="text-4xl font-bold" style={{ color: finalFg }}>Leaderboard</h2>
                  <div className="w-full max-w-2xl space-y-3">
                    {activeParticipants.slice(0, 5).map((p, i) => (
-                     <div key={p.id} className="flex items-center gap-5 p-5 rounded-lg border-2" style={{ backgroundColor: i === 0 ? finalFg : finalFg + '10', color: i === 0 ? finalBg : finalFg, borderColor: i === 0 ? finalFg : finalFg + '10' }}>
+                     <div key={p.id} className="flex items-center gap-5 p-5 rounded-xl border-2" style={{ backgroundColor: i === 0 ? finalFg : finalFg + '10', color: i === 0 ? finalBg : finalFg, borderColor: i === 0 ? finalFg : finalFg + '10' }}>
                        <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl bg-black/10">{i + 1}</div>
                        <span className="flex-1 text-xl font-semibold truncate">{p.nickname || "Anonymous"}</span>
                        <div className="flex flex-col items-end">
@@ -577,13 +543,36 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               </div>
             )}
           </div>
-          </div>
+        )}
+      </main>
+
+      <footer className="h-[10vh] flex items-center justify-between shrink-0 px-8 border-t bg-black/5" style={{ borderColor: finalFg + '15' }}>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={handlePrev} className="h-12 w-12 rounded-xl border bg-black/5" style={{ borderColor: finalFg + '20', color: finalFg }}><ChevronLeft className="h-6 w-6" /></Button>
+          <Button variant="outline" size="icon" onClick={handleNext} className="h-12 w-12 rounded-xl border bg-black/5" style={{ borderColor: finalFg + '20', color: finalFg }}><ChevronRight className="h-6 w-6" /></Button>
+          {session?.isQuiz && (
+            <Button variant="outline" onClick={() => setShowLeaderboard(!showLeaderboard)} className={cn("h-12 px-6 rounded-xl border font-semibold text-xs gap-2 shadow-none", showLeaderboard ? "bg-yellow-400 text-yellow-900" : "bg-black/5")} style={!showLeaderboard ? { borderColor: finalFg + '20', color: finalFg } : {}}><Trophy className="h-4 w-4" /> Leaderboard</Button>
+          )}
         </div>
-      </div>
+        <div className="flex items-center gap-4">
+          <Popover>
+            <PopoverTrigger asChild><Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl border bg-black/5" style={{ color: finalFg, borderColor: finalFg + '10' }}><Settings2 className="h-6 w-6" /></Button></PopoverTrigger>
+            <PopoverContent className="w-72 p-6 rounded-xl border-2 flex flex-col gap-4 shadow-xl" align="end" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+              <div className="grid gap-3">
+                <Button variant="outline" className="w-full h-11 rounded-lg font-medium text-sm" style={{ backgroundColor: finalBg + '10', color: finalBg }} onClick={() => setIsQRVisible(true)}><QrCode className="h-4 w-4 mr-2" /> Show QR Code</Button>
+                <Button variant="outline" className="w-full h-11 rounded-lg font-medium text-sm" style={{ backgroundColor: finalBg + '10', color: finalBg }} onClick={() => document.documentElement.requestFullscreen()}><Monitor className="h-4 w-4 mr-2" /> Fullscreen</Button>
+                <Link href={`/presenter/${resolvedParams.sessionId}/stats`}>
+                  <Button variant="outline" className="w-full h-11 rounded-lg font-medium text-sm" style={{ backgroundColor: finalBg + '10', color: finalBg }}><BarChart3 className="h-4 w-4 mr-2" /> Statistics</Button>
+                </Link>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </footer>
+
       <Dialog open={isQRVisible} onOpenChange={setIsQRVisible}>
-        <DialogContent className="max-w-md p-8 rounded-lg border-4 text-center" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-          <DialogTitle className="sr-only">Session QR Code</DialogTitle>
-          <div className="bg-white p-4 rounded-lg inline-block">
+        <DialogContent className="max-w-md p-8 rounded-2xl border-4 text-center" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+          <div className="bg-white p-4 rounded-xl inline-block">
             <QRCodeSVG value={joinUrl} size={260} level="H" />
           </div>
           <p className="text-4xl font-black tracking-tight mt-6">{code}</p>
