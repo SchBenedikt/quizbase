@@ -50,13 +50,15 @@ export default function DiscoverPage() {
 
   // Process surveys to include userId from the document path
   const processedSurveys = surveys?.map(doc => {
-    const pathParts = doc.ref.path.split('/');
-    const userId = pathParts[1]; // Extract userId from path: users/{userId}/surveys/{surveyId}
+    // Handle both document snapshot and document data formats
+    const path = doc.ref?.path || (doc as any).path || '';
+    const pathParts = path.split('/');
+    const userId = pathParts[1] || ''; // Extract userId from path: users/{userId}/surveys/{surveyId}
     return {
       ...doc,
       userId: userId
     };
-  }) || [];
+  }).filter(survey => survey.userId) || []; // Filter out surveys without userId
 
   // Load survey questions for preview
   const loadSurveyQuestions = async (survey: any) => {

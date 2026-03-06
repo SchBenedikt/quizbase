@@ -577,7 +577,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               </div>
             )}
           </div>
-        </div>
+          </div>
         </div>
       </div>
       <Dialog open={isQRVisible} onOpenChange={setIsQRVisible}>
