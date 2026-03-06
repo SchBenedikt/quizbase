@@ -4,17 +4,19 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Compass, Lock, History, ExternalLink, Copy } from "lucide-react";
+import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Play, Compass, Lock, History, ExternalLink, Copy, CheckSquare, Square } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { SurveyIcon } from "@/components/ui/IconPicker";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc, where, limit } from "firebase/firestore";
+import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc, setDoc, getDoc, where, limit } from "firebase/firestore";
 import { deleteDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -27,6 +29,11 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const [showAllSessions, setShowAllSessions] = useState(false);
   const [authStableTimer, setAuthStableTimer] = useState<NodeJS.Timeout | null>(null);
+  const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
 
   // Auth state stability detection - prevent premature redirects during Firebase auth resets
   useEffect(() => {
@@ -84,6 +91,92 @@ export default function DashboardPage() {
     toast({ title: "Survey deleted", description: "The presentation has been removed." });
   };
 
+  const handleDeleteSession = async (sessionId: string) => {
+    if (!user) return;
+    try {
+      // Delete the session document
+      const sessionRef = doc(db, "sessions", sessionId);
+      await deleteDocumentNonBlocking(sessionRef);
+      
+      // Delete all related subcollections
+      const subcollections = ["responses", "participants", "reactions"];
+      for (const subcollection of subcollections) {
+        const subcollectionRef = collection(db, `sessions/${sessionId}/${subcollection}`);
+        const snapshot = await getDocs(subcollectionRef);
+        snapshot.docs.forEach(doc => deleteDocumentNonBlocking(doc.ref));
+      }
+      
+      toast({ title: "Session deleted", description: "The session and all its data have been removed." });
+    } catch (error) {
+      console.error("Failed to delete session:", error);
+      toast({ title: "Delete failed", description: "Could not delete the session. Please try again.", variant: "destructive" });
+    }
+  };
+
+  const handleBulkDeleteSessions = async () => {
+    if (!user || selectedSessions.length === 0) return;
+    try {
+      for (const sessionId of selectedSessions) {
+        // Delete the session document
+        const sessionRef = doc(db, "sessions", sessionId);
+        await deleteDocumentNonBlocking(sessionRef);
+        
+        // Delete all related subcollections
+        const subcollections = ["responses", "participants", "reactions"];
+        for (const subcollection of subcollections) {
+          const subcollectionRef = collection(db, `sessions/${sessionId}/${subcollection}`);
+          const snapshot = await getDocs(subcollectionRef);
+          snapshot.docs.forEach(doc => deleteDocumentNonBlocking(doc.ref));
+        }
+      }
+      
+      setSelectedSessions([]);
+      toast({ title: "Sessions deleted", description: `${selectedSessions.length} session(s) and all their data have been removed.` });
+    } catch (error) {
+      console.error("Failed to bulk delete sessions:", error);
+      toast({ title: "Delete failed", description: "Could not delete some sessions. Please try again.", variant: "destructive" });
+    }
+  };
+
+  const toggleSessionSelection = (sessionId: string) => {
+    setSelectedSessions(prev => 
+      prev.includes(sessionId) 
+        ? prev.filter(id => id !== sessionId)
+        : [...prev, sessionId]
+    );
+  };
+
+  const toggleAllSessionsSelection = () => {
+    if (selectedSessions.length === displayedSessions?.length) {
+      setSelectedSessions([]);
+    } else {
+      setSelectedSessions(displayedSessions?.map(s => s.id) || []);
+    }
+  };
+
+  // Update selected sessions when displayed sessions change
+  useEffect(() => {
+    if (displayedSessions) {
+      setSelectedSessions(prev => {
+        const validSessionIds = displayedSessions.map(s => s.id);
+        const filteredPrev = prev.filter(id => validSessionIds.includes(id));
+        
+        // Only update if the filtered result is different from current state
+        if (filteredPrev.length !== prev.length || !filteredPrev.every(id => prev.includes(id))) {
+          return filteredPrev;
+        }
+        return prev;
+      });
+    }
+  }, [displayedSessions?.map(s => s.id).join(',')]); // Only depend on session IDs, not the full objects
+
+  // Clear selection when exiting selection mode
+  useEffect(() => {
+    if (!selectionMode) {
+      setSelectedSessions([]);
+    }
+  }, [selectionMode]);
+
   const togglePublic = (surveyId: string, currentStatus: boolean) => {
     if (!user) return;
     const surveyRef = doc(db, `users/${user.uid}/surveys/${surveyId}`);
@@ -117,13 +210,30 @@ export default function DashboardPage() {
         showResultsToParticipants: true
       };
 
-      setDocumentNonBlocking(sessionRef, sessionData, { merge: true });
+      console.log('[Dashboard] Creating session for survey:', { surveyId: survey.id, isPublic: survey.isPublic, sessionId: sessionRef.id });
+      
+      // Use blocking setDoc to ensure session is created before redirecting
+      await setDoc(sessionRef, sessionData);
+      
+      // Verify session was created successfully
+      const sessionDoc = await getDoc(sessionRef);
+      if (!sessionDoc.exists()) {
+        throw new Error('Session creation failed - document not found after creation');
+      }
+      
+      console.log('[Dashboard] Session created successfully:', sessionRef.id);
       router.push(`/presenter/${sessionRef.id}`);
     } catch (e: any) {
+      console.error('[Dashboard] Failed to create session:', e);
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: sessionRef.path,
         operation: 'create'
       }));
+      toast({ 
+        title: "Failed to launch survey", 
+        description: "Could not create session. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -146,8 +256,10 @@ export default function DashboardPage() {
         shuffleQuestions: survey.shuffleQuestions || false,
         theme: survey.theme || 'orange',
         customColor: survey.customColor || null,
+        userId: user.uid, // Add userId field to comply with security rules
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+        sessionCount: 0, // Initialize session count
       }, { merge: true });
 
       const questionsSnap = await getDocs(
@@ -168,7 +280,15 @@ export default function DashboardPage() {
 
   const filteredSurveys = surveys?.filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  if (isUserLoading || !user) return null;
+  if (isUserLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -198,7 +318,7 @@ export default function DashboardPage() {
               { label: "Latest Session", value: pastSessions?.[0]?.title ? pastSessions[0].title.slice(0, 20) + (pastSessions[0].title.length > 20 ? "..." : "") : "—", icon: Calendar },
             ].map((item, i) => (
               <div key={i} className="bg-card border rounded-lg p-4 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center">
+                <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
                   <item.icon className="h-5 w-5 text-foreground" />
                 </div>
                 <div className="min-w-0">
@@ -218,7 +338,7 @@ export default function DashboardPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search surveys..."
-              className="pl-10 h-10 rounded-md border bg-background"
+              className="pl-10 h-10 rounded-lg border bg-background"
             />
           </div>
         </div>
@@ -246,7 +366,7 @@ export default function DashboardPage() {
               <div key={survey.id} className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow group">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
                        <SurveyIcon iconName={survey.icon} className="h-4 w-4 text-foreground" />
                     </div>
                     <Button 
@@ -328,22 +448,114 @@ export default function DashboardPage() {
                 <h2 className="text-xl font-semibold text-foreground">Recent Sessions</h2>
                 <p className="text-sm text-muted-foreground">Your latest survey sessions</p>
               </div>
-              {pastSessions.length > 5 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAllSessions(!showAllSessions)}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  {showAllSessions ? "Show less" : "Show more"}
-                </Button>
-              )}
+              <div className="flex items-center gap-2">
+                {selectionMode ? (
+                  <>
+                    {selectedSessions.length > 0 && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setBulkDeleteDialogOpen(true)}
+                        className="h-8 text-xs"
+                      >
+                        <Trash2 className="mr-1 h-3 w-3" /> Delete {selectedSessions.length} selected
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedSessions(pastSessions?.map(s => s.id) || []);
+                      }}
+                      className="h-8 text-xs"
+                      disabled={!pastSessions || pastSessions.length === 0}
+                    >
+                      <CheckSquare className="mr-1 h-3 w-3" /> Select all
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedSessions([])}
+                      className="h-8 text-xs"
+                      disabled={selectedSessions.length === 0}
+                    >
+                      Clear selection
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedSessions(pastSessions.map(s => s.id));
+                        setBulkDeleteDialogOpen(true);
+                      }}
+                      className="h-8 text-xs"
+                    >
+                      <Trash2 className="mr-1 h-3 w-3" /> Delete all
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectionMode(false)}
+                      className="h-8 text-xs"
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectionMode(true)}
+                    className="h-8 text-xs"
+                  >
+                    <CheckSquare className="mr-1 h-3 w-3" /> Auswählen
+                  </Button>
+                )}
+                {pastSessions.length > 5 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAllSessions(!showAllSessions)}
+                    className="text-muted-foreground hover:text-foreground h-8 text-xs"
+                  >
+                    {showAllSessions ? "Show less" : "Show more"}
+                  </Button>
+                )}
+              </div>
             </div>
+            {selectionMode && displayedSessions && displayedSessions.length > 0 && (
+              <div className="flex items-center gap-2 mb-4">
+                <Checkbox
+                  checked={selectedSessions.length === displayedSessions.length && displayedSessions.length > 0}
+                  onCheckedChange={toggleAllSessionsSelection}
+                  className="h-4 w-4"
+                />
+                <span className="text-sm text-muted-foreground">
+                  {selectedSessions.length === displayedSessions.length && displayedSessions.length > 0
+                    ? "Deselect all"
+                    : "Select all"}
+                </span>
+                {selectedSessions.length > 0 && (
+                  <span className="text-sm text-muted-foreground">
+                    ({selectedSessions.length} selected)
+                  </span>
+                )}
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {displayedSessions?.map((session) => (
-                <div key={session.id} className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div key={session.id} className={cn("bg-card border rounded-lg p-4 hover:shadow-md transition-shadow relative", selectionMode && selectedSessions.includes(session.id) && "ring-2 ring-primary")}>
+                  {selectionMode && (
+                    <div className="absolute top-3 left-3">
+                      <Checkbox
+                        checked={selectedSessions.includes(session.id)}
+                        onCheckedChange={() => toggleSessionSelection(session.id)}
+                        className="h-4 w-4"
+                      />
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-3">
-                    <div className="min-w-0 flex-1">
+                    <div className={cn("min-w-0 flex-1", selectionMode && "ml-8")}>
                       <p className="font-medium text-foreground truncate mb-1">{session.title || "Untitled Session"}</p>
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">{session.code}</span>
@@ -352,14 +564,28 @@ export default function DashboardPage() {
                         </span>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 hover:bg-muted"
-                      onClick={() => navigator.clipboard.writeText(`${window.location.origin}/p/${session.code}`).then(() => toast({ title: "Link copied", description: `Session code: ${session.code}` }))}
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 hover:bg-muted"
+                        onClick={() => navigator.clipboard.writeText(`${window.location.origin}/p/${session.code}`).then(() => toast({ title: "Link copied", description: `Session code: ${session.code}` }))}
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 hover:bg-destructive hover:text-destructive-foreground"
+                        onClick={() => {
+                          setSessionToDelete(session.id);
+                          setDeleteDialogOpen(true);
+                        }}
+                        title="Delete session"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -385,6 +611,53 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Single Session Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Session</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this session? This action cannot be undone and will remove all session data including responses, participants, and reactions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (sessionToDelete) {
+                  handleDeleteSession(sessionToDelete);
+                  setSessionToDelete(null);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Session
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Multiple Sessions</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {selectedSessions.length} selected session(s)? This action cannot be undone and will remove all session data including responses, participants, and reactions for each session.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDeleteSessions}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete {selectedSessions.length} Session(s)
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

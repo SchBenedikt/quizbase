@@ -34,9 +34,9 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
 
   const userRef = useMemoFirebase(() => {
-    if (!user) return null;
+    if (!user || isUserLoading) return null;
     return doc(db, "users", user.uid);
-  }, [user, db]);
+  }, [user, db, isUserLoading]);
 
   const { data: userDoc } = useDoc<{ name?: string; bio?: string; username?: string }>(userRef);
 

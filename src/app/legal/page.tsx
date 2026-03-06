@@ -29,26 +29,24 @@ export default function LegalNoticePage() {
 
           <div className="bg-card border-2 border-foreground/10 p-10 md:p-16 rounded-[2.5rem] space-y-16 shadow-[20px_20px_0px_0px_rgba(0,0,0,0.03)]">
             <div className="grid lg:grid-cols-2 gap-16">
-              <section className="space-y-6">
+              <section className="space-y-4">
                 <h2 className="text-2xl font-black uppercase tracking-tight text-primary">Information according to § 5 TMG</h2>
                 <div className="text-lg font-bold opacity-80 leading-relaxed space-y-1">
                   <p>PopPulse* Interactive Studio Ltd.</p>
                   <p>Innovation Street 123</p>
                   <p>12345 London, UK</p>
                 </div>
+
+                <section className="space-y-4 mt-8">
+                  <h2 className="text-2xl font-black uppercase tracking-tight text-primary">Contact</h2>
+                  <div className="text-lg font-bold opacity-80 leading-relaxed space-y-1">
+                    <p>Phone: +44 (0) 20 1234 5678</p>
+                    <p>Email: hello@poppulse.studio</p>
+                    <p>Web: www.poppulse.studio</p>
+                  </div>
+                </section>
               </section>
 
-              <section className="space-y-6">
-                <h2 className="text-2xl font-black uppercase tracking-tight text-primary">Contact</h2>
-                <div className="text-lg font-bold opacity-80 leading-relaxed space-y-1">
-                  <p>Phone: +44 (0) 20 1234 5678</p>
-                  <p>Email: hello@poppulse.studio</p>
-                  <p>Web: www.poppulse.studio</p>
-                </div>
-              </section>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-16">
               <section className="space-y-6">
                 <h2 className="text-2xl font-black uppercase tracking-tight text-primary">Represented By</h2>
                 <p className="text-lg font-bold opacity-80">

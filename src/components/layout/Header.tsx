@@ -7,10 +7,11 @@ import { cn } from "@/lib/utils";
 import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter, usePathname } from "next/navigation";
-import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Compass, BarChart3 } from "lucide-react";
+import { LogOut, Zap, Settings, Moon, Sun, LayoutDashboard, Compass, BarChart3, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { useTranslation, type Locale } from "@/contexts/LanguageContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface HeaderProps {
   className?: string;
@@ -40,7 +41,8 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
   };
 
   const toggleLocale = () => {
-    setLocale(locale === 'en' ? 'de' : 'en');
+    // Language toggle disabled - English only
+    // setLocale(locale === 'en' ? 'de' : 'en');
   };
 
   return (
@@ -107,25 +109,22 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
               </Button>
             )}
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleLocale}
-              className="h-9 w-9 text-xs font-medium"
-              title="Toggle language"
-            >
-              {locale === 'en' ? 'DE' : 'EN'}
-            </Button>
+            {/* Language toggle removed - English only */}
 
             {user ? (
               <>
                 <Button
                   variant="ghost"
                   asChild
-                  className="h-9 px-3 text-sm font-medium"
+                  className="h-9 w-9 rounded-full"
+                  title="Profile Settings"
                 >
                   <Link href="/profile">
-                    <Settings className="h-4 w-4 mr-2" /> Profile
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-foreground text-background text-sm font-medium">
+                        {user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
                   </Link>
                 </Button>
                 <Button

@@ -51,9 +51,9 @@ service cloud.firestore {
 
     match /users/{userId}/surveys/{surveyId} {
       allow get: if isOwner(userId) || resource.data.isPublic == true;
-      allow list: if isOwner(userId) || resource.data.isPublic == true;
-      allow create: if isOwner(userId) && request.resource.data.userId == userId;
-      allow update: if isOwner(userId) && isUnchanged('userId');
+      allow list: if isOwner(userId); // Allow list based on path ownership
+      allow create: if isOwner(userId); // Remove userId field requirement since path ownership is sufficient
+      allow update: if isOwner(userId);
       allow delete: if isOwner(userId);
 
       match /questions/{questionId} {

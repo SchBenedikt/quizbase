@@ -20,6 +20,7 @@ export interface PollQuestion {
   description?: string; // Optional subtitle / hint
   options?: string[]; // For multiple choice, ranking
   correctOptionIndices?: number[]; // For Quiz Mode (Multiple Correct Answers)
+  correctAnswer?: number; // For Quiz Mode (Guess Number)
   timeLimit?: number; // In seconds, 0 = unlimited
   range?: { min: number; max: number; step: number }; // For slider, guess-number, scale
   labels?: { min: string; max: string }; // For scales

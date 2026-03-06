@@ -88,7 +88,33 @@ export function useCollection<T = any>(
           path,
           count: results.length
         });
-        setData(results);
+        
+        // Only update if data actually changed to prevent infinite loops
+        setData(prevData => {
+          // Simple comparison - if length changed, update
+          if (!prevData || prevData.length !== results.length) {
+            return results;
+          }
+          // If same length, check if IDs are different
+          const prevIds = prevData.map(item => item.id).sort().join(',');
+          const newIds = results.map(item => item.id).sort().join(',');
+          if (prevIds !== newIds) {
+            return results;
+          }
+          // If same IDs, check if actual data content changed (stringified comparison)
+          try {
+            const prevDataStr = JSON.stringify(prevData.sort((a, b) => a.id.localeCompare(b.id)));
+            const newDataStr = JSON.stringify(results.sort((a, b) => a.id.localeCompare(b.id)));
+            if (prevDataStr !== newDataStr) {
+              return results;
+            }
+          } catch (e) {
+            // If JSON.stringify fails, fall back to ID comparison
+            console.warn('[useCollection] Failed to compare data objects:', e);
+          }
+          return prevData; // No change, prevent update
+        });
+        
         setError(null);
         setIsLoading(false);
       },
