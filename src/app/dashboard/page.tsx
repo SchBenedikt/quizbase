@@ -8,7 +8,7 @@ import { Plus, BarChart3, Edit2, Trash2, Search, Loader2, Sparkles, Calendar, Pl
 import { Header } from "@/components/layout/Header";
 import { SurveyIcon } from "@/components/ui/IconPicker";
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc, where, limit } from "firebase/firestore";
+import { collection, doc, query, orderBy, getDocs, serverTimestamp, updateDoc, setDoc, getDoc, where, limit } from "firebase/firestore";
 import { deleteDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { errorEmitter } from "@/firebase/error-emitter";
@@ -130,13 +130,30 @@ export default function DashboardPage() {
         showResultsToParticipants: true
       };
 
-      setDocumentNonBlocking(sessionRef, sessionData, { merge: true });
+      console.log('[Dashboard] Creating session for survey:', { surveyId: survey.id, isPublic: survey.isPublic, sessionId: sessionRef.id });
+      
+      // Use blocking setDoc to ensure session is created before redirecting
+      await setDoc(sessionRef, sessionData);
+      
+      // Verify session was created successfully
+      const sessionDoc = await getDoc(sessionRef);
+      if (!sessionDoc.exists()) {
+        throw new Error('Session creation failed - document not found after creation');
+      }
+      
+      console.log('[Dashboard] Session created successfully:', sessionRef.id);
       router.push(`/presenter/${sessionRef.id}`);
     } catch (e: any) {
+      console.error('[Dashboard] Failed to create session:', e);
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: sessionRef.path,
         operation: 'create'
       }));
+      toast({ 
+        title: "Failed to launch survey", 
+        description: "Could not create session. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }

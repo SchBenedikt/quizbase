@@ -327,12 +327,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
     console.log('[SessionDisplayPage] No session data found');
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-background">
-        <div className="text-center">
+        <div className="text-center max-w-md mx-auto p-6">
           <h2 className="text-2xl font-bold mb-2">Session not found</h2>
-          <p className="text-muted-foreground">The session you&apos;re trying to access doesn&apos;t exist.</p>
-          <Link href="/dashboard">
-            <Button className="mt-4">Go to Dashboard</Button>
-          </Link>
+          <p className="text-muted-foreground mb-4">The session you&apos;re trying to access doesn&apos;t exist or may have been deleted.</p>
+          <p className="text-xs text-muted-foreground mb-6">Session ID: {resolvedParams.sessionId}</p>
+          <div className="flex flex-col gap-2">
+            <Link href="/dashboard">
+              <Button className="w-full">Go to Dashboard</Button>
+            </Link>
+            <Button variant="outline" onClick={() => window.location.reload()} className="w-full">
+              Try Again
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -466,7 +472,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <>
                 <div className="text-center shrink-0 space-y-4 relative">
                   <div className="flex items-center justify-center gap-5">
-                    <div className="px-6 py-3 rounded-xl text-3xl font-bold" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions.length}</div>
+                    <div className="px-6 py-3 rounded-xl text-3xl font-bold" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions?.length || 0}</div>
                     <div className="px-5 py-3 rounded-xl border-2 flex items-center gap-2 text-xl font-bold" style={{ borderColor: finalFg + '33' }}>
                       <Users className="h-5 w-5" />
                       <span className="tabular-nums">{allResponses?.filter(r => r.questionId === session?.currentQuestionId).length || 0}</span>
