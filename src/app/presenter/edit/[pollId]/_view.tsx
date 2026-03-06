@@ -86,6 +86,7 @@ export default function EditPollPage({ pollId }: { pollId: string }) {
       setPoll(null);
       setQuestions([]);
       setDataLoading(false);
+      setIsNewPoll(true);
       return;
     }
 
@@ -99,14 +100,18 @@ export default function EditPollPage({ pollId }: { pollId: string }) {
         const pollDoc = await getDoc(pollRef);
 
         if (!pollDoc.exists()) {
-          console.log('[EditPollPage] Poll not found:', resolvedPollId);
-          setNotFound(true);
+          console.log('[EditPollPage] Poll not found, treating as new poll:', resolvedPollId);
+          // Don't show not found error - treat as new poll creation
+          setPoll(null);
+          setQuestions([]);
           setDataLoading(false);
+          setIsNewPoll(true);
           return;
         }
 
         console.log('[EditPollPage] Poll data loaded:', pollDoc.data());
         setPoll(pollDoc.data());
+        setIsNewPoll(false);
 
         const questionsQuery = query(
           collection(db, `users/${uid}/surveys/${resolvedPollId}/questions`),
@@ -146,7 +151,7 @@ export default function EditPollPage({ pollId }: { pollId: string }) {
     );
   }
 
-  if (notFound) {
+  if (notFound && !isNewPoll) {
     console.log('[EditPollPage] Showing not found error');
     return (
       <div className="h-screen flex items-center justify-center bg-background">

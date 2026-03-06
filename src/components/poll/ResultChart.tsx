@@ -10,9 +10,10 @@ interface ResultChartProps {
   question: PollQuestion;
   results: Record<string, number>;
   allResponses?: any[];
+  isQuizMode?: boolean;
 }
 
-export function ResultChart({ question, results, allResponses = [] }: ResultChartProps) {
+export function ResultChart({ question, results, allResponses = [], isQuizMode = false }: ResultChartProps) {
   const chartColor = 'currentColor';
 
   if ((question.type === 'multiple-choice' || question.type === 'true-false' || question.type === 'ranking') && question.options) {
@@ -21,7 +22,8 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     if (question.type === 'multiple-choice' || question.type === 'true-false') {
       data = question.options.map((opt, idx) => ({
         name: opt,
-        value: results[idx] || 0
+        value: results[idx] || 0,
+        isCorrect: isQuizMode && question.correctOptionIndices?.includes(idx)
       }));
     } else {
       const optionScores: Record<number, number> = {};
@@ -80,7 +82,11 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
               animationDuration={1500}
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={chartColor} fillOpacity={1 - (index * 0.15)} />
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={entry.isCorrect ? "hsl(142 71% 45%)" : chartColor} 
+                  fillOpacity={entry.isCorrect ? 1 : (1 - (index * 0.15))} 
+                />
               ))}
             </Bar>
           </BarChart>
@@ -167,25 +173,84 @@ export function ResultChart({ question, results, allResponses = [] }: ResultChar
     const max = question.range?.max ?? 100;
     const percentage = ((average - min) / (max - min)) * 100;
 
+    // For guess-number questions in quiz mode, show frequency distribution
+    if (question.type === 'guess-number') {
+      // Create frequency map
+      const frequencyMap: Record<number, number> = {};
+      values.forEach(val => {
+        frequencyMap[val] = (frequencyMap[val] || 0) + 1;
+      });
+      
+      // Sort by frequency, then by value
+      const sortedEntries = Object.entries(frequencyMap)
+        .sort(([,a], [,b]) => b - a)
+        .sort(([,a], [,b]) => a === b ? Number(a) - Number(b) : 0);
+      
+      const maxFreq = Math.max(...Object.values(frequencyMap), 1);
+
+      return (
+        <div className="h-full w-full max-w-[1200px] flex flex-col items-center justify-center space-y-8">
+          {/* Correct Answer Display for Quiz Mode */}
+          {question.correctAnswer !== undefined && (
+            <div className="text-center space-y-2">
+              <p className="text-lg font-bold opacity-60 uppercase tracking-[0.3em]">Correct Answer</p>
+              <div className="inline-flex items-center justify-center px-6 py-3 rounded-lg border-2 bg-green-500 text-white border-green-600">
+                <span className="text-4xl font-black">{question.correctAnswer}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Frequency Distribution */}
+          <div className="w-full max-w-2xl space-y-4">
+            <p className="text-center text-lg font-bold opacity-60 uppercase tracking-[0.3em]">Answer Distribution</p>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {sortedEntries.map(([value, count]) => (
+                <div key={value} className="flex items-center gap-3">
+                  <span className="w-12 text-right font-bold tabular-nums">{value}</span>
+                  <div className="flex-1 h-8 bg-black/5 rounded-full overflow-hidden relative">
+                    <div 
+                      className="h-full bg-current transition-all duration-1000 ease-out"
+                      style={{ width: `${(count / maxFreq) * 100}%` }}
+                    />
+                  </div>
+                  <span className="w-16 text-left font-bold tabular-nums">{count}</span>
+                  {values.length > 0 && (
+                    <span className="w-12 text-left text-sm opacity-60">
+                      {Math.round((count / values.length) * 100)}%
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Average Display */}
+          <div className="text-center space-y-2">
+            <span className="text-4xl font-black tracking-tighter leading-none">{average.toFixed(1)}</span>
+            <p className="text-lg font-bold opacity-30 uppercase tracking-[0.5em]">Average Guess</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Handle slider and scale questions (original logic)
     return (
       <div className="h-full w-full max-w-[1000px] flex flex-col items-center justify-center space-y-16">
-        {(question.type === 'slider' || question.type === 'scale') && (
-          <div className="relative h-16 w-full bg-black/5 rounded-[1.25rem] border-2 border-current flex items-center px-10 overflow-hidden">
-             <div 
-               className="absolute left-0 h-full bg-current transition-all duration-1500 ease-out"
-               style={{ width: `${Math.max(0, Math.min(100, percentage))}%` }}
-             />
-             <div className="relative z-10 w-full flex justify-between font-bold text-lg mix-blend-difference text-white uppercase tracking-[0.2em]">
-               <span>{question.labels?.min || min}</span>
-               <span className="opacity-40">{question.type === 'scale' ? 'Consensus' : 'Intensity'}</span>
-               <span>{question.labels?.max || max}</span>
-             </div>
-          </div>
-        )}
+        <div className="relative h-16 w-full bg-black/5 rounded-[1.25rem] border-2 border-current flex items-center px-10 overflow-hidden">
+           <div 
+             className="absolute left-0 h-full bg-current transition-all duration-1500 ease-out"
+             style={{ width: `${Math.max(0, Math.min(100, percentage))}%` }}
+           />
+           <div className="relative z-10 w-full flex justify-between font-bold text-lg mix-blend-difference text-white uppercase tracking-[0.2em]">
+             <span>{question.labels?.min || min}</span>
+             <span className="opacity-40">Consensus</span>
+             <span>{question.labels?.max || max}</span>
+           </div>
+        </div>
         <div className="text-center">
-          <span className="text-6xl font-black tracking-tighter leading-none">{average.toFixed(question.type === 'guess-number' ? 1 : 0)}</span>
+          <span className="text-6xl font-black tracking-tighter leading-none">{average.toFixed(0)}</span>
           <p className="text-2xl font-bold opacity-30 uppercase tracking-[0.5em] mt-4">
-            {question.type === 'guess-number' ? 'Precision Avg' : 'Collective Result'}
+            Collective Result
           </p>
         </div>
       </div>

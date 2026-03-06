@@ -116,7 +116,7 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
             <Card 
               key={q.id} 
               className={cn(
-                "border border-foreground/8 rounded-xl bg-card overflow-hidden transition-all hover:border-primary/20 shadow-none group",
+                "border border-foreground/8 rounded-lg bg-card overflow-hidden transition-all hover:border-primary/20 shadow-none group",
                 isCollapsed && "hover:bg-muted/20",
                 q.isDoublePoints && "border-yellow-400/30"
               )}
@@ -157,13 +157,13 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
                           variant="ghost" 
                           size="icon" 
                           onClick={() => toggleCollapse(q.id)}
-                          className="h-12 w-12 rounded-xl border border-foreground/5 bg-card hover:bg-muted shadow-none"
+                          className="h-12 w-12 rounded-lg border border-foreground/5 bg-card hover:bg-muted shadow-none"
                         >
                           {isCollapsed ? <ChevronRight className="h-6 w-6" /> : <ChevronDown className="h-6 w-6" />}
                         </Button>
                         <div className="flex items-center gap-4">
                           <div className={cn(
-                            "flex items-center justify-center bg-primary text-primary-foreground rounded-xl shadow-none",
+                            "flex items-center justify-center bg-primary text-primary-foreground rounded-lg shadow-none",
                             isCollapsed ? "w-10 h-10" : "w-12 h-12"
                           )}>
                             {q.type === 'multiple-choice' && <ListChecks className={isCollapsed ? "h-5 w-5" : "h-6 w-6"} />}
@@ -298,13 +298,85 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
                               </div>
                             </div>
                           )}
+
+                          {q.type === 'guess-number' && (
+                            <div className="space-y-5">
+                              <div className="flex items-center justify-between">
+                                <Label className="text-base font-medium">Number Settings</Label>
+                                {isQuiz && <span className="text-sm font-medium text-primary">Set correct answer</span>}
+                              </div>
+                              <div className="space-y-4">
+                                {isQuiz && (
+                                  <div>
+                                    <Label className="text-sm font-medium opacity-60">Correct Answer</Label>
+                                    <Input 
+                                      type="number"
+                                      value={q.correctAnswer ?? ""}
+                                      onChange={(e) => updateQuestion(q.id, { correctAnswer: parseFloat(e.target.value) || undefined })}
+                                      placeholder="Enter correct number..."
+                                      min={q.range?.min ?? 0}
+                                      max={q.range?.max ?? 100}
+                                      className="h-12 text-center text-xl font-semibold border border-foreground/10 bg-card rounded-lg focus-visible:ring-1 focus-visible:ring-primary shadow-none"
+                                    />
+                                  </div>
+                                )}
+                                <div>
+                                  <Label className="text-sm font-medium opacity-60">Range</Label>
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <Label className="text-xs font-medium opacity-40">Min</Label>
+                                      <Input 
+                                        type="number"
+                                        value={q.range?.min ?? 0}
+                                        onChange={(e) => updateQuestion(q.id, { 
+                                          range: { 
+                                            ...q.range, 
+                                            min: parseFloat(e.target.value) || 0,
+                                            max: q.range?.max ?? 100,
+                                            step: q.range?.step ?? 1
+                                          } 
+                                        })}
+                                        className="h-12 text-center font-semibold border border-foreground/10 bg-card rounded-lg focus-visible:ring-1 focus-visible:ring-primary shadow-none"
+                                      />
+                                    </div>
+                                    <div>
+                                      <Label className="text-xs font-medium opacity-40">Max</Label>
+                                      <Input 
+                                        type="number"
+                                        value={q.range?.max ?? 100}
+                                        onChange={(e) => updateQuestion(q.id, { 
+                                          range: { 
+                                            ...q.range, 
+                                            min: q.range?.min ?? 0,
+                                            max: parseFloat(e.target.value) || 100,
+                                            step: q.range?.step ?? 1
+                                          } 
+                                        })}
+                                        className="h-12 text-center font-semibold border border-foreground/10 bg-card rounded-lg focus-visible:ring-1 focus-visible:ring-primary shadow-none"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         <div className="space-y-6 lg:border-l lg:border-foreground/5 lg:pl-8">
                            <div className="space-y-5">
                               <Label className="text-base font-medium">Visual anchor</Label>
                               <div className="aspect-[4/3] bg-muted/20 rounded-lg border border-dashed border-foreground/10 flex flex-col items-center justify-center gap-4 overflow-hidden relative group/image">
-                                {q.imageHint ? (
+                                {q.imageUrl ? (
+                                  <img 
+                                    src={q.imageUrl} 
+                                    alt="Custom image" 
+                                    className="w-full h-full object-cover opacity-80 group-hover/image:opacity-100 transition-opacity" 
+                                    onError={(e) => {
+                                      e.currentTarget.src = '';
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                ) : q.imageHint ? (
                                   <img 
                                     src={`https://picsum.photos/seed/${q.imageHint}/800/600`} 
                                     alt="Preview" 
@@ -314,17 +386,30 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
                                   <ImageIcon className="h-10 w-10 opacity-20" />
                                 )}
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex flex-col items-center justify-center p-6 text-center">
-                                   <p className="text-white font-medium text-base">Stage visual anchor</p>
+                                   <p className="text-white font-medium text-base">Visual anchor preview</p>
                                 </div>
                               </div>
-                              <div className="relative">
-                                <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 opacity-30" />
-                                <Input 
-                                  value={q.imageHint || ""} 
-                                  onChange={(e) => updateQuestion(q.id, { imageHint: e.target.value })}
-                                  placeholder="Visual keyword..."
-                                  className="h-12 pl-12 rounded-lg text-base border border-foreground/10 bg-card focus-visible:ring-1 focus-visible:ring-primary shadow-none"
-                                />
+                              
+                              <div className="space-y-3">
+                                <div className="relative">
+                                  <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 opacity-30" />
+                                  <Input 
+                                    value={q.imageUrl || ""} 
+                                    onChange={(e) => updateQuestion(q.id, { imageUrl: e.target.value })}
+                                    placeholder="Image URL (https://...)"
+                                    className="h-12 pl-12 rounded-lg text-base border border-foreground/10 bg-card focus-visible:ring-1 focus-visible:ring-primary shadow-none"
+                                  />
+                                </div>
+                                
+                                <div className="relative">
+                                  <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 opacity-30" />
+                                  <Input 
+                                    value={q.imageHint || ""} 
+                                    onChange={(e) => updateQuestion(q.id, { imageHint: e.target.value })}
+                                    placeholder="Or visual keyword for AI..."
+                                    className="h-12 pl-12 rounded-lg text-base border border-foreground/10 bg-card focus-visible:ring-1 focus-visible:ring-primary shadow-none"
+                                  />
+                                </div>
                               </div>
                            </div>
 
@@ -371,7 +456,7 @@ export function PollCreator({ onChange, initialQuestions = [], isQuiz = false }:
         })}
       </div>
 
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-foreground text-background p-4 rounded-xl flex items-center gap-4 z-50 border border-background/20 shadow-lg">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-foreground text-background p-4 rounded-lg flex items-center gap-4 z-50 border border-background/20 shadow-lg">
         <div className="flex items-center gap-3 px-5 py-3 border-r border-background/10">
            <Plus className="h-5 w-5" />
            <span className="text-sm font-medium uppercase tracking-wide">Add</span>

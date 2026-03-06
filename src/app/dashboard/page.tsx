@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
 
   // Auth state stability detection - prevent premature redirects during Firebase auth resets
   useEffect(() => {
@@ -156,9 +157,25 @@ export default function DashboardPage() {
   // Update selected sessions when displayed sessions change
   useEffect(() => {
     if (displayedSessions) {
-      setSelectedSessions(prev => prev.filter(id => displayedSessions.some(s => s.id === id)));
+      setSelectedSessions(prev => {
+        const validSessionIds = displayedSessions.map(s => s.id);
+        const filteredPrev = prev.filter(id => validSessionIds.includes(id));
+        
+        // Only update if the filtered result is different from current state
+        if (filteredPrev.length !== prev.length || !filteredPrev.every(id => prev.includes(id))) {
+          return filteredPrev;
+        }
+        return prev;
+      });
     }
-  }, [displayedSessions]);
+  }, [displayedSessions?.map(s => s.id).join(',')]); // Only depend on session IDs, not the full objects
+
+  // Clear selection when exiting selection mode
+  useEffect(() => {
+    if (!selectionMode) {
+      setSelectedSessions([]);
+    }
+  }, [selectionMode]);
 
   const togglePublic = (surveyId: string, currentStatus: boolean) => {
     if (!user) return;
@@ -301,7 +318,7 @@ export default function DashboardPage() {
               { label: "Latest Session", value: pastSessions?.[0]?.title ? pastSessions[0].title.slice(0, 20) + (pastSessions[0].title.length > 20 ? "..." : "") : "—", icon: Calendar },
             ].map((item, i) => (
               <div key={i} className="bg-card border rounded-lg p-4 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center">
+                <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
                   <item.icon className="h-5 w-5 text-foreground" />
                 </div>
                 <div className="min-w-0">
@@ -321,7 +338,7 @@ export default function DashboardPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search surveys..."
-              className="pl-10 h-10 rounded-md border bg-background"
+              className="pl-10 h-10 rounded-lg border bg-background"
             />
           </div>
         </div>
@@ -349,7 +366,7 @@ export default function DashboardPage() {
               <div key={survey.id} className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow group">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center">
+                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
                        <SurveyIcon iconName={survey.icon} className="h-4 w-4 text-foreground" />
                     </div>
                     <Button 
@@ -432,47 +449,66 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground">Your latest survey sessions</p>
               </div>
               <div className="flex items-center gap-2">
-                {selectedSessions.length > 0 && (
+                {selectionMode ? (
+                  <>
+                    {selectedSessions.length > 0 && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setBulkDeleteDialogOpen(true)}
+                        className="h-8 text-xs"
+                      >
+                        <Trash2 className="mr-1 h-3 w-3" /> Delete {selectedSessions.length} selected
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedSessions(pastSessions?.map(s => s.id) || []);
+                      }}
+                      className="h-8 text-xs"
+                      disabled={!pastSessions || pastSessions.length === 0}
+                    >
+                      <CheckSquare className="mr-1 h-3 w-3" /> Select all
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedSessions([])}
+                      className="h-8 text-xs"
+                      disabled={selectedSessions.length === 0}
+                    >
+                      Clear selection
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedSessions(pastSessions.map(s => s.id));
+                        setBulkDeleteDialogOpen(true);
+                      }}
+                      className="h-8 text-xs"
+                    >
+                      <Trash2 className="mr-1 h-3 w-3" /> Delete all
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectionMode(false)}
+                      className="h-8 text-xs"
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
-                    onClick={() => setBulkDeleteDialogOpen(true)}
+                    onClick={() => setSelectionMode(true)}
                     className="h-8 text-xs"
                   >
-                    <Trash2 className="mr-1 h-3 w-3" /> Delete {selectedSessions.length} selected
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedSessions(pastSessions?.map(s => s.id) || []);
-                  }}
-                  className="h-8 text-xs"
-                  disabled={!pastSessions || pastSessions.length === 0}
-                >
-                  <CheckSquare className="mr-1 h-3 w-3" /> Select all
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedSessions([])}
-                  className="h-8 text-xs"
-                  disabled={selectedSessions.length === 0}
-                >
-                  Clear selection
-                </Button>
-                {pastSessions && pastSessions.length > 0 && (
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedSessions(pastSessions.map(s => s.id));
-                      setBulkDeleteDialogOpen(true);
-                    }}
-                    className="h-8 text-xs"
-                  >
-                    <Trash2 className="mr-1 h-3 w-3" /> Delete all
+                    <CheckSquare className="mr-1 h-3 w-3" /> Auswählen
                   </Button>
                 )}
                 {pastSessions.length > 5 && (
@@ -487,7 +523,7 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
-            {displayedSessions && displayedSessions.length > 0 && (
+            {selectionMode && displayedSessions && displayedSessions.length > 0 && (
               <div className="flex items-center gap-2 mb-4">
                 <Checkbox
                   checked={selectedSessions.length === displayedSessions.length && displayedSessions.length > 0}
@@ -508,16 +544,18 @@ export default function DashboardPage() {
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {displayedSessions?.map((session) => (
-                <div key={session.id} className={cn("bg-card border rounded-lg p-4 hover:shadow-md transition-shadow relative", selectedSessions.includes(session.id) && "ring-2 ring-primary")}>
-                  <div className="absolute top-3 left-3">
-                    <Checkbox
-                      checked={selectedSessions.includes(session.id)}
-                      onCheckedChange={() => toggleSessionSelection(session.id)}
-                      className="h-4 w-4"
-                    />
-                  </div>
+                <div key={session.id} className={cn("bg-card border rounded-lg p-4 hover:shadow-md transition-shadow relative", selectionMode && selectedSessions.includes(session.id) && "ring-2 ring-primary")}>
+                  {selectionMode && (
+                    <div className="absolute top-3 left-3">
+                      <Checkbox
+                        checked={selectedSessions.includes(session.id)}
+                        onCheckedChange={() => toggleSessionSelection(session.id)}
+                        className="h-4 w-4"
+                      />
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-3">
-                    <div className="min-w-0 flex-1 ml-8">
+                    <div className={cn("min-w-0 flex-1", selectionMode && "ml-8")}>
                       <p className="font-medium text-foreground truncate mb-1">{session.title || "Untitled Session"}</p>
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs bg-muted px-2 py-1 rounded">{session.code}</span>

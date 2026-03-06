@@ -9,7 +9,7 @@ import { PollQuestion } from "@/app/types/poll";
 import { ArrowLeft, Loader2, CheckCircle2, Palette, Sun, Moon, Trophy, BarChart3, Shuffle } from "lucide-react";
 import { IconPicker } from "@/components/ui/IconPicker";
 import { useFirestore, useDoc, useCollection, useMemoFirebase } from "@/firebase";
-import { doc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, orderBy, writeBatch } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useUser } from "@/firebase";
@@ -42,7 +42,11 @@ export function PollEditor({ initialPoll, initialQuestions, pollId }: PollEditor
     try {
       const pollRef = doc(db, `users/${user.uid}/surveys/${pollId}`);
       
-      await setDoc(pollRef, { 
+      // Check if this is a new survey by trying to get the document
+      const pollDoc = await getDoc(pollRef);
+      const isNewSurvey = !pollDoc.exists();
+      
+      const surveyData: any = { 
         title: titleToSave, 
         theme: themeToSave, 
         customColor: customColorToSave,
@@ -50,7 +54,16 @@ export function PollEditor({ initialPoll, initialQuestions, pollId }: PollEditor
         shuffleQuestions: shuffleSave ?? false,
         icon: iconToSave || "BarChart3",
         updatedAt: serverTimestamp() 
-      }, { merge: true });
+      };
+      
+      // Add createdAt for new surveys
+      if (isNewSurvey) {
+        surveyData.createdAt = serverTimestamp();
+        surveyData.isPublic = false; // Default to private for new surveys
+        surveyData.sessionCount = 0; // Initialize session count
+      }
+      
+      await setDoc(pollRef, surveyData, { merge: true });
 
       const finalQCol = collection(db, `users/${user.uid}/surveys/${pollId}/questions`);
       const batch = writeBatch(db);
@@ -70,10 +83,13 @@ export function PollEditor({ initialPoll, initialQuestions, pollId }: PollEditor
 
         if (q.options) qData.options = q.options;
         if (q.correctOptionIndices) qData.correctOptionIndices = q.correctOptionIndices;
+        if (q.correctAnswer !== undefined) qData.correctAnswer = q.correctAnswer;
         if (q.timeLimit !== undefined) qData.timeLimit = q.timeLimit;
         if (q.range) qData.range = q.range;
         if (q.labels) qData.labels = q.labels;
         if (q.description) qData.description = q.description;
+        if (q.imageUrl) qData.imageUrl = q.imageUrl;
+        if (q.imageHint) qData.imageHint = q.imageHint;
 
         batch.set(qRef, qData, { merge: true });
       }
@@ -130,7 +146,7 @@ export function PollEditor({ initialPoll, initialQuestions, pollId }: PollEditor
         </div>
         
         <div className="space-y-8">
-          <div className="bg-card p-6 rounded-xl border border-foreground/8 space-y-6">
+          <div className="bg-card p-6 rounded-lg border border-foreground/8 space-y-6">
             <div className="space-y-2">
               <h2 className="text-xl font-semibold tracking-tight">Survey Details</h2>
               <p className="text-base text-muted-foreground">Configure your survey identity and presentation style</p>
@@ -186,7 +202,7 @@ export function PollEditor({ initialPoll, initialQuestions, pollId }: PollEditor
                       <span className="capitalize">{theme === 'custom' && customColor ? 'Custom' : theme}</span>
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-80 p-6 rounded-xl border border-foreground/8 bg-card" align="end">
+                  <PopoverContent className="w-80 p-6 rounded-lg border border-foreground/8 bg-card" align="end">
                     <div className="space-y-6">
                       <div>
                         <h3 className="text-base font-medium mb-4">Presentation Style</h3>

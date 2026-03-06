@@ -48,6 +48,16 @@ export default function DiscoverPage() {
 
   const { data: surveys, isLoading } = useCollection(publicSurveysQuery);
 
+  // Process surveys to include userId from the document path
+  const processedSurveys = surveys?.map(doc => {
+    const pathParts = doc.ref.path.split('/');
+    const userId = pathParts[1]; // Extract userId from path: users/{userId}/surveys/{surveyId}
+    return {
+      ...doc,
+      userId: userId
+    };
+  }) || [];
+
   // Load survey questions for preview
   const loadSurveyQuestions = async (survey: any) => {
     try {
@@ -138,10 +148,12 @@ export default function DiscoverPage() {
     }
   };
 
-  const filtered = surveys?.filter(s => {
-    const matchText = s.title?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchCat = category === 'all' || (category === 'quiz' ? s.isQuiz : !s.isQuiz);
-    return matchText && matchCat;
+  const filteredSurveys = processedSurveys.filter(survey => {
+    const matchesSearch = !searchQuery || survey.title?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = category === "all" || 
+      (category === "quiz" && survey.isQuiz) || 
+      (category === "survey" && !survey.isQuiz);
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -192,14 +204,14 @@ export default function DiscoverPage() {
         {/* Results */}
         {isLoading ? (
           <div className="py-32 text-center"><Loader2 className="h-7 w-7 animate-spin mx-auto opacity-20" /></div>
-        ) : !filtered || filtered.length === 0 ? (
+        ) : !filteredSurveys || filteredSurveys.length === 0 ? (
           <div className="py-32 text-center border border-dashed rounded-xl bg-card/50 space-y-3">
             <Sparkles className="h-8 w-8 mx-auto opacity-10" />
             <p className="text-sm font-medium opacity-40">{t.discover.noResults}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filtered.map((survey: any) => (
+            {filteredSurveys.map((survey: any) => (
               <article key={survey.id} className="bg-card p-5 rounded-xl border flex flex-col gap-4 group hover:border-primary/30 transition-all shadow-none cursor-pointer" onClick={() => handlePreview(survey)}>
                 <div className="flex items-start justify-between">
                   <div className="w-9 h-9 rounded-lg flex items-center justify-center border bg-muted/50 group-hover:bg-primary/10 transition-colors shrink-0">

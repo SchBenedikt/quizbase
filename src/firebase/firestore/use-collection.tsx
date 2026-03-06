@@ -101,6 +101,17 @@ export function useCollection<T = any>(
           if (prevIds !== newIds) {
             return results;
           }
+          // If same IDs, check if actual data content changed (stringified comparison)
+          try {
+            const prevDataStr = JSON.stringify(prevData.sort((a, b) => a.id.localeCompare(b.id)));
+            const newDataStr = JSON.stringify(results.sort((a, b) => a.id.localeCompare(b.id)));
+            if (prevDataStr !== newDataStr) {
+              return results;
+            }
+          } catch (e) {
+            // If JSON.stringify fails, fall back to ID comparison
+            console.warn('[useCollection] Failed to compare data objects:', e);
+          }
           return prevData; // No change, prevent update
         });
         

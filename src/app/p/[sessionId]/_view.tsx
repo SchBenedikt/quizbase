@@ -48,6 +48,21 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   }, [db, session?.id]);
   const { data: allParticipants } = useCollection<PollParticipant>(allParticipantsQuery);
 
+  const responsesQuery = useMemoFirebase(() => {
+    if (!session?.id || !user?.uid) return null;
+    return query(
+      collection(db, `sessions/${session.id}/responses`),
+      where("userId", "==", user.uid),
+      where("questionId", "==", session.currentQuestionId),
+      limit(1)
+    );
+  }, [db, session?.id, session?.currentQuestionId, user?.uid]);
+
+  const { data: userResponses } = useCollection(responsesQuery);
+  
+  // Check if user has already voted for current question
+  const hasVotedForCurrentQuestion = userResponses && userResponses.length > 0;
+
   const [currentQuestion, setCurrentQuestion] = useState<PollQuestion | null>(null);
   const [voted, setVoted] = useState(false);
   const [selection, setSelection] = useState<number | null>(null);
@@ -97,6 +112,11 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     }
   }, [session?.id, user?.uid, isSettingNickname, nickname, db]);
 
+  // Update voted state when user responses change
+  useEffect(() => {
+    setVoted(hasVotedForCurrentQuestion || false);
+  }, [hasVotedForCurrentQuestion]);
+
   useEffect(() => {
     if (session?.currentQuestionId && session.currentQuestionId !== 'lobby' && session.currentQuestionId !== 'podium' && session.userId && session.pollId) {
       const fetchQ = async () => {
@@ -106,7 +126,8 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           if (snap.exists()) {
             const qData = { ...snap.data(), id: snap.id } as PollQuestion;
             setCurrentQuestion(qData);
-            setVoted(false);
+            // Set voted state based on whether user has already voted for this question
+            setVoted(hasVotedForCurrentQuestion || false);
             setSelection(null);
             setTextValue("");
             setRatingValue(0);
@@ -158,7 +179,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   };
 
   const handleSubmit = async () => {
-    if (!currentQuestion || !session || voted || (timeLeft === 0 && currentQuestion.timeLimit)) return;
+    if (!currentQuestion || !session || voted || hasVotedForCurrentQuestion || (timeLeft === 0 && currentQuestion.timeLimit)) return;
     setLoading(true);
     
     let value: any = "";
@@ -170,11 +191,16 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         isCorrect = currentQuestion.correctOptionIndices.includes(selection);
       }
     }
+    if (currentQuestion.type === 'guess-number') {
+      value = parseFloat(textValue) || 0;
+      if (currentQuestion.correctAnswer !== undefined) {
+        isCorrect = value === currentQuestion.correctAnswer;
+      }
+    }
     if (currentQuestion.type === 'word-cloud') value = textValue.trim().toUpperCase();
     if (currentQuestion.type === 'open-text') value = textValue.trim();
     if (currentQuestion.type === 'slider' || currentQuestion.type === 'scale') value = sliderValue;
     if (currentQuestion.type === 'rating') value = ratingValue;
-    if (currentQuestion.type === 'guess-number') value = parseFloat(textValue) || 0;
     if (currentQuestion.type === 'ranking') value = rankingOrder;
 
     const responseCol = collection(db, `sessions/${session.id}/responses`);
@@ -262,7 +288,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
     <div className="min-h-screen flex flex-col p-6 transition-colors duration-700 font-body" style={dynamicStyles}>
       <div className="max-w-sm mx-auto w-full flex-1 flex flex-col items-center justify-center space-y-8">
          <header className="text-center space-y-4">
-           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+           <div className="w-16 h-16 rounded-lg flex items-center justify-center mx-auto border-2" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
               <User className="h-8 w-8" />
            </div>
            <h1 className="text-3xl font-bold">Choose a nickname</h1>
@@ -274,12 +300,12 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
              onKeyDown={(e) => e.key === 'Enter' && setIsSettingNickname(false)}
              placeholder="Your nickname..." 
              maxLength={20} 
-             className="h-14 text-xl font-medium text-center rounded-xl border-2 bg-black/10 focus-visible:ring-0 placeholder:opacity-30" 
+             className="h-14 text-xl font-medium text-center rounded-lg border-2 bg-black/10 focus-visible:ring-0 placeholder:opacity-30" 
              style={{ borderColor: finalFg + '44', color: finalFg }} 
            />
            <Button 
              onClick={() => setIsSettingNickname(false)} 
-             className="w-full h-14 text-base font-semibold rounded-xl border-2 transition-all" 
+             className="w-full h-14 text-base font-semibold rounded-lg border-2 transition-all" 
              style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
            >
              Enter <Zap className="ml-2 h-4 w-4 fill-current" />
@@ -301,12 +327,12 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           <h1 className="text-4xl font-bold">Session finished!</h1>
           {isQuizMode && (
             <>
-              <div className="bg-black/10 px-8 py-6 rounded-2xl" style={{ borderColor: finalFg + '33' }}>
+              <div className="bg-black/10 px-8 py-6 rounded-lg" style={{ borderColor: finalFg + '33' }}>
                 <p className="text-xs font-semibold uppercase tracking-widest mb-2 opacity-40">Your score</p>
                 <p className="text-5xl font-black tabular-nums">{participantData?.score || 0}</p>
               </div>
               {myRank > 0 && (
-                <div className="bg-black/10 px-6 py-4 rounded-xl">
+                <div className="bg-black/10 px-6 py-4 rounded-lg">
                   <p className="text-xs font-semibold uppercase tracking-widest mb-1 opacity-40">Your rank</p>
                   <p className="text-3xl font-bold">#{myRank} <span className="text-base font-medium opacity-50">of {totalP}</span></p>
                 </div>
@@ -316,7 +342,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 <div className="space-y-2 pt-2">
                   <p className="text-xs font-semibold uppercase tracking-widest opacity-40">Top Players</p>
                   {sorted.slice(0, 3).map((p, i) => (
-                    <div key={p.id} className={cn("flex items-center gap-3 px-4 py-3 rounded-xl", p.id === user?.uid ? "border-2" : "bg-black/5")} style={p.id === user?.uid ? { borderColor: finalFg } : {}}>
+                    <div key={p.id} className={cn("flex items-center gap-3 px-4 py-3 rounded-lg", p.id === user?.uid ? "border-2" : "bg-black/5")} style={p.id === user?.uid ? { borderColor: finalFg } : {}}>
                       <span className="text-sm font-bold w-6">{i + 1}.</span>
                       <span className="flex-1 text-sm font-semibold truncate text-left">{p.nickname || "Anonymous"}</span>
                       <span className="text-sm font-bold tabular-nums">{p.score || 0}</span>
@@ -328,7 +354,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
           )}
           <Button 
             onClick={() => window.location.href = '/join'} 
-            className="h-12 px-10 rounded-xl font-semibold" 
+            className="h-12 px-10 rounded-lg font-semibold" 
             style={{ backgroundColor: finalFg, color: finalBg }}
           >
             Join another session
@@ -341,7 +367,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
   if (session.currentQuestionId === 'lobby') return (
     <div className="min-h-screen flex flex-col p-6 transition-colors duration-700 font-body items-center justify-center" style={dynamicStyles}>
       <div className="space-y-6 text-center max-w-sm w-full">
-        <div className="w-16 h-16 rounded-2xl border-2 flex items-center justify-center mx-auto animate-pulse" style={{ borderColor: finalFg }}>
+        <div className="w-16 h-16 rounded-lg border-2 flex items-center justify-center mx-auto animate-pulse" style={{ borderColor: finalFg }}>
           <Zap className="h-8 w-8 fill-current" />
         </div>
         <h1 className="text-3xl font-bold">You're in!</h1>
@@ -364,18 +390,52 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         <div className="max-w-sm mx-auto w-full flex-1 flex flex-col items-center justify-center text-center space-y-8">
           {timeLeft === 0 && !voted ? (
             <div className="space-y-4">
-               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto bg-amber-500 border-2 border-amber-600"><Clock className="h-8 w-8 text-white" /></div>
+               <div className="w-16 h-16 rounded-lg flex items-center justify-center mx-auto bg-amber-500 border-2 border-amber-600"><Clock className="h-8 w-8 text-white" /></div>
                <h1 className="text-3xl font-bold">Time's up!</h1>
                <p className="text-base font-medium opacity-40">Your answer was not submitted in time.</p>
             </div>
           ) : showQuizResult ? (
-            <div className="space-y-4">
-              <div className={cn("w-16 h-16 rounded-2xl flex items-center justify-center mx-auto border-2", lastCorrect ? "bg-green-500 border-green-600" : "bg-red-500 border-red-600")}>
+            <div className="space-y-6">
+              <div className={cn("w-16 h-16 rounded-lg flex items-center justify-center mx-auto border-2", lastCorrect ? "bg-green-500 border-green-600" : "bg-red-500 border-red-600")}>
                 {lastCorrect ? <CheckCircle2 className="h-8 w-8 text-white" /> : <XCircle className="h-8 w-8 text-white" />}
               </div>
               <h1 className="text-3xl font-bold">{lastCorrect ? "Correct!" : "Not quite!"}</h1>
+              
+              {/* Show correct answer for incorrect answers */}
+              {!lastCorrect && (
+                <div className="space-y-3">
+                  <p className="text-lg font-medium opacity-70">The correct answer was:</p>
+                  {currentQuestion.type === 'multiple-choice' || currentQuestion.type === 'true-false' ? (
+                    <div className="bg-green-100 dark:bg-green-900/30 px-6 py-3 rounded-lg border-2 border-green-200 dark:border-green-800">
+                      <p className="text-xl font-bold text-green-700 dark:text-green-400">
+                        {currentQuestion.correctOptionIndices?.map(idx => currentQuestion.options?.[idx]).join(', ')}
+                      </p>
+                    </div>
+                  ) : currentQuestion.type === 'guess-number' && currentQuestion.correctAnswer !== undefined ? (
+                    <div className="bg-green-100 dark:bg-green-900/30 px-6 py-3 rounded-lg border-2 border-green-200 dark:border-green-800">
+                      <p className="text-3xl font-bold text-green-700 dark:text-green-400 text-center">
+                        {currentQuestion.correctAnswer}
+                      </p>
+                    </div>
+                  ) : null}
+                  
+                  {/* Show user's answer for comparison */}
+                  <div className="bg-muted/50 px-4 py-2 rounded-lg text-center">
+                    <p className="text-sm opacity-60">Your answer:</p>
+                    <p className="font-semibold">
+                      {currentQuestion.type === 'multiple-choice' || currentQuestion.type === 'true-false' 
+                        ? currentQuestion.options?.[selection ?? -1] || 'Not selected'
+                        : currentQuestion.type === 'guess-number'
+                        ? textValue || 'No answer'
+                        : 'No answer'
+                      }
+                    </p>
+                  </div>
+                </div>
+              )}
+              
               {lastCorrect && (
-                <div className="bg-black/10 px-6 py-4 rounded-xl flex flex-col items-center gap-1">
+                <div className="bg-black/10 px-6 py-4 rounded-lg flex flex-col items-center gap-1">
                    <div className="flex items-center gap-3">
                      <Trophy className="h-5 w-5 text-yellow-500" />
                      <span className="text-2xl font-bold tabular-nums">+{pointsEarned}</span>
@@ -388,7 +448,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="p-10 rounded-2xl" style={{ backgroundColor: finalFg, color: finalBg }}>
+              <div className="p-10 rounded-lg" style={{ backgroundColor: finalFg, color: finalBg }}>
                 <Heart className="h-12 w-12 fill-current" />
               </div>
               <h1 className="text-2xl font-bold">Response sent!</h1>
@@ -445,6 +505,31 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
         </div>
 
         <main className="space-y-6 flex-1">
+          {/* Image Display */}
+          {(currentQuestion.imageUrl || currentQuestion.imageHint) && (
+            <div className="aspect-[4/3] rounded-lg border-2 overflow-hidden bg-black/5" style={{ borderColor: finalFg + '33' }}>
+              {currentQuestion.imageUrl ? (
+                <img 
+                  src={currentQuestion.imageUrl} 
+                  alt="Question image" 
+                  className="w-full h-full object-cover" 
+                  onError={(e) => {
+                    // Fallback to imageHint if imageUrl fails
+                    if (currentQuestion.imageHint) {
+                      e.currentTarget.src = `https://picsum.photos/seed/${currentQuestion.imageHint}/800/600`;
+                    }
+                  }}
+                />
+              ) : (
+                <img 
+                  src={`https://picsum.photos/seed/${currentQuestion.imageHint}/800/600`} 
+                  alt="Question context" 
+                  className="w-full h-full object-cover" 
+                />
+              )}
+            </div>
+          )}
+
           {/* Question */}
           <div className="space-y-3">
             <div className="flex items-start justify-between gap-4">
@@ -460,7 +545,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 )}
               </div>
               {timeLeft !== null && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl border-2 shrink-0" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border-2 shrink-0" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
                   <Timer className="h-4 w-4" />
                   <span className="text-lg font-bold tabular-nums">{timeLeft}</span>
                 </div>
@@ -476,7 +561,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   key={idx}
                   onClick={() => setSelection(idx)}
                   className={cn(
-                    "w-full h-14 rounded-xl border-2 flex items-center px-4 gap-3 transition-all active:scale-[0.98] text-left",
+                    "w-full h-14 rounded-lg border-2 flex items-center px-4 gap-3 transition-all active:scale-[0.98] text-left",
                     selection === idx ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10"
                   )}
                   style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
@@ -506,7 +591,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   key={idx}
                   onClick={() => setSelection(idx)}
                   className={cn(
-                    "h-24 rounded-2xl border-2 flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.97] font-bold text-2xl",
+                    "h-24 rounded-lg border-2 flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.97] font-bold text-2xl",
                     selection === idx ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10"
                   )}
                   style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
@@ -539,7 +624,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                         }
                       }}
                       className={cn(
-                        "w-full h-14 rounded-xl border-2 flex items-center px-4 gap-3 transition-all active:scale-[0.98] text-left",
+                        "w-full h-14 rounded-lg border-2 flex items-center px-4 gap-3 transition-all active:scale-[0.98] text-left",
                         isRanked ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10"
                       )}
                       style={isRanked ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
@@ -572,7 +657,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 onChange={(e) => setTextValue(e.target.value.replace(/\s+/g, '').toUpperCase())}
                 placeholder="ONE WORD..."
                 maxLength={30}
-                className="w-full h-16 px-5 rounded-xl border-2 bg-black/10 text-2xl font-bold text-center tracking-widest placeholder:opacity-20 focus:outline-none focus:bg-black/20 transition-colors uppercase"
+                className="w-full h-16 px-5 rounded-lg border-2 bg-black/10 text-2xl font-bold text-center tracking-widest placeholder:opacity-20 focus:outline-none focus:bg-black/20 transition-colors uppercase"
                 style={{ borderColor: finalFg + '44', color: finalFg }}
               />
             </div>
@@ -587,7 +672,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 placeholder="Your answer..."
                 maxLength={300}
                 rows={4}
-                className="w-full px-5 py-4 rounded-xl border-2 bg-black/10 text-base font-medium placeholder:opacity-30 focus:outline-none focus:bg-black/20 transition-colors resize-none"
+                className="w-full px-5 py-4 rounded-lg border-2 bg-black/10 text-base font-medium placeholder:opacity-30 focus:outline-none focus:bg-black/20 transition-colors resize-none"
                 style={{ borderColor: finalFg + '44', color: finalFg }}
               />
             </div>
@@ -606,7 +691,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                 placeholder={`${currentQuestion.range?.min ?? 0}`}
                 min={currentQuestion.range?.min ?? 0}
                 max={currentQuestion.range?.max ?? 100}
-                className="w-full h-16 px-5 rounded-xl border-2 bg-black/10 text-3xl font-bold text-center placeholder:opacity-20 focus:outline-none focus:bg-black/20 transition-colors"
+                className="w-full h-16 px-5 rounded-lg border-2 bg-black/10 text-3xl font-bold text-center placeholder:opacity-20 focus:outline-none focus:bg-black/20 transition-colors"
                 style={{ borderColor: finalFg + '44', color: finalFg }}
               />
             </div>
@@ -655,9 +740,9 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
           {/* Submit */}
           <button
-            disabled={loading || isAnswerMissing() || (timeLeft === 0 && !!currentQuestion.timeLimit)}
+            disabled={loading || voted || hasVotedForCurrentQuestion || isAnswerMissing() || (timeLeft === 0 && !!currentQuestion.timeLimit)}
             onClick={handleSubmit}
-            className="w-full h-14 text-base font-semibold rounded-xl mt-2 border-2 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full h-14 text-base font-semibold rounded-lg mt-2 border-2 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}
           >
             {loading ? <Loader2 className="animate-spin h-5 w-5 mx-auto" /> : "Submit"}

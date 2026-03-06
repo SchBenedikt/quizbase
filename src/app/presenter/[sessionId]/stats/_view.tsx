@@ -57,7 +57,7 @@ function StatCard({ label, value, sub, icon: Icon, highlight, warn }: {
 }) {
   return (
     <div className={cn(
-      "rounded-2xl border p-5 space-y-2 shadow-none",
+      "rounded-lg border p-5 space-y-2 shadow-none",
       highlight ? "bg-primary/5 border-primary/30" : warn ? "bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800/30" : "bg-card"
     )}>
       <div className={cn("flex items-center gap-2 text-xs font-semibold uppercase tracking-wider", warn ? "text-red-600 dark:text-red-400" : "text-muted-foreground")}>
@@ -121,7 +121,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
-          <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-4 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Response Distribution</h4>
             <ResponsiveContainer width="100%" height={Math.max(140, data.length * 44)}>
               <BarChart data={data} layout="vertical" margin={{ left: 0, right: 50 }}>
@@ -141,7 +141,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
             </ResponsiveContainer>
           </div>
 
-          <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Individual Responses</h4>
             <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
               {userSelections.map((u, i) => (
@@ -190,7 +190,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
           <StatCard label="Max" value={maxVal(values)} icon={TrendingUp} />
         </div>
         <div className="grid lg:grid-cols-3 gap-6">
-          <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-4 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Star Distribution</h4>
             <ResponsiveContainer width="100%" height={150}>
               <BarChart data={distribution}>
@@ -203,7 +203,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Summary</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Std deviation</span><span className="font-bold">{stddev(values).toFixed(2)}</span></div>
@@ -213,7 +213,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
               <div className="flex justify-between"><span className="text-muted-foreground">Positive (≥4★)</span><span className="font-bold">{values.length > 0 ? Math.round((values.filter(v => v >= 4).length / values.length) * 100) : 0}%</span></div>
             </div>
           </div>
-          <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Individual Ratings</h4>
             <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
               {userRatings.map((u, i) => (
@@ -236,6 +236,119 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
     const min = question.range?.min ?? 0;
     const max = question.range?.max ?? 100;
     const step = question.range?.step ?? 1;
+    
+    // Enhanced handling for guess-number questions
+    if (question.type === 'guess-number') {
+      // Create frequency map
+      const frequencyMap: Record<number, number> = {};
+      values.forEach(val => {
+        frequencyMap[val] = (frequencyMap[val] || 0) + 1;
+      });
+      
+      // Sort by frequency, then by value
+      const sortedEntries = Object.entries(frequencyMap)
+        .sort(([,a], [,b]) => b - a)
+        .sort(([,a], [,b]) => a === b ? Number(a) - Number(b) : 0);
+      
+      const correctAnswer = question.correctAnswer;
+      const correctCount = correctAnswer !== undefined ? frequencyMap[correctAnswer] || 0 : 0;
+      const correctRate = total > 0 ? (correctCount / total) * 100 : 0;
+      
+      const userValues = participants.map(p => {
+        const r = qResponses.find(r => r.userId === p.id);
+        const value = r ? Number(r.value) : null;
+        const isCorrect = correctAnswer !== undefined && value === correctAnswer;
+        return { nickname: p.nickname || "Anon", value, answered: !!r, isCorrect };
+      });
+
+      return (
+        <div className="space-y-6">
+          <div className="flex flex-wrap items-center gap-3 mb-1">
+            {correctAnswer !== undefined && (
+              <>
+                <span className="text-xs text-muted-foreground">Correct: {correctAnswer}</span>
+                <span className="text-xs text-muted-foreground">{Math.round(correctRate)}% got it right</span>
+              </>
+            )}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <StatCard label="Responses" value={total} icon={Users} />
+            <StatCard label="Average" value={avg(values).toFixed(1)} icon={BarChart3} highlight />
+            <StatCard label="Median" value={median(sortedVals).toFixed(1)} icon={Activity} />
+            {correctAnswer !== undefined && (
+              <StatCard label="Correct" value={`${correctCount}/${total}`} sub={`${Math.round(correctRate)}% accuracy`} icon={CheckCircle2} highlight={correctRate >= 50} />
+            )}
+          </div>
+          
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Frequency Distribution */}
+            <div className="rounded-lg border bg-card p-6 space-y-4 shadow-none">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Answer Frequency</h4>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {sortedEntries.map(([value, count]) => {
+                  const isCorrect = correctAnswer === Number(value);
+                  const maxFreq = Math.max(...Object.values(frequencyMap), 1);
+                  return (
+                    <div key={value} className="flex items-center gap-3">
+                      <span className={cn(
+                        "w-12 text-right font-bold tabular-nums",
+                        isCorrect && "text-green-600 dark:text-green-400"
+                      )}>{value}</span>
+                      <div className="flex-1 h-6 bg-black/5 rounded-full overflow-hidden relative">
+                        <div 
+                          className={cn(
+                            "h-full transition-all duration-1000 ease-out",
+                            isCorrect ? "bg-green-500" : "bg-current"
+                          )}
+                          style={{ width: `${(count / maxFreq) * 100}%` }}
+                        />
+                      </div>
+                      <span className={cn(
+                        "w-16 text-left font-bold tabular-nums text-sm",
+                        isCorrect && "text-green-600 dark:text-green-400"
+                      )}>{count}</span>
+                      {total > 0 && (
+                        <span className="w-12 text-left text-xs opacity-60">
+                          {Math.round((count / total) * 100)}%
+                        </span>
+                      )}
+                      {isCorrect && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Individual Values */}
+            <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Individual Answers</h4>
+              <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
+                {userValues.map((u, i) => (
+                  <div key={i} className="flex items-center justify-between text-sm gap-3">
+                    <span className="font-medium truncate text-muted-foreground">{u.nickname}</span>
+                    {u.answered ? (
+                      <span className={cn(
+                        "font-semibold shrink-0 px-2.5 py-0.5 rounded-lg text-xs flex items-center gap-1",
+                        u.isCorrect
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                          : "bg-muted text-foreground"
+                      )}>
+                        {u.isCorrect ? <CheckCircle2 className="h-3 w-3" /> : null}
+                        {u.value}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground/40 italic">skipped</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Handle slider and scale questions (original logic)
     const buckets = 8;
     const bucketSize = (max - min) / buckets || 1;
     const histData = Array.from({ length: buckets }, (_, i) => {
@@ -258,7 +371,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
           <StatCard label="Max" value={maxVal(values)} icon={TrendingUp} />
         </div>
         <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+          <div className="lg:col-span-2 rounded-lg border bg-card p-6 space-y-4 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Distribution Histogram</h4>
             <ResponsiveContainer width="100%" height={160}>
               <BarChart data={histData}>
@@ -271,7 +384,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Summary</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Std deviation</span><span className="font-bold">{stddev(values).toFixed(2)}</span></div>
@@ -282,7 +395,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
             </div>
           </div>
         </div>
-        <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+        <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Individual Values</h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
             {userValues.map((u, i) => (
@@ -313,7 +426,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
           {noResponse > 0 && <StatCard label="No Response" value={noResponse} icon={AlertCircle} warn />}
         </div>
         <div className="grid lg:grid-cols-2 gap-6">
-          <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">All Responses ({total})</h4>
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {texts.map((t, i) => (
@@ -325,7 +438,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
               {texts.length === 0 && <p className="text-sm text-muted-foreground/50 text-center py-4">No responses yet</p>}
             </div>
           </div>
-          <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Per Participant</h4>
             <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
               {userTexts.map((u, i) => (
@@ -357,7 +470,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
           {noResponse > 0 && <StatCard label="No Response" value={noResponse} icon={AlertCircle} warn />}
         </div>
         <div className="grid lg:grid-cols-2 gap-6">
-          <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-4 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Top Words</h4>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 30 }}>
@@ -370,7 +483,7 @@ function QuestionStats({ question, responses, participants, isQuiz, qIndex }: {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+          <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Frequency Table</h4>
             <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
               {sorted.map(([word, count], i) => (
@@ -421,7 +534,7 @@ function ResponseMatrix({ questions, responses, participants, isQuiz }: {
   };
 
   return (
-    <div className="rounded-2xl border bg-card shadow-none overflow-hidden">
+    <div className="rounded-lg border bg-card shadow-none overflow-hidden">
       <div className="p-5 border-b">
         <h3 className="font-bold text-sm flex items-center gap-2"><Table2 className="h-4 w-4 text-primary" /> Full Response Matrix</h3>
         <p className="text-xs text-muted-foreground mt-0.5">Every participant's answer to every question</p>
@@ -491,7 +604,7 @@ function ScoreDistribution({ participants }: { participants: PollParticipant[] }
   });
 
   return (
-    <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+    <div className="rounded-lg border bg-card p-6 space-y-4 shadow-none">
       <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Score Distribution</h4>
       <ResponsiveContainer width="100%" height={160}>
         <BarChart data={histData}>
@@ -566,7 +679,7 @@ function QuizPerformanceTrend({ questions, responses, participants }: {
   const avgRate = Math.round(data.reduce((sum, d) => sum + d.correctRate, 0) / data.length);
 
   return (
-    <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-none">
+    <div className="rounded-lg border bg-card p-6 space-y-4 shadow-none">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-primary" /> Question Performance Trend
@@ -643,7 +756,7 @@ function EngagementScore({ participationRate, questions, responses, participants
     : { label: "Low", cls: "text-red-600 dark:text-red-400", bg: "bg-red-100 dark:bg-red-900/20" };
 
   return (
-    <div className={cn("rounded-2xl border p-5 flex items-center gap-5", level.bg)}>
+    <div className={cn("rounded-lg border p-5 flex items-center gap-5", level.bg)}>
       <div className="space-y-1 flex-1">
         <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Engagement Score</p>
         <div className="flex items-baseline gap-2">
@@ -777,7 +890,7 @@ export default function SessionStatsPage({ params }: { params: Promise<{ session
           <div className="space-y-5">
             <h2 className="text-lg font-bold flex items-center gap-2"><Trophy className="h-5 w-5 text-primary" /> Leaderboard & Scores</h2>
             <div className="grid lg:grid-cols-2 gap-6">
-              <div className="rounded-2xl border bg-card p-6 space-y-3 shadow-none">
+              <div className="rounded-lg border bg-card p-6 space-y-3 shadow-none">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Final Rankings</h4>
                 <div className="space-y-1.5">
                   {activeParticipants.map((p, i) => (
@@ -817,7 +930,7 @@ export default function SessionStatsPage({ params }: { params: Promise<{ session
               const responseCount = qResponses.length;
               const responseRate = activeParticipants.length > 0 ? Math.round((responseCount / activeParticipants.length) * 100) : 0;
               return (
-                <div key={q.id} className="rounded-2xl border bg-muted/10 overflow-hidden shadow-none">
+                <div key={q.id} className="rounded-lg border bg-muted/10 overflow-hidden shadow-none">
                   <div className="px-6 py-4 flex flex-wrap items-start gap-3 border-b bg-muted/20">
                     <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-sm font-black shrink-0">{i + 1}</div>
                     <div className="flex-1 min-w-0">
@@ -845,7 +958,7 @@ export default function SessionStatsPage({ params }: { params: Promise<{ session
         )}
 
         {(!questions || questions.length === 0) && (
-          <div className="py-32 text-center border border-dashed rounded-2xl text-muted-foreground text-sm">
+          <div className="py-32 text-center border border-dashed rounded-lg text-muted-foreground text-sm">
             Loading statistics…
           </div>
         )}
