@@ -68,34 +68,10 @@ export default function DashboardPage() {
 
   const surveysQuery = useMemoFirebase(() => {
     if (!user || !user.uid || isUserLoading) return null;
-    console.log('[Dashboard] Creating surveys query for user:', user.uid);
-    const queryRef = query(collection(db, `users/${user.uid}/surveys`), orderBy("createdAt", "desc"));
-    console.log('[Dashboard] Survey query path:', `users/${user.uid}/surveys`);
-    return queryRef;
+    return query(collection(db, `users/${user.uid}/surveys`), orderBy("createdAt", "desc"));
   }, [user, db, isUserLoading]);
 
   const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
-
-  // Debug survey data - prevent infinite loop by using stable dependencies
-  const [lastLoggedSurveyCount, setLastLoggedSurveyCount] = useState<number | null>(null);
-  const [lastLoggedLoadingState, setLastLoggedLoadingState] = useState<boolean | null>(null);
-  
-  useEffect(() => {
-    const currentCount = surveys?.length ?? 0;
-    const currentLoading = surveysLoading ?? false;
-    
-    // Only log if count or loading state actually changed from last logged values
-    if (lastLoggedSurveyCount !== currentCount || lastLoggedLoadingState !== currentLoading) {
-      console.log('[Dashboard] Survey data update:', {
-        surveys: surveys,
-        isLoading: surveysLoading,
-        count: currentCount,
-        userId: user?.uid
-      });
-      setLastLoggedSurveyCount(currentCount);
-      setLastLoggedLoadingState(currentLoading);
-    }
-  }, [surveys, surveysLoading, user?.uid]);
 
   // Past sessions query (last 50 for potential expansion)
   const sessionsQuery = useMemoFirebase(() => {
@@ -287,7 +263,15 @@ export default function DashboardPage() {
 
   const filteredSurveys = surveys?.filter(s => s.title?.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  if (isUserLoading || !user) return null;
+  if (isUserLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background font-sans">
