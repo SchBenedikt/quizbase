@@ -411,18 +411,18 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           <div className="w-full max-w-5xl flex flex-col items-center justify-center space-y-12 animate-in zoom-in duration-700">
              <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
                 <div className="space-y-8">
-                   <h2 className="text-5xl font-bold leading-tight">Join the session.</h2>
+                   <h2 className="text-5xl font-bold leading-tight" style={{ color: finalFg }}>Join the session.</h2>
                    <div className="space-y-4">
-                      <p className="text-base font-medium opacity-50">Join at your browser · enter the code below</p>
+                      <p className="text-base font-medium opacity-50" style={{ color: finalFg }}>Join at your browser · enter the code below</p>
                       <div className="bg-black/10 px-10 py-6 rounded-2xl border-4 inline-block" style={{ borderColor: finalFg }}>
-                         <p className="text-7xl font-black tracking-tight">{code}</p>
+                         <p className="text-7xl font-black tracking-tight" style={{ color: finalFg }}>{code}</p>
                       </div>
                    </div>
                    <Button onClick={handleStartQuiz} className="h-16 px-12 rounded-xl text-xl font-bold gap-4" style={{ backgroundColor: finalFg, color: finalBg }}>
                      {session.isQuiz ? "Start Quiz" : "Start Survey"} <Play className="h-6 w-6 fill-current" aria-hidden="true" />
                    </Button>
                 </div>
-                <div className="bg-white p-8 rounded-3xl border-8 shadow-xl" style={{ borderColor: finalFg }}>
+                <div className="bg-white p-6 rounded-3xl border-4 shadow-xl" style={{ borderColor: finalFg }}>
                    <QRCodeSVG value={joinUrl} size={320} level="H" />
                 </div>
              </div>
@@ -430,17 +430,17 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
         ) : session?.currentQuestionId === 'podium' ? (
           <div className="w-full max-w-3xl flex flex-col items-center space-y-10 animate-in slide-in-from-bottom-10 duration-700">
              <Trophy className="h-24 w-24 text-yellow-500 animate-bounce" />
-             <h2 className="text-6xl font-bold text-center">Final Results</h2>
+             <h2 className="text-6xl font-bold text-center" style={{ color: finalFg }}>Final Results</h2>
              <div className="grid grid-cols-3 gap-6 items-end w-full pt-12">
                 <div className="flex flex-col items-center">
-                   <div className="w-full h-36 bg-black/20 rounded-t-2xl flex flex-col items-center justify-center border-x-2 border-t-2" style={{ borderColor: finalFg + '33' }}>
+                   <div className="w-full h-36 bg-black/20 rounded-t-2xl flex flex-col items-center justify-center border-x-2 border-t-2" style={{ borderColor: finalFg + '33', color: finalFg }}>
                       <p className="text-base font-semibold opacity-40">2nd</p>
                       <p className="text-2xl font-bold truncate px-4">{activeParticipants[1]?.nickname || "---"}</p>
                       <p className="text-lg font-medium">{activeParticipants[1]?.score || 0}</p>
                    </div>
                 </div>
                 <div className="flex flex-col items-center">
-                   <div className="w-full h-56 bg-black/40 rounded-t-3xl flex flex-col items-center justify-center border-x-2 border-t-2" style={{ borderColor: finalFg }}>
+                   <div className="w-full h-56 bg-black/40 rounded-t-3xl flex flex-col items-center justify-center border-x-2 border-t-2" style={{ borderColor: finalFg, color: finalFg }}>
                       <Star className="h-8 w-8 text-yellow-400 fill-current mb-3" />
                       <p className="text-base font-semibold opacity-40">1st</p>
                       <p className="text-3xl font-bold truncate px-4">{activeParticipants[0]?.nickname || "---"}</p>
@@ -448,7 +448,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                    </div>
                 </div>
                 <div className="flex flex-col items-center">
-                   <div className="w-full h-24 bg-black/10 rounded-t-2xl flex flex-col items-center justify-center border-x-2 border-t-2" style={{ borderColor: finalFg + '10' }}>
+                   <div className="w-full h-24 bg-black/10 rounded-t-2xl flex flex-col items-center justify-center border-x-2 border-t-2" style={{ borderColor: finalFg + '10', color: finalFg }}>
                       <p className="text-base font-semibold opacity-40">3rd</p>
                       <p className="text-xl font-bold truncate px-4">{activeParticipants[2]?.nickname || "---"}</p>
                       <p className="text-base font-medium">{activeParticipants[2]?.score || 0}</p>
@@ -461,7 +461,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                     <BarChart3 className="h-4 w-4" /> View Statistics
                   </Button>
                 </Link>
-                <Button variant="outline" onClick={handleEndSession} className="h-12 px-8 rounded-xl font-semibold text-sm border-2" style={{ borderColor: finalFg + '44', color: finalFg }}>
+                <Button variant="outline" onClick={handleEndSession} className="h-12 px-8 rounded-xl font-semibold text-sm border-2" style={{ borderColor: finalFg + '44', color: finalFg, backgroundColor: 'transparent' }}>
                   End Session
                 </Button>
               </div>
@@ -472,27 +472,27 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               <>
                 <div className="text-center shrink-0 space-y-4 relative">
                   <div className="flex items-center justify-center gap-5">
-                    <div className="px-6 py-3 rounded-xl text-3xl font-bold" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions?.length || 0}</div>
-                    <div className="px-5 py-3 rounded-xl border-2 flex items-center gap-2 text-xl font-bold" style={{ borderColor: finalFg + '33' }}>
+                    <div className="px-6 py-3 rounded-xl text-3xl font-bold min-w-[120px] text-center" style={{ backgroundColor: finalFg, color: finalBg }}>{currentIdx + 1} / {questions?.length || 0}</div>
+                    <div className="px-5 py-3 rounded-xl border-2 flex items-center gap-2 text-xl font-bold min-w-[120px] justify-center" style={{ borderColor: finalFg + '33', color: finalFg }}>
                       <Users className="h-5 w-5" />
                       <span className="tabular-nums">{allResponses?.filter(r => r.questionId === session?.currentQuestionId).length || 0}</span>
                       <span className="text-sm font-medium opacity-40">/ {activeParticipants.length}</span>
                     </div>
                     {session?.isQuiz && currentQuestion?.isDoublePoints && (
-                      <div className="px-6 py-3 rounded-xl text-2xl font-bold bg-yellow-400 text-yellow-900 animate-bounce flex items-center gap-2">
+                      <div className="px-6 py-3 rounded-xl text-2xl font-bold bg-yellow-400 text-yellow-900 animate-bounce flex items-center gap-2 min-w-[120px] justify-center">
                         <Zap className="h-6 w-6 fill-current" /> 2× Points
                       </div>
                     )}
                     {timeLeft !== null && (
-                      <div className="px-8 py-3 rounded-xl border-4 flex items-center gap-3 animate-in zoom-in duration-500" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
+                      <div className="px-8 py-3 rounded-xl border-4 flex items-center gap-3 animate-in zoom-in duration-500 min-w-[140px] justify-center" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
                         <Timer className="h-7 w-7" />
                         <span className="text-4xl font-black tabular-nums">{timeLeft}</span>
                       </div>
                     )}
                   </div>
-                  <h2 className="text-4xl md:text-5xl font-bold leading-tight max-w-5xl mx-auto">{currentQuestion?.question}</h2>
+                  <h2 className="text-4xl md:text-5xl font-bold leading-tight max-w-5xl mx-auto" style={{ color: finalFg }}>{currentQuestion?.question}</h2>
                   {currentQuestion?.description && (
-                    <p className="text-lg font-medium opacity-50 max-w-3xl mx-auto">{currentQuestion.description}</p>
+                    <p className="text-lg font-medium opacity-50 max-w-3xl mx-auto" style={{ color: finalFg }}>{currentQuestion.description}</p>
                   )}
                 </div>
                 
@@ -515,7 +515,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
               </>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center space-y-10 animate-in zoom-in duration-500">
-                 <h2 className="text-4xl font-bold">Leaderboard</h2>
+                 <h2 className="text-4xl font-bold" style={{ color: finalFg }}>Leaderboard</h2>
                  <div className="w-full max-w-2xl space-y-3">
                    {activeParticipants.slice(0, 5).map((p, i) => (
                      <div key={p.id} className="flex items-center gap-5 p-5 rounded-xl border-2" style={{ backgroundColor: i === 0 ? finalFg : finalFg + '10', color: i === 0 ? finalBg : finalFg, borderColor: i === 0 ? finalFg : finalFg + '10' }}>
@@ -560,7 +560,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
 
       <Dialog open={isQRVisible} onOpenChange={setIsQRVisible}>
         <DialogContent className="max-w-md p-8 rounded-2xl border-4 text-center" style={{ backgroundColor: finalFg, color: finalBg, borderColor: finalFg }}>
-          <QRCodeSVG value={joinUrl} size={260} level="H" className="mx-auto bg-white p-4 rounded-xl" />
+          <div className="bg-white p-4 rounded-xl inline-block">
+            <QRCodeSVG value={joinUrl} size={260} level="H" />
+          </div>
           <p className="text-4xl font-black tracking-tight mt-6">{code}</p>
         </DialogContent>
       </Dialog>
