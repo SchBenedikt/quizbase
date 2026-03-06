@@ -136,10 +136,16 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         if (!pollDoc.exists()) {
           console.log('[EditPollPage] Poll not found:', pollId);
           
+          // First, fetch available polls to check if this is truly a new poll
+          const polls = await fetchAvailablePolls(uid);
+          const pollExistsInList = polls.some(poll => poll.id === pollId);
+          
           // Check if this might be a new poll creation by checking if the pollId looks like a random ID
+          // AND if the poll doesn't exist in the available polls list
           const looksLikeNewPoll = /^[a-z0-9]{9}$/.test(pollId);
           
-          if (looksLikeNewPoll) {
+          // Only treat as new poll if it looks like a random ID AND doesn't exist in available polls
+          if (looksLikeNewPoll && !pollExistsInList) {
             console.log('[EditPollPage] Appears to be new poll creation, creating poll document');
             try {
               const newPollData = await createNewPoll(uid, pollId);
@@ -154,8 +160,6 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
             }
           }
           
-          // Fetch available polls to help with debugging and user navigation
-          await fetchAvailablePolls(uid);
           setNotFound(true);
           setDataLoading(false);
           return;
