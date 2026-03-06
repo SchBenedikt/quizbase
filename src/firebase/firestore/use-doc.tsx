@@ -61,48 +61,64 @@ export function useDoc<T = any>(
     setError(null);
     // Optional: setData(null); // Clear previous data instantly
 
-    const unsubscribe = onSnapshot(
-      memoizedDocRef,
-      (snapshot: DocumentSnapshot<DocumentData>) => {
-        if (snapshot.exists()) {
-          console.log('[useDoc] Document exists:', {
+    let unsubscribe: (() => void) | null = null;
+    let isSubscribed = true;
+
+    const setupListener = () => {
+      if (!isSubscribed || !memoizedDocRef) return;
+      
+      unsubscribe = onSnapshot(
+        memoizedDocRef,
+        (snapshot: DocumentSnapshot<DocumentData>) => {
+          if (!isSubscribed) return;
+          
+          if (snapshot.exists()) {
+            console.log('[useDoc] Document exists:', {
+              path: memoizedDocRef.path,
+              id: snapshot.id,
+              hasData: !!snapshot.data()
+            });
+            setData({ ...(snapshot.data() as T), id: snapshot.id });
+          } else {
+            console.log('[useDoc] Document does not exist:', memoizedDocRef.path);
+            // Document does not exist - this is normal, not an error
+            setData(null);
+          }
+          setError(null); // Clear any previous error on successful snapshot (even if doc doesn't exist)
+          setIsLoading(false);
+        },
+        (error: FirestoreError) => {
+          if (!isSubscribed) return;
+          
+          console.error('[useDoc] Firestore error:', {
             path: memoizedDocRef.path,
-            id: snapshot.id,
-            hasData: !!snapshot.data()
+            code: error.code,
+            message: error.message
           });
-          setData({ ...(snapshot.data() as T), id: snapshot.id });
-        } else {
-          console.warn('[useDoc] Document does not exist:', memoizedDocRef.path);
-          // Document does not exist
-          setData(null);
+          
+          const contextualError = new FirestorePermissionError({
+            operation: 'get',
+            path: memoizedDocRef.path,
+          })
+
+          setError(contextualError)
+          setData(null)
+          setIsLoading(false)
+
+          // trigger global error propagation
+          errorEmitter.emit('permission-error', contextualError);
         }
-        setError(null); // Clear any previous error on successful snapshot (even if doc doesn't exist)
-        setIsLoading(false);
-      },
-      (error: FirestoreError) => {
-        console.error('[useDoc] Firestore error:', {
-          path: memoizedDocRef.path,
-          code: error.code,
-          message: error.message
-        });
-        
-        const contextualError = new FirestorePermissionError({
-          operation: 'get',
-          path: memoizedDocRef.path,
-        })
+      );
+    };
 
-        setError(contextualError)
-        setData(null)
-        setIsLoading(false)
-
-        // trigger global error propagation
-        errorEmitter.emit('permission-error', contextualError);
-      }
-    );
+    setupListener();
 
     return () => {
       console.log('[useDoc] Cleaning up listener for:', memoizedDocRef.path);
-      unsubscribe();
+      isSubscribed = false;
+      if (unsubscribe) {
+        unsubscribe();
+      }
     };
   }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.
 

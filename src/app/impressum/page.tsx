@@ -22,38 +22,36 @@ export default function ImpressumPage() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-5xl font-black uppercase tracking-tighter">Impressum</h1>
+          <h1 className="text-5xl font-black uppercase tracking-tighter">Legal Information</h1>
         </div>
 
         <div className="prose prose-zinc dark:prose-invert max-w-4xl bg-card border-2 border-foreground/10 p-12 rounded-[2rem] space-y-10">
           <section className="space-y-4">
-            <h2 className="text-2xl font-black uppercase tracking-tight">Angaben gemäß § 5 TMG</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-primary">Legal Information</h2>
             <p className="font-bold opacity-70">
-              PopPulse* Interactive Studio<br />
-              Musterstraße 123<br />
-              12345 Musterstadt
+              PopPulse* Interactive Studio Ltd.<br />
+              Innovation Street 123<br />
+              12345 London, UK
+            </p>
+
+            <h2 className="text-2xl font-black uppercase tracking-tight text-primary mt-8">Contact</h2>
+            <p className="font-bold opacity-70">
+              Phone: +44 (0) 20 1234 5678<br />
+              Email: hello@poppulse.studio
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-black uppercase tracking-tight">Kontakt</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tight">Represented by</h2>
             <p className="font-bold opacity-70">
-              Telefon: +49 (0) 123 456789<br />
-              E-Mail: hello@poppulse.studio
+              John Doe (Managing Director)
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-2xl font-black uppercase tracking-tight">Vertreten durch</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tight">VAT ID</h2>
             <p className="font-bold opacity-70">
-              Max Mustermann (Geschäftsführer)
-            </p>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-2xl font-black uppercase tracking-tight">Umsatzsteuer-ID</h2>
-            <p className="font-bold opacity-70">
-              Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br />
+              VAT identification number according to § 27 a UStG:<br />
               DE 123 456 789
             </p>
           </section>

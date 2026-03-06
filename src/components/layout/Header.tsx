@@ -41,7 +41,8 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
   };
 
   const toggleLocale = () => {
-    setLocale(locale === 'en' ? 'de' : 'en');
+    // Language toggle disabled - English only
+    // setLocale(locale === 'en' ? 'de' : 'en');
   };
 
   return (
@@ -108,15 +109,7 @@ export function Header({ className, variant = 'brand' }: HeaderProps) {
               </Button>
             )}
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleLocale}
-              className="h-9 w-9 text-xs font-medium"
-              title="Toggle language"
-            >
-              {locale === 'en' ? 'DE' : 'EN'}
-            </Button>
+            {/* Language toggle removed - English only */}
 
             {user ? (
               <>

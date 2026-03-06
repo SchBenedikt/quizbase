@@ -255,6 +255,7 @@ export default function DashboardPage() {
         userId: user.uid, // Add userId field to comply with security rules
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+        sessionCount: 0, // Initialize session count
       }, { merge: true });
 
       const questionsSnap = await getDocs(

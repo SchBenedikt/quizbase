@@ -98,7 +98,8 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         icon: "BarChart3",
         userId: uid, // Add userId field to comply with security rules
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        sessionCount: 0 // Initialize session count
       };
       
       await setDoc(pollRef, newPollData);

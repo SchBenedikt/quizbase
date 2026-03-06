@@ -1,11 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { en, de, type Translations } from "@/lib/i18n";
+import { en, type Translations } from "@/lib/i18n";
 
-export type Locale = "en" | "de";
+// Only support English
+export type Locale = "en";
 
-const TRANSLATIONS: Record<Locale, Translations> = { en, de };
+const TRANSLATIONS: Record<Locale, Translations> = { en };
 const STORAGE_KEY = "qb_locale";
 
 interface LanguageContextValue {
@@ -21,23 +22,24 @@ const LanguageContext = createContext<LanguageContextValue>({
 });
 
 function detectLocale(): Locale {
-  if (typeof window === "undefined") return "en";
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === "en" || stored === "de") return stored;
-  const lang = navigator.language?.toLowerCase() ?? "";
-  return lang.startsWith("de") ? "de" : "en";
+  // Always return English
+  return "en";
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
-    setLocaleState(detectLocale());
+    // Always set to English
+    setLocaleState("en");
   }, []);
 
   const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
-    localStorage.setItem(STORAGE_KEY, next);
+    // Only allow English
+    if (next === "en") {
+      setLocaleState(next);
+      localStorage.setItem(STORAGE_KEY, next);
+    }
   }, []);
 
   return (
