@@ -182,7 +182,8 @@ export function PollEditor({ initialPoll, initialQuestions, pollId }: PollEditor
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="h-12 px-6 rounded-lg border border-foreground/10 font-medium gap-2 bg-card hover:bg-muted shadow-none text-base">
-                      <Palette className="h-5 w-5" /> Theme
+                      <Palette className="h-5 w-5" /> 
+                      <span className="capitalize">{theme === 'custom' && customColor ? 'Custom' : theme}</span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 p-6 rounded-xl border border-foreground/8 bg-card" align="end">

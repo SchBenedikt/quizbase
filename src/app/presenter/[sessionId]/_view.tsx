@@ -75,7 +75,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       hasQuery: !!q,
       userId: session?.userId,
       pollId: session?.pollId,
-      queryPath: q ? `users/${session.userId}/surveys/${session.pollId}/questions` : null
+      queryPath: q && session ? `users/${session.userId}/surveys/${session.pollId}/questions` : null
     });
     return q;
   }, [db, session?.userId, session?.pollId]);
@@ -300,17 +300,39 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       sessionLoading,
       hasQuestions: !!questions,
       questionsLength: questions?.length,
-      shouldShowLoading: sessionLoading || !questions
+      shouldShowLoading: sessionLoading || !questions,
+      hasSession: !!session,
+      sessionUserId: session?.userId,
+      sessionPollId: session?.pollId,
+      rawQuestionsLength: rawQuestions?.length || 0
     });
-  }, [sessionLoading, questions]);
+  }, [sessionLoading, questions, session, rawQuestions]);
 
-  if (sessionLoading || !questions) {
-    console.log('[SessionDisplayPage] Showing loading screen');
+  // Show loading only while session is loading
+  // Allow empty questions to proceed (show empty state instead of loading)
+  if (sessionLoading) {
+    console.log('[SessionDisplayPage] Showing loading screen (session loading)');
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin opacity-20" />
-          <p className="text-sm text-muted-foreground">Loading session... {sessionLoading ? '(Loading session data)' : '(Loading questions)'}</p>
+          <p className="text-sm text-muted-foreground">Loading session data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error if no session data
+  if (!session) {
+    console.log('[SessionDisplayPage] No session data found');
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Session not found</h2>
+          <p className="text-muted-foreground">The session you&apos;re trying to access doesn&apos;t exist.</p>
+          <Link href="/dashboard">
+            <Button className="mt-4">Go to Dashboard</Button>
+          </Link>
         </div>
       </div>
     );
@@ -328,9 +350,9 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
   const finalFg = getContrastColor(finalBg);
   const dynamicStyles = { backgroundColor: finalBg, color: finalFg, borderColor: finalFg + '15' };
   const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/p/${code}` : '';
-  const currentIdx = questions.findIndex(q => q.id === session?.currentQuestionId);
+  const currentIdx = questions?.findIndex(q => q.id === session?.currentQuestionId) ?? -1;
   const activeParticipants = participants?.filter(p => p.status === 'active') || [];
-  const currentQuestion = questions[currentIdx];
+  const currentQuestion = currentIdx >= 0 && questions && questions.length > 0 ? questions[currentIdx] : null;
 
   return (
     <div className="no-scroll h-screen w-screen flex flex-col font-body transition-colors duration-700 overflow-hidden" style={dynamicStyles}>
@@ -478,9 +500,11 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
                        />
                     </div>
                   )}
+                  {currentQuestion && (
                   <Card className="flex-1 border-2 rounded-2xl bg-black/5 p-8 flex items-center justify-center overflow-hidden" style={{ borderColor: finalFg + '08' }}>
                     <ResultChart question={currentQuestion} results={results} allResponses={allResponses?.filter(r => r.questionId === session?.currentQuestionId) || []} />
                   </Card>
+                )}
                 </div>
               </>
             ) : (
