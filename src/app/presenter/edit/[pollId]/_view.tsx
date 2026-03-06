@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { doc, getDoc, collection, getDocs, query, orderBy, setDoc, serverTimestamp } from "firebase/firestore";
 import { PollQuestion } from "@/app/types/poll";
@@ -11,23 +11,22 @@ import { Loader2 } from "lucide-react";
 import { useResolvedParam } from "@/hooks/use-resolved-param";
 import { Button } from "@/components/ui/button";
 
-// Force dynamic rendering for this page
-export default function EditPollPage({ params }: { params: Promise<{ pollId: string }> }) {
-  const { pollId: rawPollId } = use(params);
-  const pollId = useResolvedParam(rawPollId, 2);
+// Client component for the actual edit page
+export default function EditPollPage({ pollId }: { pollId: string }) {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const db = useFirestore();
+  const resolvedPollId = useResolvedParam(pollId, 2);
 
   // Extended logging for debugging
   useEffect(() => {
     console.log('[EditPollPage] Component mounted');
-    console.log('[EditPollPage] pollId:', pollId);
+    console.log('[EditPollPage] pollId:', resolvedPollId);
     console.log('[EditPollPage] user:', user?.uid);
     console.log('[EditPollPage] isUserLoading:', isUserLoading);
     console.log('[EditPollPage] db initialized:', !!db);
     console.log('[EditPollPage] window.location:', typeof window !== 'undefined' ? window.location.href : 'SSR');
-  }, [pollId, user, isUserLoading, db]);
+  }, [resolvedPollId, user, isUserLoading, db]);
 
   const [poll, setPoll] = useState<any>(null);
   const [questions, setQuestions] = useState<PollQuestion[]>([]);
@@ -66,51 +65,6 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
   }, [user, isUserLoading, router]);
 
-  // Function to fetch all available polls for the user
-  async function fetchAvailablePolls(uid: string) {
-    try {
-      console.log('[EditPollPage] Fetching available polls for user:', uid);
-      const surveysQuery = query(collection(db, `users/${uid}/surveys`));
-      const surveysSnapshot = await getDocs(surveysQuery);
-      const polls = surveysSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      console.log('[EditPollPage] Available polls:', polls);
-      setAvailablePolls(polls);
-      return polls;
-    } catch (err) {
-      console.error('[EditPollPage] Error fetching available polls:', err);
-      return [];
-    }
-  }
-
-  // Function to create a new poll document
-  async function createNewPoll(uid: string, pollId: string) {
-    try {
-      console.log('[EditPollPage] Creating new poll:', { uid, pollId });
-      const pollRef = doc(db, `users/${uid}/surveys/${pollId}`);
-      const newPollData = {
-        title: "New Survey",
-        theme: "orange",
-        isQuiz: false,
-        shuffleQuestions: false,
-        icon: "BarChart3",
-        userId: uid, // Add userId field to comply with security rules
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        sessionCount: 0 // Initialize session count
-      };
-      
-      await setDoc(pollRef, newPollData);
-      console.log('[EditPollPage] New poll created successfully with userId:', uid);
-      return newPollData;
-    } catch (err) {
-      console.error('[EditPollPage] Error creating new poll:', err);
-      throw err;
-    }
-  }
-
   // Cleanup timer on unmount
   useEffect(() => {
     return () => {
@@ -121,46 +75,31 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
   }, [authStableTimer]);
 
   useEffect(() => {
-    if (!user || !pollId) {
-      console.log('[EditPollPage] Missing user or pollId, skipping fetch:', { hasUser: !!user, pollId });
+    if (!user || !resolvedPollId) {
+      console.log('[EditPollPage] Missing user or pollId, skipping fetch:', { hasUser: !!user, pollId: resolvedPollId });
       return;
     }
+
+    // Check if this is a new poll creation (pollId === '_')
+    if (resolvedPollId === '_') {
+      console.log('[EditPollPage] Creating new poll, skipping fetch');
+      setPoll(null);
+      setQuestions([]);
+      setDataLoading(false);
+      return;
+    }
+
     const uid = user.uid;
 
     async function fetchData() {
       try {
-        console.log('[EditPollPage] Fetching poll data:', { uid, pollId });
-        const pollRef = doc(db, `users/${uid}/surveys/${pollId}`);
+        console.log('[EditPollPage] Fetching poll data:', { uid, pollId: resolvedPollId });
+        const pollRef = doc(db, `users/${uid}/surveys/${resolvedPollId}`);
         console.log('[EditPollPage] Poll ref path:', pollRef.path);
         const pollDoc = await getDoc(pollRef);
 
         if (!pollDoc.exists()) {
-          console.log('[EditPollPage] Poll not found:', pollId);
-          
-          // First, fetch available polls to check if this is truly a new poll
-          const polls = await fetchAvailablePolls(uid);
-          const pollExistsInList = polls.some(poll => poll.id === pollId);
-          
-          // Check if this might be a new poll creation by checking if the pollId looks like a random ID
-          // AND if the poll doesn't exist in the available polls list
-          const looksLikeNewPoll = /^[a-z0-9]{9}$/.test(pollId);
-          
-          // Only treat as new poll if it looks like a random ID AND doesn't exist in available polls
-          if (looksLikeNewPoll && !pollExistsInList) {
-            console.log('[EditPollPage] Appears to be new poll creation, creating poll document');
-            try {
-              const newPollData = await createNewPoll(uid, pollId);
-              setPoll(newPollData);
-              setQuestions([]); // Start with empty questions for new poll
-              setIsNewPoll(true);
-              setDataLoading(false);
-              return;
-            } catch (createErr) {
-              console.error('[EditPollPage] Failed to create new poll:', createErr);
-              // Fall through to show not found error
-            }
-          }
-          
+          console.log('[EditPollPage] Poll not found:', resolvedPollId);
           setNotFound(true);
           setDataLoading(false);
           return;
@@ -170,10 +109,10 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         setPoll(pollDoc.data());
 
         const questionsQuery = query(
-          collection(db, `users/${uid}/surveys/${pollId}/questions`),
+          collection(db, `users/${uid}/surveys/${resolvedPollId}/questions`),
           orderBy("order", "asc")
         );
-        console.log('[EditPollPage] Fetching questions from:', `users/${uid}/surveys/${pollId}/questions`);
+        console.log('[EditPollPage] Fetching questions from:', `users/${uid}/surveys/${resolvedPollId}/questions`);
         const questionsSnapshot = await getDocs(questionsQuery);
         console.log('[EditPollPage] Questions loaded:', questionsSnapshot.docs.length);
         setQuestions(questionsSnapshot.docs.map((d) => d.data() as PollQuestion));
@@ -191,7 +130,7 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     }
 
     fetchData();
-  }, [user, pollId, db]);
+  }, [user, resolvedPollId, db]);
 
   if (isUserLoading || (user && dataLoading) || authStableTimer) {
     console.log('[EditPollPage] Showing loading screen:', { isUserLoading, dataLoading, hasUser: !!user, hasAuthTimer: !!authStableTimer });
@@ -211,39 +150,10 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
     console.log('[EditPollPage] Showing not found error');
     return (
       <div className="h-screen flex items-center justify-center bg-background">
-        <div className="text-center max-w-md mx-auto p-6">
+        <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Poll not found</h2>
-          <p className="text-muted-foreground mb-4">The poll you&apos;re trying to edit doesn&apos;t exist.</p>
-          <p className="text-xs text-muted-foreground mb-6">Poll ID: {pollId}</p>
-          
-          {availablePolls.length > 0 && (
-            <div className="mb-6">
-              <p className="text-sm font-medium mb-2">Your available polls:</p>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {availablePolls.map((poll) => (
-                  <div key={poll.id} className="flex items-center justify-between p-2 border rounded">
-                    <span className="text-sm truncate">{poll.title || `Poll ${poll.id}`}</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => router.push(`/presenter/edit/${poll.id}`)}
-                    >
-                      Edit
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <div className="flex flex-col gap-2">
-            <Button onClick={() => router.push("/presenter")}>
-              Go to Dashboard
-            </Button>
-            <Button variant="outline" onClick={() => router.push("/presenter/new")}>
-              Create New Poll
-            </Button>
-          </div>
+          <p className="text-muted-foreground">The poll you&apos;re trying to edit doesn&apos;t exist.</p>
+          <p className="text-xs text-muted-foreground mt-2">Poll ID: {resolvedPollId}</p>
         </div>
       </div>
     );
@@ -268,8 +178,9 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
       <PollEditor
         initialPoll={poll}
         initialQuestions={questions}
-        pollId={pollId}
+        pollId={resolvedPollId}
       />
     </>
   );
 }
+
