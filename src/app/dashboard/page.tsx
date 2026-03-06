@@ -76,15 +76,17 @@ export default function DashboardPage() {
 
   const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
 
-  // Debug survey data
+  // Debug survey data - remove infinite loop by limiting logging
   useEffect(() => {
-    console.log('[Dashboard] Survey data update:', {
-      surveys: surveys,
-      isLoading: surveysLoading,
-      count: surveys?.length || 0,
-      userId: user?.uid
-    });
-  }, [surveys, surveysLoading, user]);
+    if (surveys !== undefined && surveysLoading !== undefined) {
+      console.log('[Dashboard] Survey data update:', {
+        surveys: surveys,
+        isLoading: surveysLoading,
+        count: surveys?.length || 0,
+        userId: user?.uid
+      });
+    }
+  }, [surveys?.length, surveysLoading, user?.uid]); // Only log when length or loading changes
 
   // Past sessions query (last 50 for potential expansion)
   const sessionsQuery = useMemoFirebase(() => {

@@ -88,7 +88,22 @@ export function useCollection<T = any>(
           path,
           count: results.length
         });
-        setData(results);
+        
+        // Only update if data actually changed to prevent infinite loops
+        setData(prevData => {
+          // Simple comparison - if length changed, update
+          if (!prevData || prevData.length !== results.length) {
+            return results;
+          }
+          // If same length, check if IDs are different
+          const prevIds = prevData.map(item => item.id).sort().join(',');
+          const newIds = results.map(item => item.id).sort().join(',');
+          if (prevIds !== newIds) {
+            return results;
+          }
+          return prevData; // No change, prevent update
+        });
+        
         setError(null);
         setIsLoading(false);
       },
