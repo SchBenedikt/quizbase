@@ -62,10 +62,23 @@ export default function DashboardPage() {
 
   const surveysQuery = useMemoFirebase(() => {
     if (!user || !user.uid || isUserLoading) return null;
-    return query(collection(db, `users/${user.uid}/surveys`), orderBy("createdAt", "desc"));
+    console.log('[Dashboard] Creating surveys query for user:', user.uid);
+    const queryRef = query(collection(db, `users/${user.uid}/surveys`), orderBy("createdAt", "desc"));
+    console.log('[Dashboard] Survey query path:', `users/${user.uid}/surveys`);
+    return queryRef;
   }, [user, db, isUserLoading]);
 
   const { data: surveys, isLoading: surveysLoading } = useCollection(surveysQuery);
+
+  // Debug survey data
+  useEffect(() => {
+    console.log('[Dashboard] Survey data update:', {
+      surveys: surveys,
+      isLoading: surveysLoading,
+      count: surveys?.length || 0,
+      userId: user?.uid
+    });
+  }, [surveys, surveysLoading, user]);
 
   // Past sessions query (last 50 for potential expansion)
   const sessionsQuery = useMemoFirebase(() => {
@@ -146,6 +159,7 @@ export default function DashboardPage() {
         shuffleQuestions: survey.shuffleQuestions || false,
         theme: survey.theme || 'orange',
         customColor: survey.customColor || null,
+        userId: user.uid, // Add userId field to comply with security rules
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       }, { merge: true });

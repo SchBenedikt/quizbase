@@ -96,12 +96,13 @@ export default function EditPollPage({ params }: { params: Promise<{ pollId: str
         isQuiz: false,
         shuffleQuestions: false,
         icon: "BarChart3",
+        userId: uid, // Add userId field to comply with security rules
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
       
       await setDoc(pollRef, newPollData);
-      console.log('[EditPollPage] New poll created successfully');
+      console.log('[EditPollPage] New poll created successfully with userId:', uid);
       return newPollData;
     } catch (err) {
       console.error('[EditPollPage] Error creating new poll:', err);
