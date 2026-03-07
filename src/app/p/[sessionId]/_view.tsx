@@ -555,26 +555,33 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
           {/* Multiple choice */}
           {currentQuestion.type === 'multiple-choice' && currentQuestion.options && (
-            <div className="grid gap-3">
+            <div className="grid gap-4">
               {currentQuestion.options.map((opt, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelection(idx)}
                   className={cn(
-                    "w-full h-14 rounded-lg border-2 flex items-center px-4 gap-3 transition-all active:scale-[0.98] text-left",
-                    selection === idx ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10"
+                    "w-full h-16 rounded-2xl border-2 flex items-center px-6 gap-4 transition-all active:scale-[0.98] text-left font-semibold text-lg",
+                    selection === idx 
+                      ? "border-current scale-105" 
+                      : "border-current/20 bg-current/5 hover:bg-current/10 hover:scale-102"
                   )}
-                  style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
+                  style={selection === idx 
+                    ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } 
+                    : { borderColor: finalFg + '33' }
+                  }
                 >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border text-sm font-bold transition-colors"
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border-2 text-lg font-black transition-all"
                     style={{ 
                       backgroundColor: selection === idx ? finalBg : 'transparent', 
                       color: finalFg, 
-                      borderColor: selection === idx ? finalBg : finalFg + '55' 
-                    }}>
+                      borderColor: selection === idx ? finalBg : finalFg + '55',
+                      fontSize: '18px'
+                    }}
+                  >
                     {String.fromCharCode(65 + idx)}
                   </div>
-                  <span className="font-medium text-base">{opt}</span>
+                  <span className="font-medium">{opt}</span>
                 </button>
               ))}
             </div>
@@ -582,7 +589,7 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
           {/* True / False */}
           {currentQuestion.type === 'true-false' && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               {[
                 { label: 'True', icon: '✓', idx: 0 },
                 { label: 'False', icon: '✗', idx: 1 },
@@ -591,13 +598,18 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
                   key={idx}
                   onClick={() => setSelection(idx)}
                   className={cn(
-                    "h-24 rounded-lg border-2 flex flex-col items-center justify-center gap-1 transition-all active:scale-[0.97] font-bold text-2xl",
-                    selection === idx ? "border-current" : "border-current/20 bg-black/5 hover:bg-black/10"
+                    "h-28 rounded-2xl border-2 flex flex-col items-center justify-center gap-3 transition-all active:scale-[0.97] font-bold text-2xl",
+                    selection === idx 
+                      ? "border-current scale-105" 
+                      : "border-current/20 bg-current/5 hover:bg-current/10 hover:scale-102"
                   )}
-                  style={selection === idx ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } : { borderColor: finalFg + '33' }}
+                  style={selection === idx 
+                    ? { backgroundColor: finalFg, color: finalBg, borderColor: finalFg } 
+                    : { borderColor: finalFg + '33' }
+                  }
                 >
-                  <span className="text-3xl">{icon}</span>
-                  <span className="text-base font-semibold">{label}</span>
+                  <span className="text-5xl">{icon}</span>
+                  <span className="text-lg font-semibold">{label}</span>
                 </button>
               ))}
             </div>
@@ -699,40 +711,48 @@ export default function ParticipantView({ params }: { params: Promise<{ sessionI
 
           {/* Slider */}
           {(currentQuestion.type === 'slider' || currentQuestion.type === 'scale') && (
-            <div className="space-y-6 py-2">
+            <div className="space-y-8 py-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium opacity-50">
+                <span className="text-sm font-bold opacity-60 uppercase tracking-wider">
                   {currentQuestion.labels?.min || (currentQuestion.range?.min ?? 0)}
                 </span>
-                <span className="text-4xl font-bold tabular-nums">{sliderValue}</span>
-                <span className="text-sm font-medium opacity-50">
+                <span className="text-5xl font-black tabular-nums">{sliderValue}</span>
+                <span className="text-sm font-bold opacity-60 uppercase tracking-wider">
                   {currentQuestion.labels?.max || (currentQuestion.range?.max ?? 100)}
                 </span>
               </div>
-              <input
-                type="range"
-                min={currentQuestion.range?.min ?? 0}
-                max={currentQuestion.range?.max ?? 100}
-                step={currentQuestion.range?.step ?? 1}
-                value={sliderValue}
-                onChange={(e) => setSliderValue(Number(e.target.value))}
-                className="w-full h-3 rounded-full appearance-none cursor-pointer"
-                style={{ accentColor: finalFg }}
-              />
+              <div className="relative">
+                <input
+                  type="range"
+                  min={currentQuestion.range?.min ?? 0}
+                  max={currentQuestion.range?.max ?? 100}
+                  step={currentQuestion.range?.step ?? 1}
+                  value={sliderValue}
+                  onChange={(e) => setSliderValue(Number(e.target.value))}
+                  className="w-full h-4 rounded-full appearance-none cursor-pointer transition-all"
+                  style={{ 
+                    accentColor: finalFg,
+                    background: `linear-gradient(to right, ${finalFg} 0%, ${finalFg} ${((sliderValue - (currentQuestion.range?.min ?? 0)) / ((currentQuestion.range?.max ?? 100) - (currentQuestion.range?.min ?? 0))) * 100}%, ${finalFg + '20'} ${((sliderValue - (currentQuestion.range?.min ?? 0)) / ((currentQuestion.range?.max ?? 100) - (currentQuestion.range?.min ?? 0))) * 100}%, ${finalFg + '20'} 100%)`
+                  }}
+                />
+              </div>
             </div>
           )}
 
           {/* Rating (Stars) */}
           {currentQuestion.type === 'rating' && (
-            <div className="flex items-center justify-center gap-4 py-4">
+            <div className="flex items-center justify-center gap-6 py-8">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
                   onClick={() => setRatingValue(star)}
-                  className="transition-all active:scale-90 hover:scale-110"
+                  className="transition-all duration-300 hover:scale-125 active:scale-95"
                   style={{ color: finalFg }}
                 >
-                  <Star className={cn("h-12 w-12 transition-all", ratingValue >= star ? "fill-current" : "opacity-20")} />
+                  <Star className={cn(
+                    "h-16 w-16 transition-all duration-300 drop-shadow-sm",
+                    ratingValue >= star ? "fill-current" : "opacity-20"
+                  )} />
                 </button>
               ))}
             </div>

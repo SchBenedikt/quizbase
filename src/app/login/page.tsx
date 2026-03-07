@@ -80,28 +80,28 @@ export default function LoginPage() {
       </div>
 
       {/* Right Form Side */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-16 bg-[#f3f3f1] dark:bg-zinc-950">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-16 bg-gray-50 dark:bg-gray-900">
         <div className="w-full max-w-md space-y-8">
-          <div className="flex bg-white/50 dark:bg-white/5 p-1.5 rounded-xl border border-foreground/10 mb-6">
+          <div className="flex bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
             <button 
               onClick={() => setIsSignUp(false)}
-              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${!isSignUp ? 'bg-foreground text-primary' : 'text-foreground opacity-40'}`}
+              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${!isSignUp ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-600 dark:text-gray-400'}`}
             >
               Login
             </button>
             <button 
               onClick={() => setIsSignUp(true)}
-              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${isSignUp ? 'bg-foreground text-primary' : 'text-foreground opacity-40'}`}
+              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${isSignUp ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-600 dark:text-gray-400'}`}
             >
               Sign Up
             </button>
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-foreground">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {isSignUp ? "Create an account" : "Welcome back"}
             </h2>
-            <p className="text-sm text-foreground/50">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {isSignUp ? "Get started in minutes." : "Sign in to continue."}
             </p>
           </div>
@@ -109,24 +109,24 @@ export default function LoginPage() {
           <form onSubmit={handleAuth} className="space-y-4">
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold opacity-50 ml-1 text-foreground">Email Address</label>
+                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 ml-1">Email Address</label>
                 <Input 
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="deine.email@beispiel.de"
-                  className="h-12 px-4 rounded-lg border bg-white dark:bg-zinc-900 focus-visible:ring-1 focus-visible:ring-primary font-medium text-foreground shadow-none"
+                  className="h-12 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 font-medium text-gray-900 dark:text-white"
                   required
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold opacity-50 ml-1 text-foreground">Password</label>
+                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 ml-1">Password</label>
                 <Input 
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="h-12 px-4 rounded-lg border bg-white dark:bg-zinc-900 focus-visible:ring-1 focus-visible:ring-primary font-medium text-foreground shadow-none"
+                  className="h-12 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 font-medium text-gray-900 dark:text-white"
                   required
                 />
               </div>
@@ -135,7 +135,7 @@ export default function LoginPage() {
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full h-12 font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-none"
+              className="w-full h-12 font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
             >
               {isSignUp ? "Create Account" : "Sign In"} 
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -143,14 +143,14 @@ export default function LoginPage() {
           </form>
 
           <div className="relative">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-foreground/10"></span></div>
-            <div className="relative flex justify-center text-xs font-medium text-foreground opacity-40"><span className="bg-[#f3f3f1] dark:bg-zinc-950 px-3">Or continue with</span></div>
+            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-300 dark:border-gray-600"></span></div>
+            <div className="relative flex justify-center text-xs font-medium text-gray-500 dark:text-gray-400"><span className="bg-gray-50 dark:bg-gray-900 px-3">Or continue with</span></div>
           </div>
 
           <Button 
             variant="outline" 
             onClick={handleGoogleSignIn}
-            className="w-full h-12 rounded-lg border bg-white dark:bg-zinc-900 font-semibold text-foreground hover:bg-foreground/5 transition-all shadow-none"
+            className="w-full h-12 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 font-semibold text-gray-900 dark:text-white transition-colors"
           >
             <Zap className="mr-2 h-4 w-4 fill-current" /> Continue with Google
           </Button>

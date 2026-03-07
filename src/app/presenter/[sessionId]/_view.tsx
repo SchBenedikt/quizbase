@@ -20,6 +20,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Header } from "@/components/layout/Header";
 import { useResolvedParam } from "@/hooks/use-resolved-param";
 
 // Force dynamic rendering for this page
@@ -397,7 +398,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
       </header>
 
       <main className="flex-1 min-h-0 p-8 flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Floating emoji reactions */}
         {floatingReactions.map((r) => (
           <span
             key={r.id}
@@ -578,6 +578,7 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           <p className="text-4xl font-black tracking-tight mt-6">{code}</p>
         </DialogContent>
       </Dialog>
+      </main>
     </div>
   );
 }

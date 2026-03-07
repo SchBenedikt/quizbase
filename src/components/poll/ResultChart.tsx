@@ -45,29 +45,42 @@ export function ResultChart({ question, results, allResponses = [], isQuizMode =
     }
 
     return (
-      <div className="h-full w-full max-w-[1200px] animate-in fade-in duration-1000 flex items-center px-8">
-        <ResponsiveContainer width="100%" height="80%">
-          <BarChart data={data} layout="vertical" margin={{ left: 40, right: 100, top: 0, bottom: 0 }}>
-            <XAxis type="number" hide />
+      <div className="h-full w-full max-w-[1400px] animate-in fade-in duration-1000 flex items-center px-10">
+        <ResponsiveContainer width="100%" height="85%">
+          <BarChart data={data} layout="vertical" margin={{ left: 60, right: 120, top: 20, bottom: 20 }}>
+            <XAxis 
+              type="number" 
+              hide 
+              domain={[0, 'dataMax']}
+            />
             <YAxis 
               dataKey="name" 
               type="category" 
-              width={220} 
+              width={240} 
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: 'currentColor', fontSize: 18, fontWeight: 700, fontFamily: 'Bricolage Grotesque' }}
+              tick={{ fill: 'currentColor', fontSize: 20, fontWeight: 800, fontFamily: 'Bricolage Grotesque' }}
             />
             <Tooltip 
-              cursor={{ fill: 'rgba(0,0,0,0.03)' }}
+              cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+              contentStyle={{ 
+                backgroundColor: 'currentColor', 
+                border: 'none', 
+                borderRadius: '16px',
+                color: 'var(--background)',
+                padding: '20px',
+                fontSize: '18px',
+                fontWeight: '700'
+              }}
               content={({ active, payload }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className="bg-foreground p-6 rounded-[1rem] border-2 border-background shadow-none">
-                      <p className="font-black text-background text-3xl leading-none">
+                    <div className="text-center">
+                      <p className="font-black text-4xl leading-none">
                         {Number(payload[0]?.value ?? 0).toFixed(1)}
-                        <span className="text-[9px] uppercase tracking-[0.2em] opacity-40 ml-3 block mt-1.5">
-                          {question.type === 'multiple-choice' ? 'Total Responses' : 'Average Priority'}
-                        </span>
+                      </p>
+                      <p className="text-[10px] uppercase tracking-[0.3em] opacity-70 mt-2 font-bold">
+                        {question.type === 'multiple-choice' ? 'TOTAL RESPONSES' : 'AVERAGE PRIORITY'}
                       </p>
                     </div>
                   );
@@ -77,15 +90,16 @@ export function ResultChart({ question, results, allResponses = [], isQuizMode =
             />
             <Bar 
               dataKey="value" 
-              radius={[0, 20, 20, 0]} 
-              barSize={60}
-              animationDuration={1500}
+              radius={[0, 24, 24, 0]} 
+              barSize={70}
+              animationDuration={2000}
+              animationBegin={300}
             >
               {data.map((entry, index) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={entry.isCorrect ? "hsl(142 71% 45%)" : chartColor} 
-                  fillOpacity={entry.isCorrect ? 1 : (1 - (index * 0.15))} 
+                  fillOpacity={entry.isCorrect ? 1 : (1 - (index * 0.12))} 
                 />
               ))}
             </Bar>
@@ -98,24 +112,38 @@ export function ResultChart({ question, results, allResponses = [], isQuizMode =
   if (question.type === 'word-cloud') {
     const entries = Object.entries(results);
     const sorted = entries.sort((a, b) => b[1] - a[1]);
+    const maxCount = Math.max(...entries.map(e => e[1]), 1);
 
     return (
-      <div className="h-full w-full flex flex-wrap items-center justify-center gap-10 p-12 overflow-hidden">
+      <div className="h-full w-full flex flex-wrap items-center justify-center gap-8 p-16 overflow-hidden">
         {entries.length === 0 ? (
-          <p className="text-3xl font-bold opacity-10 tracking-widest animate-pulse">Awaiting pulse feedback...</p>
+          <div className="text-center space-y-4">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto animate-pulse bg-current/10">
+              <div className="w-10 h-10 rounded-full bg-current/30"></div>
+            </div>
+            <p className="text-4xl font-black opacity-20 tracking-widest animate-pulse">Awaiting pulse feedback...</p>
+          </div>
         ) : (
-          sorted.map(([word, count], i) => (
-            <span 
-              key={i} 
-              className="font-bold tracking-tight transition-all hover:scale-110 cursor-default animate-in zoom-in duration-700"
-              style={{ 
-                fontSize: `${Math.min(120, 32 + count * 16)}px`, 
-                opacity: 0.7 + (count / Math.max(...entries.map(e => e[1]))) * 0.3
-              }}
-            >
-              {word}
-            </span>
-          ))
+          sorted.map(([word, count], i) => {
+            const fontSize = Math.min(140, 36 + (count / maxCount) * 84);
+            const opacity = 0.6 + (count / maxCount) * 0.4;
+            const animationDelay = i * 100;
+            
+            return (
+              <span 
+                key={i} 
+                className="font-black tracking-tight transition-all duration-500 hover:scale-125 cursor-default animate-in zoom-in duration-700"
+                style={{ 
+                  fontSize: `${fontSize}px`, 
+                  opacity,
+                  animationDelay: `${animationDelay}ms`,
+                  lineHeight: 1.1
+                }}
+              >
+                {word}
+              </span>
+            );
+          })
         )}
       </div>
     );
