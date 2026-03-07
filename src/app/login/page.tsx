@@ -82,16 +82,16 @@ export default function LoginPage() {
       {/* Right Form Side */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 lg:p-16 bg-gray-50 dark:bg-gray-900">
         <div className="w-full max-w-md space-y-8">
-          <div className="flex bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
+          <div className="flex bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 mb-6 gap-2">
             <button 
               onClick={() => setIsSignUp(false)}
-              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${!isSignUp ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-600 dark:text-gray-400'}`}
+              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${!isSignUp ? 'bg-[#ff9312] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
             >
               Login
             </button>
             <button 
               onClick={() => setIsSignUp(true)}
-              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${isSignUp ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-600 dark:text-gray-400'}`}
+              className={`flex-1 py-3 rounded-lg font-semibold text-sm transition-all ${isSignUp ? 'bg-[#ff9312] text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
             >
               Sign Up
             </button>
@@ -106,36 +106,49 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleAuth} className="space-y-4">
+          <form onSubmit={handleAuth} className="space-y-4" aria-label="Login form">
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 ml-1">Email Address</label>
+                <label className="text-xs font-semibold opacity-50 ml-1 text-foreground" htmlFor="email">Email Address</label>
                 <Input 
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="deine.email@beispiel.de"
                   className="h-12 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 font-medium text-gray-900 dark:text-white"
+                  aria-required="true"
+                  aria-describedby="email-help"
                   required
                 />
+                <div id="email-help" className="sr-only">
+                  Enter your email address to sign in or create an account
+                </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300 ml-1">Password</label>
+                <label className="text-xs font-semibold opacity-50 ml-1 text-foreground" htmlFor="password">Password</label>
                 <Input 
+                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="•••••••••"
                   className="h-12 px-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 font-medium text-gray-900 dark:text-white"
+                  aria-required="true"
+                  aria-describedby="password-help"
                   required
                 />
+                <div id="password-help" className="sr-only">
+                  Enter your password to secure your account
+                </div>
               </div>
             </div>
 
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full h-12 font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+              className="w-full h-12 font-semibold rounded-lg bg-[#ff9312] hover:bg-[#e68300] text-white transition-colors"
+              aria-label={isSignUp ? "Create new account" : "Sign in to your account"}
             >
               {isSignUp ? "Create Account" : "Sign In"} 
               <ArrowRight className="ml-2 h-4 w-4" />

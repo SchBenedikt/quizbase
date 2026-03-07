@@ -10,25 +10,25 @@ import { AuthManager } from '@/components/auth/AuthManager';
 export const metadata: Metadata = {
   metadataBase: new URL('https://quizbase.xn--schchner-2za.de'),
   title: {
-    default: 'Quizbase — Free Live Polls & Interactive Quizzes | No Download Required',
+    default: 'Quizbase — Free Live Polls & Interactive Quizzes | Real-time Audience Engagement',
     template: '%s | Quizbase',
   },
-  description: 'Create and run live polls, interactive quizzes, word clouds, and audience engagement tools in real-time. Free alternative to Mentimeter and Kahoot. Join instantly with a 6-digit code - no app download needed.',
+  description: 'Create and run live polls, interactive quizzes, word clouds, and real-time audience engagement tools. Free instant-join alternative to Mentimeter and Kahoot. Perfect for classrooms, meetings, and events.',
   keywords: [
     'live polls', 'interactive quizzes', 'audience engagement', 'real-time surveys',
     'mentimeter alternative', 'kahoot alternative', 'live presentation software',
     'word cloud generator', 'interactive classroom tools', 'team building activities',
     'audience response system', 'live voting', 'quiz maker', 'polling software',
-    'virtual engagement', 'online quizzes', 'classroom polling', 'meeting polls'
+    'virtual engagement', 'online quizzes', 'classroom polling', 'meeting polls',
+    'real-time polling', 'instant feedback', 'audience interaction', 'presentation tools'
   ],
   authors: [{ name: 'Quizbase Team', url: 'https://quizbase.xn--schchner-2za.de' }],
-  creator: 'Quizbase',
   publisher: 'Quizbase',
   category: 'Education',
   classification: 'Educational Software',
   referrer: 'origin-when-cross-origin',
   openGraph: {
-    title: 'Quizbase — Free Live Polls & Interactive Quizzes',
+    title: 'Quizbase — Free Live Polls & Interactive Quizzes | Real-time Engagement',
     description: 'Create engaging live polls, quizzes, and word clouds. Join instantly with a 6-digit code - no download required. Perfect for classrooms, meetings, and events.',
     type: 'website',
     url: 'https://quizbase.xn--schchner-2za.de',
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
       'max-video-preview': -1, 
       'max-image-preview': 'large', 
       'max-snippet': -1
-    },
+    }
   },
   verification: {
     google: 'verification-code-here',
@@ -78,6 +78,36 @@ export const metadata: Metadata = {
 };
 
 const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Quizbase',
+  description: 'Create and run live polls, interactive quizzes, word clouds, and real-time audience engagement tools. Free instant-join alternative to Mentimeter and Kahoot.',
+  url: 'https://quizbase.xn--schchner-2za.de',
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Any',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock'
+  },
+  creator: {
+    '@type': 'Organization',
+    name: 'Quizbase Team',
+    url: 'https://quizbase.xn--schchner-2za.de'
+  },
+  featureList: [
+    'Live polling',
+    'Interactive quizzes',
+    'Word clouds',
+    'Real-time engagement',
+    'No download required',
+    'Mobile responsive',
+    'Multi-language support'
+  ]
+};
+
+const jsonLd2 = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   name: 'Quizbase',
