@@ -578,7 +578,6 @@ export default function SessionDisplayPage({ params }: { params: Promise<{ sessi
           <p className="text-4xl font-black tracking-tight mt-6">{code}</p>
         </DialogContent>
       </Dialog>
-      </main>
     </div>
   );
 }
